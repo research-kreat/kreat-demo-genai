@@ -108,7 +108,7 @@ def build_blocks_app():
     
     llm = initialize_llm()  # Initialize AzureChatOpenAI
     
-    problem = st.text_area("Enter your problem statement here:")
+    problem = st.text_input("Enter your problem statement here:")
     
     if st.button("Classify"):
         if problem:
