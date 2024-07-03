@@ -3,12 +3,14 @@
 import streamlit as st
 from spark_blocks import spark_blocks_app
 from build_blocks import build_blocks_app
+from conversation import convo
 
 def main():
     st.set_page_config(page_title="Kreat Demo",page_icon="💡")
     pages = {
         "Spark Blocks": spark_blocks_app,
         "Build Blocks": build_blocks_app,
+        "Conversation": convo
     }
 
     st.sidebar.title("Navigation")
