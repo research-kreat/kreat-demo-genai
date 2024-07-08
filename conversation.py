@@ -413,6 +413,7 @@ def user_enhanced_problem_classification(llm, extracted_problem,complexity,predi
     - If Complexity < 4 and Predictability > 7: Classify as SIMPLE
     - For scores falling between these ranges, classify based on the nearest quadrant or consider a hybrid classification
 
+    MAKE SURE THE CLASSIFICATIONS ARE STRICTLY BASED ON THE COMPLEXITY AND PREDICTABILITY SCORES GIVEN BY THE USER ACCORDING TO THE RULES GIVEN ABOVE.
     
     ## Problem Classification Output
 
