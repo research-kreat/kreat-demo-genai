@@ -18,6 +18,29 @@ def initialize_llm():
     )
     return llm
 
+# Function to extract problems from a conversation
+def problem_extraction(llm, problem):
+    prompt = f''' 
+            {problem}
+
+            Based on the innovator's response to "What is a problem for you?", extract the following key elements:
+
+            1. Core issue: Identify the central problem or challenge.
+            2. Affected stakeholders: Note who is impacted by this problem.
+            3. Context or scope: Determine the scale and relevant setting of the problem.
+            4. Current impact: Understand how this problem is affecting stakeholders or the situation.
+            5. Desired outcome: If mentioned, note the envisioned improvement or solution.
+            6. Root causes: Identify underlying factors contributing to the problem.
+            7. Timeframe: Note if the problem is urgent, ongoing, or anticipated.
+            8. Quantifiable aspects: Extract any numbers, statistics, or metrics mentioned.
+            9. Industry or field: Determine the specific sector or area of focus.
+            10. Key terms: Identify important keywords or phrases related to the problem.
+            11. Constraints: Note any limitations or obstacles in addressing the problem.
+            12. Unique aspects: Highlight distinctive features of the problem.
+
+            '''
+    response = llm.invoke(prompt)
+    return response.content
 
 # Function to prepare a problem title
 def generate_title(llm, extracted_problem):
@@ -111,10 +134,14 @@ def generate_title(llm, extracted_problem):
             Characteristic: Reflect the perspective or approach being taken, such as policy, technology, or societal impact.
             Good example: "Policy Interventions for Reducing Childhood Obesity"
             Bad example: "Childhood Obesity Reduction"
+
+        **Output Format:**
+        Title: "......"
+        Reasoning: 
+        (....step by step reasoning....)
         '''
     response = llm.invoke(prompt)
     return response.content
-
 
 #Funtion to check a problem title
 def check_title(llm,title):
@@ -147,56 +174,7 @@ def check_title(llm,title):
     response = llm.invoke(prompt)
     return response.content
 
-# Function to extract problems from a conversation
-def problem_extraction(llm, problem):
-    prompt = f''' 
-            {problem}
-
-            Based on the innovator's response to "What is a problem for you?", extract the following key elements:
-
-            1. Core issue: Identify the central problem or challenge.
-            2. Affected stakeholders: Note who is impacted by this problem.
-            3. Context or scope: Determine the scale and relevant setting of the problem.
-            4. Current impact: Understand how this problem is affecting stakeholders or the situation.
-            5. Desired outcome: If mentioned, note the envisioned improvement or solution.
-            6. Root causes: Identify underlying factors contributing to the problem.
-            7. Timeframe: Note if the problem is urgent, ongoing, or anticipated.
-            8. Quantifiable aspects: Extract any numbers, statistics, or metrics mentioned.
-            9. Industry or field: Determine the specific sector or area of focus.
-            10. Key terms: Identify important keywords or phrases related to the problem.
-            11. Constraints: Note any limitations or obstacles in addressing the problem.
-            12. Unique aspects: Highlight distinctive features of the problem.
-
-            '''
-    response = llm.invoke(prompt)
-    return response.content
-
-def update_abstract(llm, abstract, feedback):
-    prompt = f'''
-        You are tasked with understand the sentiment of a feedback and updating an abstract if required based on the feedback provided by the user.
-        Here is the original abstract:
-        {abstract}
-        
-        And here is the feedback:
-        {feedback}
-        
-        If the feedback is positive then your response will the same abstract otherwise please update the abstract according to the feedback. 
-        Thus your response will be one of the following:
-
-        Output:
-
-        Okay then we will stick with the same abstract:
-        {abstract}
-
-        or
-
-        Okay here's an updated abstract:
-        
-    '''
-    
-    response = llm.invoke(prompt)
-    return response.content
-
+#Function to update title
 def update_title(llm, title, feedback):
     prompt = f'''
         You are tasked with understand the sentiment of a feedback and updating an abstract if required based on the feedback provided by the user.
@@ -222,8 +200,6 @@ def update_title(llm, title, feedback):
     
     response = llm.invoke(prompt)
     return response.content
-
-
 
 # Function to prepare an abstract
 def generate_abstract(llm, title,extracted_problem):
@@ -285,16 +261,167 @@ def generate_abstract(llm, title,extracted_problem):
         Example 1:
         "Urban air pollution, primarily caused by vehicle emissions, affects the health of millions in major cities. This project aims to reduce pollution levels by 30% through the implementation of AI-driven traffic management systems. This intervention could significantly improve public health outcomes and enhance the quality of life for urban residents. Immediate action is needed to address this pressing issue and to secure a healthier future."
 
-        Example 2:
-        "Deforestation in the Amazon rainforest results in significant biodiversity loss and disrupts the lives of indigenous communities. This research focuses on developing sustainable land management practices to preserve this vital ecosystem. By integrating community-driven conservation efforts, we aim to reduce deforestation rates by 40% over the next decade. Successful implementation will help maintain biodiversity and support the livelihoods of local populations."
-
-        Example 3:
-        "Water scarcity in arid regions poses a severe threat to both human populations and agricultural activities. Our initiative proposes the adoption of advanced water-saving technologies and practices to increase water use efficiency. With a target of improving water availability by 25% within five years, this project seeks to enhance sustainability and resilience in these vulnerable areas. Timely intervention is crucial to prevent further degradation of water resources."
-
+        
         Your response should be in the following format:
         Here's a draft abstract for you:
         Abstract:
+
+        Reasoning:
+        (...step by step reasoning, bulleted point-wise of why it is a well-framed abstract...)
     '''
+    response = llm.invoke(prompt)
+    return response.content
+
+#Function to update abstract
+def update_abstract(llm, abstract, feedback):
+    prompt = f'''
+        You are tasked with understand the sentiment of a feedback and updating an abstract if required based on the feedback provided by the user.
+        Here is the original abstract:
+        {abstract}
+        
+        And here is the feedback:
+        {feedback}
+        
+        If the feedback is positive then your response will the same abstract otherwise please update the abstract according to the feedback. 
+        Thus your response will be one of the following:
+
+        Output:
+
+        Okay then we will stick with the same abstract:
+        {abstract}
+
+        or
+
+        Okay here's an updated abstract:
+        
+    '''
+    
+    response = llm.invoke(prompt)
+    return response.content
+
+# Function to classify problems
+def assess_problem(llm, extracted_problem):
+    prompt = f'''
+    ## Problem Analysis
+    
+    **Problem Description:**
+    {extracted_problem}
+
+    **Instructions:**
+    Analyze the text to determine the level of complexity and predictability:
+
+    **1. Complexity Assessment (score from 1-10):**
+    - Count the number of distinct concepts, stakeholders, or systems mentioned
+    - Identify keywords indicating complexity (e.g., "interconnected", "multi-faceted", "systemic")
+    - Assess the scope of the problem (local, organizational, global)
+    - Consider the timeframe mentioned (short-term vs long-term)
+
+    **2. Predictability Assessment (score from 1-10):**
+    - Identify language suggesting certainty or uncertainty
+    - Look for mentions of established procedures or novel approaches
+    - Assess the availability of historical data or similar past experiences
+    - Consider the number of unknown variables or potential outcomes mentioned
+
+    **3. Classification:**
+    - If Complexity > 7 and Predictability < 4: Classify as COMPLEX
+    - If Complexity > 7 and Predictability > 7: Classify as COMPLICATED
+    - If Complexity < 4 and Predictability < 4: Classify as WICKED
+    - If Complexity < 4 and Predictability > 7: Classify as SIMPLE
+    - For scores falling between these ranges, classify based on the nearest quadrant or consider a hybrid classification
+
+    **4. Confidence Score:**
+    - Calculate a confidence score based on how clearly the problem fits into a quadrant
+    - If confidence is low, flag for human review
+
+    ## Problem Classification Output
+
+    **Results:**
+    - Complexity Score: 
+    - Predictability Score: 
+    - Classification: 
+    - Confidence Score: 
+    '''
+
+    response = llm.invoke(prompt)
+    return response.content
+
+# Function to explain problem classification
+def explain_problem_classification(llm, extracted_problem,problem_classification):
+    prompt = f'''
+    ## Problem Analysis
+    
+    **Problem Description:**
+    {extracted_problem}
+
+    **Problem classifications:**
+    {problem_classification}
+
+    **Instructions:**
+    You are tasked to reason the problem classification based on the extracted problems and the below given instructions. Make sure you include all 4 comparison parameters  to reason this classification:
+
+    **1. Complexity Assessment (score from 1-10):**
+    - Count the number of distinct concepts, stakeholders, or systems mentioned
+    - Identify keywords indicating complexity (e.g., "interconnected", "multi-faceted", "systemic")
+    - Assess the scope of the problem (local, organizational, global)
+    - Consider the timeframe mentioned (short-term vs long-term)
+
+    **2. Predictability Assessment (score from 1-10):**
+    - Identify language suggesting certainty or uncertainty
+    - Look for mentions of established procedures or novel approaches
+    - Assess the availability of historical data or similar past experiences
+    - Consider the number of unknown variables or potential outcomes mentioned
+
+    **3. Classification:**
+    - If Complexity > 7 and Predictability < 4: Classify as COMPLEX
+    - If Complexity > 7 and Predictability > 7: Classify as COMPLICATED
+    - If Complexity < 4 and Predictability < 4: Classify as WICKED
+    - If Complexity < 4 and Predictability > 7: Classify as SIMPLE
+    - For scores falling between these ranges, classify based on the nearest quadrant or consider a hybrid classification
+
+    **4. Confidence Score:**
+    - Calculate a confidence score based on how clearly the problem fits into a quadrant
+    - If confidence is low, flag for human review
+
+    ## Problem Classification Output
+
+    **Results:**
+    - Reasons for the given problem classification are: 
+    '''
+
+    response = llm.invoke(prompt)
+    return response.content
+
+#Function to classify problems based on user input
+def user_enhanced_problem_classification(llm, extracted_problem,complexity,predictability):
+    prompt = f'''
+    ## Problem Analysis
+    
+    **Problem Description:**
+    {extracted_problem}
+
+    ** User input complexity and predictabilty **:
+    Complexity: {complexity}
+    Predictabilty: {predictability}
+
+    **Instructions:**
+    You are tasked to classify the problem based on the complexity and predictability and the below given instructions:
+
+    **1. Classification:**
+    - If Complexity > 7 and Predictability < 4: Classify as COMPLEX
+    - If Complexity > 7 and Predictability > 7: Classify as COMPLICATED
+    - If Complexity < 4 and Predictability < 4: Classify as WICKED
+    - If Complexity < 4 and Predictability > 7: Classify as SIMPLE
+    - For scores falling between these ranges, classify based on the nearest quadrant or consider a hybrid classification
+
+    
+    ## Problem Classification Output
+
+    **Results:**
+    - Classification: 
+    - Confidence Score:
+    - Reasons for the given problem classification are: 
+    '''
+
     response = llm.invoke(prompt)
     return response.content
 
@@ -380,19 +507,104 @@ def generate_description(llm, extracted_problem):
         9. Stakeholder analysis:
         Characteristic: Identifies key stakeholders affected by or involved in the problem.
 
-        10. Finally the description should contain step by step breakdown of the problem and not just be a bunch of paragraphs. 
-
-        Here is an example:
-
-        "Climate change poses a significant threat to coastal cities worldwide, with rising sea levels and increased storm intensity. In [City Z], sea levels have risen by an average of 3 millimeters per year over the past two decades, resulting in frequent flooding and coastal erosion. The primary causes of this problem include global warming, melting polar ice caps, and increased greenhouse gas emissions from industrial activities. 
-
-        Current mitigation efforts in [City Z] include the construction of sea walls, the development of early warning systems, and the implementation of green infrastructure projects. However, these measures have been insufficient to fully address the issue. The city's sea walls, for example, are often overwhelmed during severe storms, leading to significant property damage and displacement of residents. 
-
-        If left unaddressed, the impacts of rising sea levels in [City Z] could be catastrophic. By 2050, it is projected that over 100,000 residents could be displaced due to flooding, resulting in economic losses of up to $1 billion annually. Additionally, the loss of coastal habitats could lead to a decline in biodiversity, affecting local fisheries and tourism industries. 
-
-        To effectively combat this issue, a multifaceted approach is required. This includes reducing greenhouse gas emissions, enhancing coastal resilience through natural solutions like mangrove restoration, and improving urban planning to accommodate future sea level rise. Addressing climate change in [City Z] is not only critical for protecting the local population and economy but also contributes to global efforts in mitigating environmental degradation."
-
+        10. Finally the description should contain step by step breakdown of the problem and not just be a bunch of paragraphs. Include all these above points in the description.
+        
+        
     '''
+    response = llm.invoke(prompt)
+    return response.content
+
+# Function to generate problem breadth and depth
+def generate_breadth_and_depth(llm,extracted_problems):
+    prompt = f"""
+    You are provided with  a detailed description of the problem. Use these details to generate the problem breadth and depth by answering the 5Ws and 1H.
+
+    *Problem Description:*
+    {extracted_problems}
+
+    Your task is to provide a detailed response to the following questions:
+    **What:** Define the Problem Statement. This is the type of question we ask in order to narrow the problem and focus in on key issues.
+    **When:** Clearly identifying the time related aspects of the problem. When does the conflict occur? Is the key question here.
+    **Where:** The 'Where?' key is relating to the ‘zones of conflict’. Determine what is the zone of conflict looking at the super-system, system and sub-system.
+    **Who:** Clearly identify the person connected with the problem. He could be one who is using the final product or anyone in the line-up of concept-to-market or a person at any of the product Life-stages.
+    **How:** The how question is present to encourage you to think about the underlying causes and effects of the problem. How does the conflict arise?
+
+    Now think about these inverse questions:
+    **What is not a Problem?**: In contrast to the above context of "what is the problem", identify what is not a problem in the current scenario.
+    **When is it not a Problem?**: When is it not a problem or when is the time the conflict doesn't occur?
+    **Where is it not a Problem?**: Identify the zones of conflict where the problem doesn't occur looking at the super-system, system, and sub-system.
+    **Who is not affected?**: Here, identify the people who are not connected with the problem. They could be ones who are not using the final product or anyone not affected by the problem.
+    **How is it not a Problem?**: The how-not question is present to encourage us to think about how it is not affecting the current environment.
+
+    Provide comprehensive and relevant answers based on the given domain, sub-domain, title, abstract, and description.
+    """
+    response = llm.invoke(prompt)
+    return response.content
+
+# Function to update problem depth and breadth
+def update_depth_breadth(llm,problem_breadth_depth,feedback):
+    prompt = f"""
+    You are tasked with understand the sentiment of a feedback and updating the problem breadth and depth if required based on the feedback provided by the user.
+        Here is the original Title:
+        {problem_breadth_depth}
+        
+        And here is the feedback:
+        {feedback}
+        
+        If the feedback is positive then your response will the same problem breadth and depth, otherwise please update the problem breadth and depth according to the feedback. 
+        Thus your response will be one of the following:
+
+        Output:
+
+        Okay then we will stick with the same Title:
+        {problem_breadth_depth}
+
+        or
+
+        Okay here's an updated Problem breadth and depth:
+        
+    """
+    response = llm.invoke(prompt)
+    return response.content
+
+
+#Function to create a function map
+def function_map(llm,extracted_information):
+    prompt = f"""
+        In systems theory, a function map illustrates the relationships between systems, subsystems, and super-systems within a larger framework. Here's how they are defined:
+
+        1. **System**: A system consists of interconnected components or elements working together to achieve specific functions or goals.
+
+        2. **Subsystem**: A subsystem is a smaller, specialized system within a larger system. It performs distinct functions that contribute to the overall function of the larger system.
+
+        3. **Super-system**: A super-system is a larger entity that encompasses multiple systems or subsystems. It provides context, coordination, or support to these smaller systems.
+
+        A function map visually represents these relationships, depicting the interconnections, dependencies, and interactions between systems, subsystems, and super-systems. This visualization helps stakeholders comprehend the hierarchical structure and the flow of information or processes within the entire system framework. Function maps are essential tools in system analysis, design, and optimization, enabling effective management and improvement of complex systems.
+
+        Now here is some information about the problem in hand:
+        {extracted_information}
+
+        Your task is to use your specialised knowledge system to give the System, Subsystem and Supersystem for the given problem. Think carefully about each of the three step and answer with proper reasons. Please confine the searching problem to the one given in the prompt and use your knowledge to only identify the three kind of systems.
+
+        **Output Format:** 
+        System:
+        a.
+        b.....
+        ....
+        Reasoning:
+
+        Subsystem:
+        a.
+        b.
+        ......
+        Reasoning:
+
+        Supersystem:
+        a.
+        b.
+        ......
+        Reasoning:
+    """
     response = llm.invoke(prompt)
     return response.content
 
@@ -485,20 +697,21 @@ def convo():
      # Sidebar navigation
     st.sidebar.title("Function Navigator")
     function_names = [
-        "Generate Title",
-        "Update Title",
-        "Generate Abstract",
-        "Update Abstract",
-        "Assess Problem Type",
-        "Explain Problem Type Assessment",
-        "Visualize Sliders",
+        "Extract Problem Information✅",
+        "Generate Title✅",
+        "Update Title✅",
+        "Generate Abstract✅",
+        "Update Abstract✅",
+        "Assess Problem Type✅",
+        "Explain Problem Type Assessment✅",
+        "Visualize Sliders✅",
         "Access Data Sources",
         "Summarize Key Findings",
-        "Update Problem Description",
-        "Analyze Problem Breadth and Depth",
-        "Update Breadth and Depth",
+        "Update Problem Description✅",
+        "Analyze Problem Breadth and Depth✅",
+        "Update Breadth and Depth✅",
         "Generate Future Scenarios",
-        "Create Function Map",
+        "Create Function Map✅",
         "Apply TRIZ Principle",
         "Generate Problem Summary",
         "Recommend Experts",
@@ -513,59 +726,104 @@ def convo():
     # Main content based on sidebar choice
     st.title(choice)
 
-    if choice == "Generate Title":
+    if choice =="Extract Problem Information✅":
         goal = st.text_input("Goal")
         if st.button("Run"):
             with st.spinner("Extracting Information...."):
                 extracted_information = problem_extraction(llm,goal)
-            result = generate_title(llm,extracted_information)
-            st.write(result)
+            st.code(extracted_information)
 
-    elif choice == "Update Title":
-        current_title = st.text_input("Current Title")
+    elif choice == "Generate Title✅":
+        extracted_information = st.text_area("Input the extracted Information(user won't need to enter): ")
+        if st.button("Run"):
+            with st.spinner("Generating Title..."):
+                result = generate_title(llm,extracted_information)
+            st.code(result)
+
+    elif choice == "Update Title✅":
+        current_title = st.text_input("Current Title(User won't need to enter)")
         feedback = st.text_input("Feedback")
         if st.button("Run"):
             result = update_title(llm,current_title, feedback)
             st.write(result)
 
-    elif choice == "Generate Abstract":
-        title = st.text_input("Title")
+    elif choice == "Generate Abstract✅":
+        title = st.text_input("Title(User won't need to enter)")
+        extracted_information = st.text_area("Enter the extracted information(User won't need to enter): ")
         if st.button("Run"):
             result = generate_abstract(llm,title,extracted_information)
             st.write(result)
 
-    elif choice == "Update Abstract":
+    elif choice == "Update Abstract✅":
         current_abstract = st.text_input("Current Abstract")
         feedback = st.text_input("Feedback")
         if st.button("Run"):
-            result = update_abstract(current_abstract, feedback)
+            result = update_abstract(llm,current_abstract, feedback)
             st.write(result)
 
-    elif choice == "Assess Problem Type":
-        st.write("Prompt Under Development")
-    elif choice == "Explain Problem Type Assessment":
-        st.write("Prompt Under Development")
+    elif choice == "Assess Problem Type✅":
+        extracted_problems = st.text_area("Enter the extracted problems(User would not have to enter):")
+        if st.button("Run"):
+            with st.spinner("Assessing Problem type..."):
+                problem_classification = assess_problem(llm,extracted_problems)
+            st.code(problem_classification)
 
-    elif choice == "Visualize Sliders":
-        st.write("Prompt Under Development")
+    elif choice == "Explain Problem Type Assessment✅":
+        extracted_problems = st.text_area("Enter the extracted problems(User would not have to enter):")
+        if st.button("Run"):
+            with st.spinner("Assessing Problem type..."):
+                problem_classification = assess_problem(llm,extracted_problems)
+            with st.spinner("Reasoning Problem Classifications...."):
+                explained_problem_classification = explain_problem_classification(llm,extracted_problems,problem_classification)
+            st.code(explained_problem_classification)
+
+    elif choice == "Visualize Sliders✅":
+        complexity = st.slider("How would you rate the complexity of your problem on a scale of 1-10?", 1, 10, 1)
+        predictability = st.slider("How would you rate the predictability of your problem on a scale of 1-10?", 1, 10, 1)
+        extracted_problems = st.text_area("Enter the extracted problems(User would not have to enter):")
+        if st.button("Run:"):
+            with st.spinner("Analyzing your problem now..."):
+                problem_classification = user_enhanced_problem_classification(llm,extracted_problems,complexity,predictability)
+            st.code(problem_classification)
 
     elif choice == "Access Data Sources":
         st.write("Prompt Under Development")
+        
     elif choice == "Summarize Key Findings":
         pass
-    elif choice == "Update Problem Description":
-        st.write("Prompt Under Development")
 
-    elif choice == "Analyze Problem Breadth and Depth":
-        st.write("Prompt Under Development")
-    elif choice == "Update Breadth and Depth":
-        st.write("Prompt Under Development")
+    elif choice == "Update Problem Description✅":
+        extracted_problems = st.text_area("Enter extracted problems(user won't have to add):")
+        if st.button("Run"):
+            with st.spinner("Generating and updating description..."):
+                description = generate_description(llm,extracted_problems)
+            st.write(description)
+
+    elif choice == "Analyze Problem Breadth and Depth✅":
+        extracted_problems = st.text_area("Enter extracted problems(user won't have to add):")
+        if st.button("Run"):
+            with st.spinner("Generating problem breadth and depth..."):
+                problem_breadth_depth = generate_breadth_and_depth(llm,extracted_problems)
+            st.markdown(problem_breadth_depth)
+
+    elif choice == "Update Breadth and Depth✅":
+        current_breadth_depth = st.text_area("Enter current problem breadth and depth(user wont have to add):")
+        feedback = st.text_area("Enter input:")
+        if st.button("Run"):
+            with st.spinner("Updating problem breadth and depth..."):
+                updated_depth_breadth = update_depth_breadth(llm,current_breadth_depth,feedback)
+            st.markdown(updated_depth_breadth)
 
     elif choice == "Generate Future Scenarios":
         st.write("Prompt Under Development")
 
-    elif choice == "Create Function Map":
-        st.write("Prompt Under Development")
+    elif choice == "Create Function Map✅":
+        extracted_information = st.text_area("Enter extracted problems(user won't have to add):")
+        if st.button("Run"):
+            with st.spinner("Generating Function Maps...."):
+                functionmap = function_map(llm,extracted_information)
+            st.write(functionmap)
+
     elif choice == "Apply TRIZ Principle":
         st.write("Prompt Under Development")
 
