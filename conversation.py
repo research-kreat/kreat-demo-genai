@@ -19,65 +19,8 @@ def initialize_llm():
     return llm
 
 
-#Funtion to check a problem title
-def check_title(llm,title):
-    guidelines = [
-        "1. Scope indication: Includes a hint about the scale or scope of the problem. Good example: 'Reducing Plastic Waste in Southeast Asian Coastal Communities'. Bad example: 'Plastic Waste Reduction'.",
-        "2. Stakeholder focus: Mentions key stakeholders affected by or involved in the problem. Good example: 'Improving Healthcare Access for Rural Elderly Populations'. Bad example: 'Healthcare Access Improvement'.",
-        "3. Timeframe: Indicates whether it's an urgent, ongoing, or future issue. Good example: 'Addressing Immediate Food Insecurity in Drought-Affected Regions'. Bad example: 'Food Insecurity in Drought Regions'.",
-        "4. Outcome-oriented: Suggests the desired result or improvement. Good example: 'Enhancing Student Engagement Through Gamified Learning Platforms'. Bad example: 'Using Gamification in Education'.",
-        "5. Keyword optimization: Uses relevant keywords for searchability and categorization. Good example: 'Sustainable Urban Development: Implementing Green Infrastructure Solutions'. Bad example: 'City Planning Improvements'.",
-        "6. Avoid unnecessary words: Eliminates articles and filler words when possible. Good example: 'Reducing Industrial Carbon Emissions'. Bad example: 'The Challenge of Reducing the Carbon Emissions in the Industry'.",
-        "7. Use active voice: Employs active rather than passive language for directness. Good example: 'Implementing Water Conservation Strategies in Arid Regions'. Bad example: 'Water Conservation Strategies Being Implemented in Arid Regions'.",
-        "8. Quantify if possible: Includes numbers or metrics if they add significant value. Good example: 'Halving Food Waste: A 10-Year Strategy for Restaurants'. Bad example: 'Reducing Food Waste in Restaurants'.",
-        "9. Avoid questions: Frames the title as a statement rather than a question. Good example: 'Improving Public Transportation Efficiency in High-Density Urban Areas'. Bad example: 'How Can We Improve Public Transportation in Crowded Cities?'.",
-        "10. Balance creativity and clarity: Uses engaging language but prioritizes clarity over cleverness. Good example: 'From Trash to Treasure: Upcycling Industrial Waste into Valuable Products'. Bad example: 'Turning Garbage into Gold: A Waste Revolution'.",
-        "11. Consistency: Ensures the title aligns with the content of the problem statement. Good example: 'Global Climate Change Mitigation Strategies'. Bad example: 'Global Climate Change Mitigation Strategies' (if the content only discusses local initiatives).",
-        "12. Avoid abbreviations: Spells out terms unless universally recognized in the field. Good example: 'Reducing Greenhouse Gas Emissions in the Transport Sector'. Bad example: 'Reducing GHG Emissions in the Transport Sector'.",
-        "13. Clarity and Simplicity: Ensure the title is easy to understand and free of complex jargon unless necessary. Good example: 'Improving Air Quality in Urban Areas'. Bad example: 'Enhancing Atmospheric Composition Through Pollution Mitigation'.",
-        "14. Engagement: Make the title engaging to capture the reader's interest. Good example: 'Boosting Renewable Energy Adoption in Developing Countries'. Bad example: 'Promoting Renewable Energy'.",
-        "15. Precision: Use precise and specific language to avoid vagueness. Good example: 'Enhancing Cybersecurity Measures in Online Banking'. Bad example: 'Improving Security in Banking'.",
-        "16. Length: Maintain a balance between brevity and informativeness, aiming for 5 to 12 words. Good example: 'Enhancing Urban Mobility Through Bike-Sharing Programs'. Bad example: 'Exploring Ways to Enhance Urban Mobility Through the Implementation of Bike-Sharing Programs'.",
-        "17. Perspective: Reflect the perspective or approach being taken, such as policy, technology, or societal impact. Good example: 'Policy Interventions for Reducing Childhood Obesity'. Bad example: 'Childhood Obesity Reduction'."
-    ]
-
-    prompt = f'''
-    Given title: "{title}"
-    Please evaluate this title based on the following guidelines:
-    {guidelines}
-    Provide a clear judgment: "Yes it's a good title" or "No if it is out of the scope". If it's no then give clear reasons as to which guidelines it failed.
-    '''
-    response = llm.invoke(prompt)
-    return response.content
-
-
-# Function to extract problems from a conversation
-def problem_extraction(llm, problem):
-    prompt = f''' 
-            {problem}
-
-            Based on the innovator's response to "What is a problem for you?", extract the following key elements to create a good problem statement:
-
-            1. Core issue: Identify the central problem or challenge.
-            2. Affected stakeholders: Note who is impacted by this problem.
-            3. Context or scope: Determine the scale and relevant setting of the problem.
-            4. Current impact: Understand how this problem is affecting stakeholders or the situation.
-            5. Desired outcome: If mentioned, note the envisioned improvement or solution.
-            6. Root causes: Identify underlying factors contributing to the problem.
-            7. Timeframe: Note if the problem is urgent, ongoing, or anticipated.
-            8. Quantifiable aspects: Extract any numbers, statistics, or metrics mentioned.
-            9. Industry or field: Determine the specific sector or area of focus.
-            10. Key terms: Identify important keywords or phrases related to the problem.
-            11. Constraints: Note any limitations or obstacles in addressing the problem.
-            12. Unique aspects: Highlight distinctive features of the problem.
-
-            '''
-    response = llm.invoke(prompt)
-    return response.content
-
-
 # Function to prepare a problem title
-def problem_title(llm, extracted_problem):
+def generate_title(llm, extracted_problem):
     prompt = f'''
         You are tasked with generating Title for a problem statement of an innovator from some information provided to you by the innovator.
         Here are some information related to a problem. 
@@ -173,10 +116,121 @@ def problem_title(llm, extracted_problem):
     return response.content
 
 
+#Funtion to check a problem title
+def check_title(llm,title):
+    guidelines = [
+        "1. Scope indication: Includes a hint about the scale or scope of the problem. Good example: 'Reducing Plastic Waste in Southeast Asian Coastal Communities'. Bad example: 'Plastic Waste Reduction'.",
+        "2. Stakeholder focus: Mentions key stakeholders affected by or involved in the problem. Good example: 'Improving Healthcare Access for Rural Elderly Populations'. Bad example: 'Healthcare Access Improvement'.",
+        "3. Timeframe: Indicates whether it's an urgent, ongoing, or future issue. Good example: 'Addressing Immediate Food Insecurity in Drought-Affected Regions'. Bad example: 'Food Insecurity in Drought Regions'.",
+        "4. Outcome-oriented: Suggests the desired result or improvement. Good example: 'Enhancing Student Engagement Through Gamified Learning Platforms'. Bad example: 'Using Gamification in Education'.",
+        "5. Keyword optimization: Uses relevant keywords for searchability and categorization. Good example: 'Sustainable Urban Development: Implementing Green Infrastructure Solutions'. Bad example: 'City Planning Improvements'.",
+        "6. Avoid unnecessary words: Eliminates articles and filler words when possible. Good example: 'Reducing Industrial Carbon Emissions'. Bad example: 'The Challenge of Reducing the Carbon Emissions in the Industry'.",
+        "7. Use active voice: Employs active rather than passive language for directness. Good example: 'Implementing Water Conservation Strategies in Arid Regions'. Bad example: 'Water Conservation Strategies Being Implemented in Arid Regions'.",
+        "8. Quantify if possible: Includes numbers or metrics if they add significant value. Good example: 'Halving Food Waste: A 10-Year Strategy for Restaurants'. Bad example: 'Reducing Food Waste in Restaurants'.",
+        "9. Avoid questions: Frames the title as a statement rather than a question. Good example: 'Improving Public Transportation Efficiency in High-Density Urban Areas'. Bad example: 'How Can We Improve Public Transportation in Crowded Cities?'.",
+        "10. Balance creativity and clarity: Uses engaging language but prioritizes clarity over cleverness. Good example: 'From Trash to Treasure: Upcycling Industrial Waste into Valuable Products'. Bad example: 'Turning Garbage into Gold: A Waste Revolution'.",
+        "11. Consistency: Ensures the title aligns with the content of the problem statement. Good example: 'Global Climate Change Mitigation Strategies'. Bad example: 'Global Climate Change Mitigation Strategies' (if the content only discusses local initiatives).",
+        "12. Avoid abbreviations: Spells out terms unless universally recognized in the field. Good example: 'Reducing Greenhouse Gas Emissions in the Transport Sector'. Bad example: 'Reducing GHG Emissions in the Transport Sector'.",
+        "13. Clarity and Simplicity: Ensure the title is easy to understand and free of complex jargon unless necessary. Good example: 'Improving Air Quality in Urban Areas'. Bad example: 'Enhancing Atmospheric Composition Through Pollution Mitigation'.",
+        "14. Engagement: Make the title engaging to capture the reader's interest. Good example: 'Boosting Renewable Energy Adoption in Developing Countries'. Bad example: 'Promoting Renewable Energy'.",
+        "15. Precision: Use precise and specific language to avoid vagueness. Good example: 'Enhancing Cybersecurity Measures in Online Banking'. Bad example: 'Improving Security in Banking'.",
+        "16. Length: Maintain a balance between brevity and informativeness, aiming for 5 to 12 words. Good example: 'Enhancing Urban Mobility Through Bike-Sharing Programs'. Bad example: 'Exploring Ways to Enhance Urban Mobility Through the Implementation of Bike-Sharing Programs'.",
+        "17. Perspective: Reflect the perspective or approach being taken, such as policy, technology, or societal impact. Good example: 'Policy Interventions for Reducing Childhood Obesity'. Bad example: 'Childhood Obesity Reduction'."
+    ]
+
+    prompt = f'''
+    Given title: "{title}"
+    Please evaluate this title based on the following guidelines:
+    {guidelines}
+    Provide a clear judgment: "Yes it's a good title" or "No if it is out of the scope". If it's no then give clear reasons as to which guidelines it failed.
+    '''
+    response = llm.invoke(prompt)
+    return response.content
+
+# Function to extract problems from a conversation
+def problem_extraction(llm, problem):
+    prompt = f''' 
+            {problem}
+
+            Based on the innovator's response to "What is a problem for you?", extract the following key elements:
+
+            1. Core issue: Identify the central problem or challenge.
+            2. Affected stakeholders: Note who is impacted by this problem.
+            3. Context or scope: Determine the scale and relevant setting of the problem.
+            4. Current impact: Understand how this problem is affecting stakeholders or the situation.
+            5. Desired outcome: If mentioned, note the envisioned improvement or solution.
+            6. Root causes: Identify underlying factors contributing to the problem.
+            7. Timeframe: Note if the problem is urgent, ongoing, or anticipated.
+            8. Quantifiable aspects: Extract any numbers, statistics, or metrics mentioned.
+            9. Industry or field: Determine the specific sector or area of focus.
+            10. Key terms: Identify important keywords or phrases related to the problem.
+            11. Constraints: Note any limitations or obstacles in addressing the problem.
+            12. Unique aspects: Highlight distinctive features of the problem.
+
+            '''
+    response = llm.invoke(prompt)
+    return response.content
+
+def update_abstract(llm, abstract, feedback):
+    prompt = f'''
+        You are tasked with understand the sentiment of a feedback and updating an abstract if required based on the feedback provided by the user.
+        Here is the original abstract:
+        {abstract}
+        
+        And here is the feedback:
+        {feedback}
+        
+        If the feedback is positive then your response will the same abstract otherwise please update the abstract according to the feedback. 
+        Thus your response will be one of the following:
+
+        Output:
+
+        Okay then we will stick with the same abstract:
+        {abstract}
+
+        or
+
+        Okay here's an updated abstract:
+        
+    '''
+    
+    response = llm.invoke(prompt)
+    return response.content
+
+def update_title(llm, title, feedback):
+    prompt = f'''
+        You are tasked with understand the sentiment of a feedback and updating an abstract if required based on the feedback provided by the user.
+        Here is the original Title:
+        {title}
+        
+        And here is the feedback:
+        {feedback}
+        
+        If the feedback is positive then your response will the same abstract otherwise please update the abstract according to the feedback. 
+        Thus your response will be one of the following:
+
+        Output:
+
+        Okay then we will stick with the same Title:
+        {title}
+
+        or
+
+        Okay here's an updated Title:
+        
+    '''
+    
+    response = llm.invoke(prompt)
+    return response.content
+
+
+
 # Function to prepare an abstract
-def generate_abstract(llm, extracted_problem):
+def generate_abstract(llm, title,extracted_problem):
     prompt = f'''
         You are tasked with generating an abstract for a problem statement from some information provided to you by the innovator.
+        Here is the title of the problem:
+        {title}
         Here are some information related to a problem. 
         {extracted_problem} 
         Using these extracted elements, create an abstract that follows these guidelines:
@@ -237,11 +291,12 @@ def generate_abstract(llm, extracted_problem):
         Example 3:
         "Water scarcity in arid regions poses a severe threat to both human populations and agricultural activities. Our initiative proposes the adoption of advanced water-saving technologies and practices to increase water use efficiency. With a target of improving water availability by 25% within five years, this project seeks to enhance sustainability and resilience in these vulnerable areas. Timely intervention is crucial to prevent further degradation of water resources."
 
+        Your response should be in the following format:
+        Here's a draft abstract for you:
+        Abstract:
     '''
     response = llm.invoke(prompt)
     return response.content
-
-
 
 # Function to prepare assumptions
 def generate_assumptions(llm, extracted_problem):
@@ -290,7 +345,6 @@ def generate_assumptions(llm, extracted_problem):
     response = llm.invoke(prompt)
     return response.content
 
-
 # Function to prepare a problem description
 def generate_description(llm, extracted_problem):
     prompt = f'''
@@ -326,6 +380,8 @@ def generate_description(llm, extracted_problem):
         9. Stakeholder analysis:
         Characteristic: Identifies key stakeholders affected by or involved in the problem.
 
+        10. Finally the description should contain step by step breakdown of the problem and not just be a bunch of paragraphs. 
+
         Here is an example:
 
         "Climate change poses a significant threat to coastal cities worldwide, with rising sea levels and increased storm intensity. In [City Z], sea levels have risen by an average of 3 millimeters per year over the past two decades, resulting in frequent flooding and coastal erosion. The primary causes of this problem include global warming, melting polar ice caps, and increased greenhouse gas emissions from industrial activities. 
@@ -339,7 +395,6 @@ def generate_description(llm, extracted_problem):
     '''
     response = llm.invoke(prompt)
     return response.content
-
 
 # Function to prepare constraints
 def generate_constraints(llm, extracted_problem):
@@ -378,7 +433,6 @@ def generate_constraints(llm, extracted_problem):
     '''
     response = llm.invoke(prompt)
     return response.content
-
 
 # Function to prepare risks
 def generate_risks(llm, extracted_problem):
@@ -423,57 +477,234 @@ def generate_risks(llm, extracted_problem):
     return response.content
 
 
-
 def convo():
     st.title("Kreat Conversation")
     st.header("Converse with Kreat")
-    
+
+
+     # Sidebar navigation
+    st.sidebar.title("Function Navigator")
+    function_names = [
+        "Generate Title",
+        "Update Title",
+        "Generate Abstract",
+        "Update Abstract",
+        "Assess Problem Type",
+        "Explain Problem Type Assessment",
+        "Visualize Sliders",
+        "Access Data Sources",
+        "Summarize Key Findings",
+        "Update Problem Description",
+        "Analyze Problem Breadth and Depth",
+        "Update Breadth and Depth",
+        "Generate Future Scenarios",
+        "Create Function Map",
+        "Apply TRIZ Principle",
+        "Generate Problem Summary",
+        "Recommend Experts",
+        "Create Visual Map",
+        "Download Analysis",
+        "Share Analysis"
+    ]
+
+    choice = st.sidebar.selectbox("Select a Function", function_names)
     llm = initialize_llm()  # Initialize AzureChatOpenAI
 
-    title = st.text_input("Enter your project title: ")
-    if st.button("Enter",key="title-input"):
-        if title:
-            title_eval = check_title(llm,title)
-            st.markdown(title_eval)
-        else:
-            st.markdown("Enter a title.")
+    # Main content based on sidebar choice
+    st.title(choice)
 
-    problem = st.text_area("According to you, what is the problem?")
-    if st.button("Enter",key="problem-input"):
-        if problem:
-            extracted_problem = problem_extraction(llm, problem)
-            st.markdown("### Extracted problems ###")
-            st.markdown(extracted_problem)
+    if choice == "Generate Title":
+        goal = st.text_input("Goal")
+        if st.button("Run"):
+            with st.spinner("Extracting Information...."):
+                extracted_information = problem_extraction(llm,goal)
+            result = generate_title(llm,extracted_information)
+            st.write(result)
 
-            title = problem_title(llm,extracted_problem)
-            st.markdown('### Problem title ###')
-            st.markdown(title)
+    elif choice == "Update Title":
+        current_title = st.text_input("Current Title")
+        feedback = st.text_input("Feedback")
+        if st.button("Run"):
+            result = update_title(llm,current_title, feedback)
+            st.write(result)
 
-            abstract = generate_abstract(llm,extracted_problem)
-            st.markdown('### Problem abstract ###')
-            st.markdown(abstract)
+    elif choice == "Generate Abstract":
+        title = st.text_input("Title")
+        if st.button("Run"):
+            result = generate_abstract(llm,title,extracted_information)
+            st.write(result)
 
-            assumptions = generate_assumptions(llm,extracted_problem)
-            st.markdown('### Problem assumptions ###')
-            st.markdown(assumptions)
+    elif choice == "Update Abstract":
+        current_abstract = st.text_input("Current Abstract")
+        feedback = st.text_input("Feedback")
+        if st.button("Run"):
+            result = update_abstract(current_abstract, feedback)
+            st.write(result)
 
-            description = generate_description(llm,extracted_problem)
-            st.markdown('### Problem description ###')
-            st.markdown(description)
+    elif choice == "Assess Problem Type":
+        st.write("Prompt Under Development")
+    elif choice == "Explain Problem Type Assessment":
+        st.write("Prompt Under Development")
 
+    elif choice == "Visualize Sliders":
+        st.write("Prompt Under Development")
 
-            constraints = generate_constraints(llm,extracted_problem)
-            st.markdown('### Problem constraints ###')
-            st.markdown(constraints)
+    elif choice == "Access Data Sources":
+        st.write("Prompt Under Development")
+    elif choice == "Summarize Key Findings":
+        pass
+    elif choice == "Update Problem Description":
+        st.write("Prompt Under Development")
 
+    elif choice == "Analyze Problem Breadth and Depth":
+        st.write("Prompt Under Development")
+    elif choice == "Update Breadth and Depth":
+        st.write("Prompt Under Development")
 
-            risks = generate_risks(llm,extracted_problem)
-            st.markdown('### Problem risks ###')
-            st.markdown(risks)
-            
-        else:
-            st.error("Please enter a problem statement.")
+    elif choice == "Generate Future Scenarios":
+        st.write("Prompt Under Development")
+
+    elif choice == "Create Function Map":
+        st.write("Prompt Under Development")
+    elif choice == "Apply TRIZ Principle":
+        st.write("Prompt Under Development")
+
+    elif choice == "Generate Problem Summary":
+        # title = st.text_input("Title")
+        # abstract = st.text_input("Abstract")
+        # problem_description = st.text_input("Problem Description")
+        # insights = st.text_area("Insights (comma-separated)").split(",")
+        # future_scenarios = st.text_area("Future Scenarios (comma-separated)").split(",")
+        # function_map = st.text_input("Function Map")
+        # triz_solution = st.text_input("TRIZ Solution")
+        # if st.button("Run"):
+        #     result = generate_problem_summary(title, abstract, problem_description, insights, future_scenarios, function_map, triz_solution)
+        #     st.write(result)
+        st.write("Prompt Under Development")
+
+    elif choice == "Recommend Experts":
+        st.write("Prompt Under Development")
+    elif choice == "Create Visual Map":
+        st.write("Prompt Under Development")
+
+    elif choice == "Download Analysis":
+        st.write("Prompt Under Development")
+
+    elif choice == "Share Analysis":
+        st.write("Prompt Under Development")
     
-
 if __name__ == "__main__":
     convo()
+
+
+
+#to be inserted after problem extraction
+
+#title = problem_title(llm,extracted_problem)
+# st.markdown('### Problem title ###')
+# st.markdown(title)
+
+# abstract = generate_abstract(llm,extracted_problem)
+# st.markdown('### Problem abstract ###')
+# st.markdown(abstract)
+
+# assumptions = generate_assumptions(llm,extracted_problem)
+# st.markdown('### Problem assumptions ###')
+# st.markdown(assumptions)
+
+# description = generate_description(llm,extracted_problem)
+# st.markdown('### Problem description ###')
+# st.markdown(description)
+
+
+# constraints = generate_constraints(llm,extracted_problem)
+# st.markdown('### Problem constraints ###')
+# st.markdown(constraints)
+
+
+# risks = generate_risks(llm,extracted_problem)
+# st.markdown('### Problem risks ###')
+# st.markdown(risks)
+
+
+
+
+# if 'problem' not in st.session_state:
+#         st.session_state.problem = ""
+#     if 'extracted_problem' not in st.session_state:
+#         st.session_state.extracted_problem = ""
+#     if 'abstract' not in st.session_state:
+#         st.session_state.abstract = ""
+#     if 'title' not in st.session_state:
+#         st.session_state.title = ""
+#     if 'show_options' not in st.session_state:
+#         st.session_state.show_options = False
+#     if 'abstract_generated' not in st.session_state:
+#         st.session_state.abstract_generated = False
+#     if 'title_generated' not in st.session_state:
+#         st.session_state.title_generated = False
+#     if 'description_generated' not in st.session_state:
+#         st.session_state.description_generated = False
+
+#     st.session_state.problem = st.text_area("Hey, what is the problem that you are trying to crack?", st.session_state.problem)
+
+#     if st.button("Enter", key="problem-input"):
+#         if st.session_state.problem:
+#             st.session_state.show_options = True
+#             st.session_state.extracted_problem = problem_extraction(llm, st.session_state.problem)
+#         else:
+#             st.error("Please enter a problem statement.")
+
+#     if st.session_state.show_options:
+#         st.markdown("**Cool, should we make a good abstract based on this?**")
+#         option = st.radio(
+#             "Please choose an option:",
+#             ('Yes get me an AI generated abstract', 'No I will provide an abstract')
+#         )
+
+#         if option == 'Yes get me an AI generated abstract':
+#             if not st.session_state.abstract_generated:
+#                 with st.spinner('Generating Abstracts'):
+#                     st.session_state.abstract = generate_abstract(llm, st.session_state.extracted_problem)
+#                     st.session_state.abstract_generated = True
+#             st.markdown('### Abstract ###')
+#             st.markdown(st.session_state.abstract)
+            
+#             abstract_feedback = st.text_area("Do you like the abstract or should we change something? Please let me know below:", key="abstract-feedback")
+#             if st.button("Update Abstract", key="update-abstract"):
+#                 with st.spinner('Finishing up the abstract...'):
+#                     st.session_state.abstract = update_abstract(llm, st.session_state.abstract, abstract_feedback)
+#                 st.markdown('### Abstract ###')
+#                 st.markdown(st.session_state.abstract)
+                
+#             if not st.session_state.title_generated and st.button("Generate Title", key="generate-title"):
+#                 with st.spinner('Generating Title'):
+#                     st.session_state.title = problem_title(llm, st.session_state.extracted_problem)
+#                     st.session_state.title_generated = True
+#                 st.markdown('### Problem Title ###')
+#                 st.markdown(st.session_state.title)
+
+#             if st.session_state.title_generated:
+#                 st.markdown('### Problem Title ###')
+#                 st.markdown(st.session_state.title)
+#                 title_feedback = st.text_area("Do you like the title or should we change something? Please let me know below:", key="title-feedback")
+#                 if st.button("Update Title", key="update-title"):
+#                     with st.spinner('Finishing up the title...'):
+#                         st.session_state.title = update_title(llm, st.session_state.title, title_feedback)
+#                     st.markdown('### Problem Title ###')
+#                     st.markdown(st.session_state.title)
+                    
+#                     if not st.session_state.description_generated:
+#                         if st.button("Generate Description", key="generate-description"):
+#                             with st.spinner('Generating Description'):
+#                                 st.session_state.description = generate_description(llm, st.session_state.extracted_problems)
+#                                 st.session_state.description_generated = True
+#                             st.markdown('### Generated Description ###')
+#                             st.markdown(st.session_state.description)
+#                     elif st.session_state.description_generated:
+#                         st.markdown('### Generated Description ###')
+#                         st.markdown(st.session_state.description)
+
+#         else:
+#             st.session_state.abstract = st.text_area('You may enter an abstract:')
+#             st.session_state.title = st.text_area('You may enter a title:')

@@ -8,9 +8,9 @@ from conversation import convo
 def main():
     st.set_page_config(page_title="Kreat Demo",page_icon="💡")
     pages = {
+        "Conversation": convo,
         "Spark Blocks": spark_blocks_app,
-        "Build Blocks": build_blocks_app,
-        "Conversation": convo
+        "Build Blocks": build_blocks_app
     }
 
     st.sidebar.title("Navigation")
