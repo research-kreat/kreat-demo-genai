@@ -593,17 +593,17 @@ def problem_landscape(llm,extracted_information):
         All the 9 results should be within " " (double quotes). All 9 ANSWERS SHOULD BE IN NEWLINE.
         THE OUTPUT WILL BE PARSED TO A JSON SO STRICTLY RESPOND TO THE FORMAT GIVEN BELOW:
 
-        PAST SUPER SYSTEM: "...COMPONENTS(part by part, seperated by comma)..." \n
-        PAST SYSTEM: "...COMPONENTS(part by part, seperated by comma)..." \n
-        PAST SUB SYSTEM: "...COMPONENTS(part by part, seperated by comma)..." \n
+        PAST SUPER SYSTEM: "...ALL POSSIBLE COMPONENTS LIST(part by part, seperated by comma)..." \n
+        PAST SYSTEM: "...ALL POSSIBLE COMPONENTS LISR(part by part, seperated by comma)..." \n
+        PAST SUB SYSTEM: "...ALL POSSIBLE COMPONENTS LIST(part by part, seperated by comma)..." \n
 
-        PRESENT SUPER SYSTEM: "...COMPONENTS(part by part, seperated by comma)..." \n
-        PRESENT SYSTEM: "...COMPONENTS(part by part, seperated by comma)..."\n
-        PRESENT SUB SYSTEM: "...COMPONENTS(part by part, seperated by comma)..." \n
+        PRESENT SUPER SYSTEM: "...ALL POSSIBLE COMPONENTS LIST(part by part, seperated by comma)..." \n
+        PRESENT SYSTEM: "...ALL POSSIBLE COMPONENTS LIST(part by part, seperated by comma)..."\n
+        PRESENT SUB SYSTEM: "...ALL POSSIBLE COMPONENTS LIST(part by part, seperated by comma)..." \n
 
-        PRESENT SUPER SYSTEM: "...COMPONENTS(part by part, seperated by comma)..." \n
-        PRESENT SYSTEM: "...COMPONENTS(part by part, seperated by comma)..." \n
-        PRESENT SUB SYSTEM: "...COMPONENTS(part by part, seperated by comma)..." \n
+        PRESENT SUPER SYSTEM: "...ALL POSSIBLE COMPONENTS LIST(part by part, seperated by comma)..." \n
+        PRESENT SYSTEM: "...ALL POSSIBLE COMPONENTS LIST(part by part, seperated by comma)..." \n
+        PRESENT SUB SYSTEM: "...ALL POSSIBLE COMPONENTS LIST(part by part, seperated by comma)..." \n
     """
     response = llm.invoke(prompt)
     return response.content
