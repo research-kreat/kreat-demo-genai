@@ -580,6 +580,7 @@ def problem_landscape(llm,extracted_information):
         1. Supersystem (Past, Present, Future):
         - Describe the broader applications, contexts, and environments in which the [TECHNOLOGY/SYSTEM] has been, is currently, and will be used.
         - Identify the key trends, drivers, and requirements shaping the evolution of the [TECHNOLOGY/SYSTEM] at the Supersystem level.
+        
 
         2. System (Past, Present, Future):
         - Identify the specific [TECHNOLOGY/SYSTEM] architectures, designs, or dominant solutions in each time period.
@@ -594,11 +595,27 @@ def problem_landscape(llm,extracted_information):
 
         A function map visually represents these relationships, depicting the interconnections, dependencies, and interactions between systems, subsystems, and super-systems. This visualization helps stakeholders comprehend the hierarchical structure and the flow of information or processes within the entire system framework. Function maps are essential tools in system analysis, design, and optimization, enabling effective management and improvement of complex systems.
 
+        For the Past systems, subsystems, and supersystems think like this and answer:
+        1. What were the key milestones, inventions, or discoveries that marked the early development of [TECHNOLOGY/SYSTEM]?
+        2. How did the performance, capabilities, and applications of [TECHNOLOGY/SYSTEM] evolve over time in the past?
+        3. What were the main drivers, challenges, and limitations that shaped the historical development of [TECHNOLOGY/SYSTEM]?
+        4. How did the needs, expectations, and behaviors of users or society influence the past evolution of [TECHNOLOGY/SYSTEM]?
+        5. What were the significant transitions or paradigm shifts in the past that transformed [TECHNOLOGY/SYSTEM]?
+
+        For the present system, subsystems, and supersystems search from the given information and answer.
+
+        For the Future systems, subsystems, and supersystems:
+        1. What are the emerging technologies and trends that could shape the future of [TECHNOLOGY/SYSTEM]?
+        2. How might the performance, capabilities, and applications of [TECHNOLOGY/SYSTEM] evolve in the next 5, 10, or 20 years?
+        3. What are the potential disruptive innovations or breakthrough technologies that could revolutionize [TECHNOLOGY/SYSTEM]?
+        4. How might the changing needs, expectations, and behaviors of users or society influence the future development of [TECHNOLOGY/SYSTEM]?
+
+
         Now here is some information about the problem in hand:
         {extracted_information}
 
         ## INSTRUCTION ##
-        Your task is to use your specialised knowledge system to give the System, Subsystem and Supersystem for PRESENT, PAST AND ALSO PREDICT FOR FUTURE the given problem. Think carefully about each of the three step and answer with proper reasons. Please confine the searching problem to the one given in the prompt and use your knowledge to only identify the kind of systems FOR ALL THREE: PAST, PRESENT AND FUTURE.
+        Your task is to use your specialised knowledge system to give the System, Subsystem and Supersystem for PRESENT, PAST AND ALSO PREDICT FOR FUTURE for the given problem. Think carefully about each of the three step and answer with proper reasons. Please confine the searching problem to the one given in the prompt and use your knowledge to only identify the kind of systems FOR ALL THREE: PAST, PRESENT AND FUTURE.
         All the 9 results should be within " " (double quotes). All 9 ANSWERS SHOULD BE IN NEWLINE.
         THE OUTPUT WILL BE PARSED TO A JSON SO STRICTLY RESPOND TO THE FORMAT GIVEN BELOW:
 
