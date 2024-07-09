@@ -584,6 +584,9 @@ def problem_landscape(llm,extracted_information):
         2. System (Past, Present, Future):
         - Identify the specific [TECHNOLOGY/SYSTEM] architectures, designs, or dominant solutions in each time period.
         - Describe the key capabilities, functions, and performance characteristics of the [TECHNOLOGY/SYSTEM] in each generation.
+        - For the present system, talk about only the system is queried about[YOU CAN FIND THIS IN THE PROBBLEM INFORMATION]
+        - For the past system look for the systems, architectures, designs that were dominant in the past.[TRY AND FIND THE TECHNOLOGIES THAT HAD BEEN IN USE FROOM YOUR KNOWLEDGE]
+        - For the future system look for the systems, architectures, designs that will dominate in the comming years[PREDICT THESE TECHNOLOGIES USING YOUR KNOWLEDGE]
 
         3. Subsystem (Past, Present, Future):
         - Break down the critical components, technologies, and sub-systems used within each generation of the [TECHNOLOGY/SYSTEM].
