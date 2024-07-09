@@ -577,11 +577,17 @@ def problem_landscape(llm,extracted_information):
         ## INFORMATION ##
         In systems theory, a function map illustrates the relationships between systems, subsystems, and super-systems within a larger framework. Here's how they are defined:
 
-        1. **System**: A system consists of interconnected components or elements working together to achieve specific functions or goals.
+        1. Supersystem (Past, Present, Future):
+        - Describe the broader applications, contexts, and environments in which the [TECHNOLOGY/SYSTEM] has been, is currently, and will be used.
+        - Identify the key trends, drivers, and requirements shaping the evolution of the [TECHNOLOGY/SYSTEM] at the Supersystem level.
 
-        2. **Subsystem**: A subsystem is a smaller, specialized system within a larger system. It performs distinct functions that contribute to the overall function of the larger system.
+        2. System (Past, Present, Future):
+        - Identify the specific [TECHNOLOGY/SYSTEM] architectures, designs, or dominant solutions in each time period.
+        - Describe the key capabilities, functions, and performance characteristics of the [TECHNOLOGY/SYSTEM] in each generation.
 
-        3. **Super-system**: A super-system is a larger entity that encompasses multiple systems or subsystems. It provides context, coordination, or support to these smaller systems.
+        3. Subsystem (Past, Present, Future):
+        - Break down the critical components, technologies, and sub-systems used within each generation of the [TECHNOLOGY/SYSTEM].
+        - Highlight the advancements, innovations, and enabling technologies at the Subsystem level that drive the evolution of the [TECHNOLOGY/SYSTEM].
 
         A function map visually represents these relationships, depicting the interconnections, dependencies, and interactions between systems, subsystems, and super-systems. This visualization helps stakeholders comprehend the hierarchical structure and the flow of information or processes within the entire system framework. Function maps are essential tools in system analysis, design, and optimization, enabling effective management and improvement of complex systems.
 
