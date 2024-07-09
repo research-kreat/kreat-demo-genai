@@ -612,7 +612,7 @@ def problem_landscape(llm,extracted_information):
         4. How might the changing needs, expectations, and behaviors of users or society influence the future development of [TECHNOLOGY/SYSTEM]?
         PREDICT 5 OR MORE SUCH UPCOMING TECHNOLOGIES. 
 
-        ALL THE TECHNOLOGIES AND THE NAMES SHOULD NOT BE CONSISTING OF JARGON WORDS LIKE "EARLY" SYSTEMS OR "ADVANCED" OR "FUTURE" SYSTEMS.
+        Avoid using OF JARGON WORDS LIKE "EARLY" SYSTEMS OR "ADVANCED" OR "FUTURE" SYSTEMS.
 
 
         Now here is some information about the problem in hand:
