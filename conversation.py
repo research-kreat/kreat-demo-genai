@@ -570,8 +570,10 @@ def update_depth_breadth(llm,problem_breadth_depth,feedback):
 
 
 #Function to create a function map
-def function_map(llm,extracted_information):
+def problem_landscape(llm,extracted_information):
     prompt = f"""
+
+        ## INFORMATION ##
         In systems theory, a function map illustrates the relationships between systems, subsystems, and super-systems within a larger framework. Here's how they are defined:
 
         1. **System**: A system consists of interconnected components or elements working together to achieve specific functions or goals.
@@ -585,29 +587,64 @@ def function_map(llm,extracted_information):
         Now here is some information about the problem in hand:
         {extracted_information}
 
-        Your task is to use your specialised knowledge system to give the System, Subsystem and Supersystem for the given problem. Think carefully about each of the three step and answer with proper reasons. Please confine the searching problem to the one given in the prompt and use your knowledge to only identify the three kind of systems.
+        ## INSTRUCTION ##
+        Your task is to use your specialised knowledge system to give the System, Subsystem and Supersystem for PRESENT, PAST AND ALSO PREDICT FOR FUTURE the given problem. Think carefully about each of the three step and answer with proper reasons. Please confine the searching problem to the one given in the prompt and use your knowledge to only identify the kind of systems FOR ALL THREE: PAST, PRESENT AND FUTURE.
+        All the 9 results should be within " " (double quotes). All 9 ANSWERS SHOULD BE IN NEWLINE.
+        THE OUTPUT WILL BE PARSED TO A JSON SO STRICTLY RESPOND TO THE FORMAT GIVEN BELOW:
 
-        **Output Format:** 
-        System:
-        a.
-        b.....
-        ....
-        Reasoning:
+        PAST SUPER SYSTEM: "...YOUR ONE TWO WORDED ANSWER..." \n
+        PAST SYSTEM: "...YOUR ONE TWO WORDED ANSWER..." \n
+        PAST SUB SYSTEM: "...YOUR ONE TWO WORDED ANSWER..." \n
 
-        Subsystem:
-        a.
-        b.
-        ......
-        Reasoning:
+        PRESENT SUPER SYSTEM: "...YOUR ONE TWO WORDED ANSWER..." \n
+        PRESENT SYSTEM: "...YOUR ONE TWO WORDED ANSWER..."\n
+        PRESENT SUB SYSTEM: "...YOUR ONE TWO WORDED ANSWER..." \n
 
-        Supersystem:
-        a.
-        b.
-        ......
-        Reasoning:
+        PRESENT SUPER SYSTEM: "...YOUR ONE TWO WORDED ANSWER..." \n
+        PRESENT SYSTEM: "...YOUR ONE TWO WORDED ANSWER..." \n
+        PRESENT SUB SYSTEM: "...YOUR ONE TWO WORDED ANSWER..." \n
     """
     response = llm.invoke(prompt)
     return response.content
+
+def parse_problem_landscape_output(output):
+    # Initialize a dictionary to store the parsed values
+    parsed_data = {
+        "past_super_system": "",
+        "past_system": "",
+        "past_sub_system": "",
+        "present_super_system": "",
+        "present_system": "",
+        "present_sub_system": "",
+        "future_super_system": "",
+        "future_system": "",
+        "future_sub_system": ""
+    }
+
+    # Split the output by lines and process each line
+    for line in output.split('\n'):
+        # Remove leading and trailing whitespace from each line
+        line = line.strip()
+        if line.startswith("PAST SUPER SYSTEM:"):
+            parsed_data["past_super_system"] = line.split(":")[1].strip().strip('"')
+        elif line.startswith("PAST SYSTEM:"):
+            parsed_data["past_system"] = line.split(":")[1].strip().strip('"')
+        elif line.startswith("PAST SUB SYSTEM:"):
+            parsed_data["past_sub_system"] = line.split(":")[1].strip().strip('"')
+        elif line.startswith("PRESENT SUPER SYSTEM:"):
+            parsed_data["present_super_system"] = line.split(":")[1].strip().strip('"')
+        elif line.startswith("PRESENT SYSTEM:"):
+            parsed_data["present_system"] = line.split(":")[1].strip().strip('"')
+        elif line.startswith("PRESENT SUB SYSTEM:"):
+            parsed_data["present_sub_system"] = line.split(":")[1].strip().strip('"')
+        elif line.startswith("FUTURE SUPER SYSTEM:"):
+            parsed_data["future_super_system"] = line.split(":")[1].strip().strip('"')
+        elif line.startswith("FUTURE SYSTEM:"):
+            parsed_data["future_system"] = line.split(":")[1].strip().strip('"')
+        elif line.startswith("FUTURE SUB SYSTEM:"):
+            parsed_data["future_sub_system"] = line.split(":")[1].strip().strip('"')
+
+    return parsed_data
 
 # Function to prepare constraints
 def generate_constraints(llm, extracted_problem):
@@ -712,7 +749,7 @@ def convo():
         "Analyze Problem Breadth and Depth✅",
         "Update Breadth and Depth✅",
         "Generate Future Scenarios",
-        "Create Function Map✅",
+        "Create Problem Landscape✅",
         "Apply TRIZ Principle",
         "Generate Problem Summary",
         "Recommend Experts",
@@ -818,12 +855,13 @@ def convo():
     elif choice == "Generate Future Scenarios":
         st.write("Prompt Under Development")
 
-    elif choice == "Create Function Map✅":
+    elif choice == "Create Problem Landscape✅":
         extracted_information = st.text_area("Enter extracted problems(user won't have to add):")
         if st.button("Run"):
-            with st.spinner("Generating Function Maps...."):
-                functionmap = function_map(llm,extracted_information)
+            with st.spinner("Creating Problem Landscape...."):
+                functionmap = problem_landscape(llm,extracted_information)
             st.write(functionmap)
+            st.write(parse_problem_landscape_output(functionmap))
 
     elif choice == "Apply TRIZ Principle":
         st.write("Prompt Under Development")
