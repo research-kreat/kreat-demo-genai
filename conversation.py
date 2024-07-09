@@ -601,6 +601,7 @@ def problem_landscape(llm,extracted_information):
         3. What were the main drivers, challenges, and limitations that shaped the historical development of [TECHNOLOGY/SYSTEM]?
         4. How did the needs, expectations, and behaviors of users or society influence the past evolution of [TECHNOLOGY/SYSTEM]?
         5. What were the significant transitions or paradigm shifts in the past that transformed [TECHNOLOGY/SYSTEM]?
+        FIND OUT 5 OR MORE SUCH TECHNOLOGIES THAT WERE DOMINANT IN THE PAST.
 
         For the present system, subsystems, and supersystems search from the given information and answer.
 
@@ -609,6 +610,9 @@ def problem_landscape(llm,extracted_information):
         2. How might the performance, capabilities, and applications of [TECHNOLOGY/SYSTEM] evolve in the next 5, 10, or 20 years?
         3. What are the potential disruptive innovations or breakthrough technologies that could revolutionize [TECHNOLOGY/SYSTEM]?
         4. How might the changing needs, expectations, and behaviors of users or society influence the future development of [TECHNOLOGY/SYSTEM]?
+        PREDICT 5 OR MORE SUCH UPCOMING TECHNOLOGIES. 
+
+        ALL THE TECHNOLOGIES AND THE NAMES SHOULD NOT BE CONSISTING OF JARGON WORDS LIKE "EARLY" SYSTEMS OR "ADVANCED" OR "FUTURE" SYSTEMS.
 
 
         Now here is some information about the problem in hand:
