@@ -2,6 +2,7 @@
 
 import streamlit as st
 from langchain_openai import AzureChatOpenAI
+import pandas as pd
 
 # Function to initialize AzureChatOpenAI
 def initialize_llm():
@@ -592,17 +593,17 @@ def problem_landscape(llm,extracted_information):
         All the 9 results should be within " " (double quotes). All 9 ANSWERS SHOULD BE IN NEWLINE.
         THE OUTPUT WILL BE PARSED TO A JSON SO STRICTLY RESPOND TO THE FORMAT GIVEN BELOW:
 
-        PAST SUPER SYSTEM: "...YOUR ONE TWO WORDED ANSWER..." \n
-        PAST SYSTEM: "...YOUR ONE TWO WORDED ANSWER..." \n
-        PAST SUB SYSTEM: "...YOUR ONE TWO WORDED ANSWER..." \n
+        PAST SUPER SYSTEM: "...COMPONENTS(part by part, seperated by comma)..." \n
+        PAST SYSTEM: "...COMPONENTS(part by part, seperated by comma)..." \n
+        PAST SUB SYSTEM: "...COMPONENTS(part by part, seperated by comma)..." \n
 
-        PRESENT SUPER SYSTEM: "...YOUR ONE TWO WORDED ANSWER..." \n
-        PRESENT SYSTEM: "...YOUR ONE TWO WORDED ANSWER..."\n
-        PRESENT SUB SYSTEM: "...YOUR ONE TWO WORDED ANSWER..." \n
+        PRESENT SUPER SYSTEM: "...COMPONENTS(part by part, seperated by comma)..." \n
+        PRESENT SYSTEM: "...COMPONENTS(part by part, seperated by comma)..."\n
+        PRESENT SUB SYSTEM: "...COMPONENTS(part by part, seperated by comma)..." \n
 
-        PRESENT SUPER SYSTEM: "...YOUR ONE TWO WORDED ANSWER..." \n
-        PRESENT SYSTEM: "...YOUR ONE TWO WORDED ANSWER..." \n
-        PRESENT SUB SYSTEM: "...YOUR ONE TWO WORDED ANSWER..." \n
+        PRESENT SUPER SYSTEM: "...COMPONENTS(part by part, seperated by comma)..." \n
+        PRESENT SYSTEM: "...COMPONENTS(part by part, seperated by comma)..." \n
+        PRESENT SUB SYSTEM: "...COMPONENTS(part by part, seperated by comma)..." \n
     """
     response = llm.invoke(prompt)
     return response.content
@@ -644,7 +645,18 @@ def parse_problem_landscape_output(output):
         elif line.startswith("FUTURE SUB SYSTEM:"):
             parsed_data["future_sub_system"] = line.split(":")[1].strip().strip('"')
 
-    return parsed_data
+    # Create a DataFrame
+    data = {
+        "Past": [parsed_data["past_super_system"], parsed_data["past_system"], parsed_data["past_sub_system"]],
+        "Present": [parsed_data["present_super_system"], parsed_data["present_system"], parsed_data["present_sub_system"]],
+        "Future": [parsed_data["future_super_system"], parsed_data["future_system"], parsed_data["future_sub_system"]]
+    }
+
+    index = ["Super System", "System", "Sub System"]
+
+    df = pd.DataFrame(data, index=index)
+
+    return df
 
 # Function to prepare constraints
 def generate_constraints(llm, extracted_problem):
@@ -856,12 +868,12 @@ def convo():
         st.write("Prompt Under Development")
 
     elif choice == "Create Problem Landscape✅":
-        extracted_information = st.text_area("Enter extracted problems(user won't have to add):")
+        extracted_information = st.text_input("Enter extracted problems(user won't have to add):")
         if st.button("Run"):
             with st.spinner("Creating Problem Landscape...."):
                 functionmap = problem_landscape(llm,extracted_information)
-            st.write(functionmap)
-            st.write(parse_problem_landscape_output(functionmap))
+            #st.write(functionmap)
+            st.table(parse_problem_landscape_output(functionmap))
 
     elif choice == "Apply TRIZ Principle":
         st.write("Prompt Under Development")
