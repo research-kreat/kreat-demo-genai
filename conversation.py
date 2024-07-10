@@ -577,24 +577,26 @@ def problem_landscape(llm, extracted_information):
         {extracted_information}
 
         ## TASK ##
-        Your task is to create a function map for the given technology/system. You need to identify the past, present, and future systems, subsystems, and supersystems. A function map illustrates the relationships between systems, subsystems, and super-systems within a larger framework.
+        Your task is to create a detailed function map for the given technology/system. Identify specific past, present, and future systems, subsystems, and supersystems. A function map illustrates the relationships between systems, subsystems, and super-systems within a larger framework.
 
         Follow these guidelines:
 
         1. **Supersystem**:
-            - **Past**: Broader applications and environments where the technology/system was used.
-            - **Present**: Current broader applications and environments.
-            - **Future**: Predict future broader applications and environments.
+            - **Past**: Identify specific broader applications, industries, and environments where the technology/system was used historically.
+            - **Present**: List current specific broader applications, industries, and environments.
+            - **Future**: Predict specific future broader applications, industries, and environments, including emerging trends.
 
         2. **System**:
-            - **Past**: Specific architectures, designs, or solutions used historically.
-            - **Present**: Current architectures, designs, or solutions.
-            - **Future**: Predict future architectures, designs, or solutions.
+            - **Past**: Name specific architectures, designs, or solutions used historically. Include actual technologies or products when possible.
+            - **Present**: Describe current specific architectures, designs, or solutions. Focus on the main technology in question.
+            - **Future**: Predict specific future architectures, designs, or solutions. Include emerging technologies and theoretical concepts.
 
         3. **Subsystem**:
-            - **Past**: Critical components and technologies used historically.
-            - **Present**: Current critical components and technologies.
-            - **Future**: Predict future critical components and technologies.
+            - **Past**: List specific critical components, technologies, and materials used historically.
+            - **Present**: Enumerate current specific critical components, technologies, and materials.
+            - **Future**: Predict specific future critical components, technologies, and materials. Include cutting-edge research areas.
+
+        Aim for high specificity and technical detail in your responses. Include actual technology names, scientific concepts, and industry-specific terminology where appropriate. Provide 4-5 examples for each category when possible.
 
         Use the following format for your response:
 
@@ -625,25 +627,7 @@ def problem_landscape(llm, extracted_information):
         FUTURE SYSTEM: "Solid-state batteries, Graphene-based batteries, Sodium-ion batteries, Flow batteries, Aluminium-air batteries"
         FUTURE SUB SYSTEM: "Advanced electrode materials, Energy-dense electrolytes, Intelligent BMS, Rapid charging technology, Self-healing battery technologies"
 
-        I'd be happy to provide 5 more examples in a similar format. Here they are:
-
-        ##EXAMPLE INPUT##
-        Solar Photovoltaic Panels
-        ## EXAMPLE OUTPUT ##
-        PAST SUPER SYSTEM: "Early renewable energy technologies, Space exploration power systems, Off-grid power solutions, Environmental sustainability initiatives"
-        PAST SYSTEM: "Solar thermal collectors, Photovoltaic cells, Concentrated solar power, Silicon-based solar cells"
-        PAST SUB SYSTEM: "Silicon wafers, Anti-reflective coatings, Metal contacts, Encapsulation materials"
-
-        PRESENT SUPER SYSTEM: "Renewable energy grids, Green building technologies, Microgrids, Sustainable urban development"
-        PRESENT SYSTEM: "Solar Photovoltaic Panels"
-        PRESENT SUB SYSTEM: "Monocrystalline cells, Polycrystalline cells, Thin-film cells, Inverters, Mounting systems"
-
-        FUTURE SUPER SYSTEM: "Advanced energy harvesting systems, Self-powered smart cities, Space-based solar power, Integrated energy ecosystems"
-        FUTURE SYSTEM: "Perovskite solar cells, Quantum dot solar cells, Transparent solar panels, Bifacial solar panels, Organic photovoltaics"
-        FUTURE SUB SYSTEM: "Multi-junction cells, Nanomaterial-enhanced photovoltaics, Self-cleaning surfaces, Integrated energy storage, AI-optimized solar tracking"
-
-
-        Please provide the components for each category in a similar format for the problem system: {extracted_information}.
+        Please provide highly detailed and specific components for each category in a similar format for the problem system: {extracted_information}.
         
         Your Input: {extracted_information}
         Your output:
@@ -651,7 +635,6 @@ def problem_landscape(llm, extracted_information):
     """
     response = llm.invoke(prompt)
     return response.content
-
 
 #Function to check the landscape
 def check_problem_landscape(llm,landscape):
