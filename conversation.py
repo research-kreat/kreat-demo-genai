@@ -570,73 +570,94 @@ def update_depth_breadth(llm,problem_breadth_depth,feedback):
     return response.content
 
 
-#Function to create a function map
-def problem_landscape(llm,extracted_information):
+def problem_landscape(llm, extracted_information):
     prompt = f"""
-
-        ## INFORMATION ##
-        In systems theory, a function map illustrates the relationships between systems, subsystems, and super-systems within a larger framework. Here's how they are defined:
-
-        1. Supersystem (Past, Present, Future):
-        - Describe the broader applications, contexts, and environments in which the [TECHNOLOGY/SYSTEM] has been, is currently, and will be used.
-        - Identify the key trends, drivers, and requirements shaping the evolution of the [TECHNOLOGY/SYSTEM] at the Supersystem level.
-        
-
-        2. System (Past, Present, Future):
-        - Identify the specific [TECHNOLOGY/SYSTEM] architectures, designs, or dominant solutions in each time period.
-        - Describe the key capabilities, functions, and performance characteristics of the [TECHNOLOGY/SYSTEM] in each generation.
-        - For the present system, talk about only the system is queried about[YOU CAN FIND THIS IN THE PROBBLEM INFORMATION]
-        - For the past system look for the systems, architectures, designs that were dominant in the past.[TRY AND FIND THE TECHNOLOGIES THAT HAD BEEN IN USE FROOM YOUR KNOWLEDGE]
-        - For the future system look for the systems, architectures, designs that will dominate in the comming years[PREDICT THESE TECHNOLOGIES USING YOUR KNOWLEDGE]
-
-        3. Subsystem (Past, Present, Future):
-        - Break down the critical components, technologies, and sub-systems used within each generation of the [TECHNOLOGY/SYSTEM].
-        - Highlight the advancements, innovations, and enabling technologies at the Subsystem level that drive the evolution of the [TECHNOLOGY/SYSTEM].
-
-        A function map visually represents these relationships, depicting the interconnections, dependencies, and interactions between systems, subsystems, and super-systems. This visualization helps stakeholders comprehend the hierarchical structure and the flow of information or processes within the entire system framework. Function maps are essential tools in system analysis, design, and optimization, enabling effective management and improvement of complex systems.
-
-        For the Past systems, subsystems, and supersystems think like this and answer:
-        1. What were the key milestones, inventions, or discoveries that marked the early development of [TECHNOLOGY/SYSTEM]?
-        2. How did the performance, capabilities, and applications of [TECHNOLOGY/SYSTEM] evolve over time in the past?
-        3. What were the main drivers, challenges, and limitations that shaped the historical development of [TECHNOLOGY/SYSTEM]?
-        4. How did the needs, expectations, and behaviors of users or society influence the past evolution of [TECHNOLOGY/SYSTEM]?
-        5. What were the significant transitions or paradigm shifts in the past that transformed [TECHNOLOGY/SYSTEM]?
-        FIND OUT 5 OR MORE SUCH TECHNOLOGIES THAT WERE DOMINANT IN THE PAST.
-
-        For the present system, subsystems, and supersystems search from the given information and answer.
-
-        For the Future systems, subsystems, and supersystems:
-        1. What are the emerging technologies and trends that could shape the future of [TECHNOLOGY/SYSTEM]?
-        2. How might the performance, capabilities, and applications of [TECHNOLOGY/SYSTEM] evolve in the next 5, 10, or 20 years?
-        3. What are the potential disruptive innovations or breakthrough technologies that could revolutionize [TECHNOLOGY/SYSTEM]?
-        4. How might the changing needs, expectations, and behaviors of users or society influence the future development of [TECHNOLOGY/SYSTEM]?
-        PREDICT 5 OR MORE SUCH UPCOMING TECHNOLOGIES. 
-
-        Avoid using OF JARGON WORDS LIKE "EARLY" SYSTEMS OR "ADVANCED" OR "FUTURE" SYSTEMS.
-
-
-        Now here is some information about the problem in hand:
+        ## CONTEXT ##
+        Here is some information about the problem:
         {extracted_information}
 
-        ## INSTRUCTION ##
-        Your task is to use your specialised knowledge system to give the System, Subsystem and Supersystem for PRESENT, PAST AND ALSO PREDICT FOR FUTURE for the given problem. Think carefully about each of the three step and answer with proper reasons. Please confine the searching problem to the one given in the prompt and use your knowledge to only identify the kind of systems FOR ALL THREE: PAST, PRESENT AND FUTURE.
-        All the 9 results should be within " " (double quotes). All 9 ANSWERS SHOULD BE IN NEWLINE.
-        THE OUTPUT WILL BE PARSED TO A JSON SO STRICTLY RESPOND TO THE FORMAT GIVEN BELOW:
+        ## TASK ##
+        Your task is to create a function map for the given technology/system. You need to identify the past, present, and future systems, subsystems, and supersystems. A function map illustrates the relationships between systems, subsystems, and super-systems within a larger framework.
 
-        PAST SUPER SYSTEM: "...COMPONENTS LIST(part by part, seperated by comma)..." \n
-        PAST SYSTEM: "...COMPONENTS LISR(part by part, seperated by comma)..." \n
-        PAST SUB SYSTEM: "...COMPONENTS LIST(part by part, seperated by comma)..." \n
+        Follow these guidelines:
 
-        PRESENT SUPER SYSTEM: "...COMPONENTS LIST(part by part, seperated by comma)..." \n
-        PRESENT SYSTEM: "...COMPONENTS LIST(part by part, seperated by comma)..."\n
-        PRESENT SUB SYSTEM: "...COMPONENTS LIST(part by part, seperated by comma)..." \n
+        1. **Supersystem**:
+            - **Past**: Broader applications and environments where the technology/system was used.
+            - **Present**: Current broader applications and environments.
+            - **Future**: Predict future broader applications and environments.
 
-        PRESENT SUPER SYSTEM: "...COMPONENTS LIST(part by part, seperated by comma)..." \n
-        PRESENT SYSTEM: "...COMPONENTS LIST(part by part, seperated by comma)..." \n
-        PRESENT SUB SYSTEM: "...COMPONENTS LIST(part by part, seperated by comma)..." \n
+        2. **System**:
+            - **Past**: Specific architectures, designs, or solutions used historically.
+            - **Present**: Current architectures, designs, or solutions.
+            - **Future**: Predict future architectures, designs, or solutions.
+
+        3. **Subsystem**:
+            - **Past**: Critical components and technologies used historically.
+            - **Present**: Current critical components and technologies.
+            - **Future**: Predict future critical components and technologies.
+
+        Use the following format for your response:
+
+        PAST SUPER SYSTEM: "..."
+        PAST SYSTEM: "..."
+        PAST SUB SYSTEM: "..."
+
+        PRESENT SUPER SYSTEM: "..."
+        PRESENT SYSTEM: "..."
+        PRESENT SUB SYSTEM: "..."
+
+        FUTURE SUPER SYSTEM: "..."
+        FUTURE SYSTEM: "..."
+        FUTURE SUB SYSTEM: "..."
+
+        ##EXAMPLE INPUT##
+        Lithium-ion batteries
+        ## EXAMPLE OUTPUT ##
+        PAST SUPER SYSTEM: "Early battery technologies, Electrical systems, Automotive industry, Portable electronic devices"
+        PAST SYSTEM: "Lead-acid batteries, Nickel-cadmium batteries, Nickel-metal hydride batteries, Lithium-ion batteries, Zinc-carbon batteries"
+        PAST SUB SYSTEM: "Electrodes, Electrolytes, Battery management circuits, Casing and packaging"
+
+        PRESENT SUPER SYSTEM: "Renewable energy systems, Electric vehicles, Consumer electronics, Industrial power backup systems"
+        PRESENT SYSTEM: "Lithium-ion batteries"
+        PRESENT SUB SYSTEM: "Battery cells, Battery management system (BMS), Thermal management system, Charging system"
+
+        FUTURE SUPER SYSTEM: "Smart grid energy storage, High-capacity energy storage, Advanced transportation systems, Wearable technology, Space exploration technology"
+        FUTURE SYSTEM: "Solid-state batteries, Graphene-based batteries, Sodium-ion batteries, Flow batteries, Aluminium-air batteries"
+        FUTURE SUB SYSTEM: "Advanced electrode materials, Energy-dense electrolytes, Intelligent BMS, Rapid charging technology, Self-healing battery technologies"
+
+        I'd be happy to provide 5 more examples in a similar format. Here they are:
+
+        ##EXAMPLE INPUT##
+        Solar Photovoltaic Panels
+        ## EXAMPLE OUTPUT ##
+        PAST SUPER SYSTEM: "Early renewable energy technologies, Space exploration power systems, Off-grid power solutions, Environmental sustainability initiatives"
+        PAST SYSTEM: "Solar thermal collectors, Photovoltaic cells, Concentrated solar power, Silicon-based solar cells"
+        PAST SUB SYSTEM: "Silicon wafers, Anti-reflective coatings, Metal contacts, Encapsulation materials"
+
+        PRESENT SUPER SYSTEM: "Renewable energy grids, Green building technologies, Microgrids, Sustainable urban development"
+        PRESENT SYSTEM: "Solar Photovoltaic Panels"
+        PRESENT SUB SYSTEM: "Monocrystalline cells, Polycrystalline cells, Thin-film cells, Inverters, Mounting systems"
+
+        FUTURE SUPER SYSTEM: "Advanced energy harvesting systems, Self-powered smart cities, Space-based solar power, Integrated energy ecosystems"
+        FUTURE SYSTEM: "Perovskite solar cells, Quantum dot solar cells, Transparent solar panels, Bifacial solar panels, Organic photovoltaics"
+        FUTURE SUB SYSTEM: "Multi-junction cells, Nanomaterial-enhanced photovoltaics, Self-cleaning surfaces, Integrated energy storage, AI-optimized solar tracking"
+
+
+        Please provide the components for each category in a similar format for the problem system: {extracted_information}.
+        
+        Your Input: {extracted_information}
+        Your output:
+
     """
     response = llm.invoke(prompt)
     return response.content
+
+
+#Function to check the landscape
+def check_problem_landscape(llm,landscape):
+    prompt = f"""
+    Here is a problem: 
+    """
 
 def parse_problem_landscape_output(output):
     # Initialize a dictionary to store the parsed values
@@ -674,7 +695,7 @@ def parse_problem_landscape_output(output):
             parsed_data["future_system"] = line.split(":")[1].strip().strip('"')
         elif line.startswith("FUTURE SUB SYSTEM:"):
             parsed_data["future_sub_system"] = line.split(":")[1].strip().strip('"')
-
+    #st.write(parsed_data)
     # Create a DataFrame
     data = {
         "Past": [parsed_data["past_super_system"], parsed_data["past_system"], parsed_data["past_sub_system"]],
