@@ -770,6 +770,68 @@ def identify_harmful_function_map(llm, components):
     response = llm.invoke(prompt)
     return response.content
 
+#Function to use CREATE think model for Ideas.
+def create_combined_prompt(llm, idea):
+    prompt = f"""
+    Let's explore ways to enhance and reimagine your product idea using the CREATE method. We'll go through each step together, considering both intuitive insights and creative suggestions.
+
+    Your product idea:
+    {idea}
+
+    For each CREATE step, we'll consider:
+    1. Intuitive insights: What naturally comes to mind when thinking about this aspect?
+    2. Creative suggestions: Some fresh ideas to consider.
+
+    Let's begin our journey through CREATE:
+
+    1. Combine
+       How might we blend this with other concepts or technologies for added value?
+
+    2. Reverse
+       What if we flipped our approach or looked at this from a new angle?
+
+    3. Eliminate
+       Are there aspects we could simplify or remove to streamline the product?
+
+    4. Adapt
+       In what ways could we adjust the product for different uses or markets?
+
+    5. Transform (Modify)
+       What changes in form or function might enhance the product?
+
+    6. Explore Other Uses
+       What unexpected applications might we discover for this product?
+
+    Feel free to let your imagination run wild - there are no wrong answers here. Let's see where this creative journey takes us!
+
+    Please note:
+    The Creative suggestions for every part of the response should be based on these intuitive insights given the same part.
+
+    Please provide your thoughts on each CREATE step, following this format at the end of your response:
+
+    - Combine:
+      - Intuitive insights: 
+      - Creative suggestions: 
+    - Reverse:
+      - Intuitive insights: 
+      - Creative suggestions: 
+    - Eliminate:
+      - Intuitive insights: 
+      - Creative suggestions: 
+    - Adapt:
+      - Intuitive insights: 
+      - Creative suggestions: 
+    - Transform:
+      - Intuitive insights: 
+      - Creative suggestions: 
+    - Explore Other Uses:
+      - Intuitive insights: 
+      - Creative suggestions: 
+    """
+    response = llm.invoke(prompt)
+    return response.content
+
+
 # Function to prepare constraints
 def generate_constraints(llm, extracted_problem):
     prompt = f'''
@@ -874,8 +936,8 @@ def convo():
         "Update Breadth and Depth✅",
         "Generate Future Scenarios",
         "Create Problem Landscape✅",
-        "Create Problem Landscape(updated:v2)✅",
         "Create Function Map✅",
+        "CREATE Model for ideas✅",
         "Apply TRIZ Principle",
         "Generate Problem Summary",
         "Recommend Experts",
@@ -1014,6 +1076,12 @@ def convo():
             with st.spinner("Creating Harmful Function map..."):
                 st.markdown("### Function Map with Harmful Functions")
                 st.write(identify_harmful_function_map(llm,components))
+
+    elif choice == "CREATE Model for ideas✅":
+        idea = st.text_input("Enter any idea:")
+        if st.button("Run"):
+            with st.spinner("C for Combine, R for Reverse, E for Eliminate, A for Adapt, T for Transform, E for Explore... Now let's CREATE your idea..."):
+                st.write(create_combined_prompt(llm,idea))
 
 
     elif choice == "Apply TRIZ Principle":
