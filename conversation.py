@@ -264,8 +264,7 @@ def generate_abstract(llm, title,extracted_problem):
 
         
         Your response should be in the following format:
-        Here's a draft abstract for you:
-        Abstract:
+        Here is your Abstract:
 
         Reasoning:
         (...step by step reasoning, bulleted point-wise of why it is a well-framed abstract...)
@@ -690,7 +689,86 @@ def parse_problem_landscape_output(output):
 
     df = pd.DataFrame(data, index=index)
 
-    return df
+    return df,parsed_data
+
+#Funtions to create function map updated.
+def identify_useful_function_map(llm, components):
+    prompt = f"""
+    Create a detailed Useful Function Map for the given system components. Follow these steps:
+
+    1. Use the provided components to create a matrix where both rows and columns are labeled with these components.
+    2. For each interaction between components, identify only the useful functions (UF). Think very carefully about all possible useful functions.
+    3. Describe how one component positively affects the other using concise phrases that include both the action and the affected component.
+    4. Place these functions in the corresponding cell of the matrix.
+
+    Guidelines:
+    - Use "UF:" to prefix useful functions.
+    - Be specific and accurate when identifying functions. Include both the action and the affected component.
+    - If there's no useful interaction between components, leave the cell empty or use a dash (-).
+    - Multiple functions in the same cell should be separated by a line break.
+
+    Here's an example of the desired output format based on the provided CSV data:
+
+    | Components | Three point linkage | Blades | Chain and cover | Water | Stone | Mud | Shaft | Tiller cover | Tractor | Farmer |
+    |------------|---------------------|--------|-----------------|-------|-------|-----|-------|--------------|---------|--------|
+    | Three point linkage | - | - | - | - | - | - | - | - | UF: Pull tractor | UF: Farmer connects |
+    | Blades | - | - | - | - | - | UF: Cuts mud | UF: Shaft rotates blades | - | - | - |
+    | Chain and cover | - | - | - | - | - | - | UF: Rotates shaft | - | - | - |
+    | Water | - | - | - | - | - | - | - | UF: Tiller cover stops water | - | - |
+    | Stone | - | - | - | - | - | - | - | UF: Tiller cover protects from stone | - | - |
+    | Mud | - | UF: Cuts blades | - | - | - | - | - | UF: Tiller cover stops mud | - | - |
+    | Shaft | - | UF: Rotates blades | UF: Rotates chain | - | - | - | - | - | - | - |
+    | Tiller cover | - | - | - | UF: Stops water | UF: Protects from stone | UF: Stops mud | - | - | - | - |
+    | Tractor | UF: Pulls three point linkage | - | - | - | - | - | - | - | - | UF: Farmer drives tractor |
+    | Farmer | UF: Connects three point linkage | - | - | - | - | - | - | - | UF: Drives tractor | - |
+
+    This example demonstrates the ideal format and level of detail we're aiming for. Your task is to create a similar matrix using the provided components, identifying only useful functions for each interaction.
+
+    Components: {components}
+
+    Please provide the Useful Function Map in a markdown table format similar to the example above, using the given components.
+    """
+    response = llm.invoke(prompt)
+    return response.content
+
+def identify_harmful_function_map(llm, components):
+    prompt = f"""
+    Create a detailed Harmful Function Map for the given system components. Follow these steps:
+
+    1. Use the provided components to create a matrix where both rows and columns are labeled with these components.
+    2. For each interaction between components, identify only the harmful functions (HF). Think very carefully about all possible harmful functions.
+    3. Describe how one component negatively affects the other using concise phrases that include both the action and the affected component.
+    4. Place these functions in the corresponding cell of the matrix.
+
+    Guidelines:
+    - Use "HF:" to prefix harmful functions.
+    - Be specific and accurate when identifying functions. Include both the action and the affected component.
+    - If there's no harmful interaction between components, leave the cell empty or use a dash (-).
+    - Multiple functions in the same cell should be separated by a line break.
+
+    Here's an example of the desired output format based on the provided CSV data:
+
+    | Components | Three point linkage | Blades | Chain and cover | Water | Stone | Mud | Shaft | Tiller cover | Tractor | Farmer |
+    |------------|---------------------|--------|-----------------|-------|-------|-----|-------|--------------|---------|--------|
+    | Three point linkage | - | - | - | - | - | - | - | - | - | - |
+    | Blades | - | - | - | HF: Water rusts blades | HF: Stone breaks blades | HF: Throws mud | - | - | - | - |
+    | Chain and cover | - | - | - | HF: Water rusts chain and cover | - | - | - | - | - | - |
+    | Water | - | HF: Rusts blades | HF: Rusts chain and cover | - | - | - | HF: Rusts shaft | HF: Rusts tiller cover | - | - |
+    | Stone | - | HF: Breaks blades | - | - | - | - | HF: Hits shaft | HF: Hits tiller cover | - | - |
+    | Mud | - | HF: Blade throws mud | - | - | - | - | HF: Sticks to shaft | - | - | - |
+    | Shaft | - | - | - | HF: Water rusts shaft | HF: Stone hits shaft | HF: Mud sticks to shaft | - | - | - | - |
+    | Tiller cover | - | - | - | HF: Water rusts tiller cover | HF: Stone hits tiller cover | - | - | - | - | - |
+    | Tractor | - | - | - | - | - | - | - | - | - | - |
+    | Farmer | - | - | - | - | - | - | - | - | - | - |
+
+    This example demonstrates the ideal format and level of detail we're aiming for. Your task is to create a similar matrix using the provided components, identifying only harmful functions for each interaction.
+
+    Components: {components}
+
+    Please provide the Harmful Function Map in a markdown table format similar to the example above, using the given components.
+    """
+    response = llm.invoke(prompt)
+    return response.content
 
 # Function to prepare constraints
 def generate_constraints(llm, extracted_problem):
@@ -796,6 +874,8 @@ def convo():
         "Update Breadth and Depth✅",
         "Generate Future Scenarios",
         "Create Problem Landscape✅",
+        "Create Problem Landscape(updated:v2)✅",
+        "Create Function Map✅",
         "Apply TRIZ Principle",
         "Generate Problem Summary",
         "Recommend Experts",
@@ -907,7 +987,34 @@ def convo():
             with st.spinner("Creating Problem Landscape...."):
                 functionmap = problem_landscape(llm,extracted_information)
             #st.write(functionmap)
-            st.table(parse_problem_landscape_output(functionmap))
+            table,parsed_data = parse_problem_landscape_output(functionmap)
+            st.table(table)
+           # Store the parsed data in session state
+            st.session_state.parsed_data = parsed_data
+
+            # Check if parsed data is in session state to display multiselect
+            if 'parsed_data' in st.session_state:
+                # Convert the dictionary to a list of tuples (key, value) for multiselect options
+                options = [(key, value) for key, value in st.session_state.parsed_data.items()]
+
+                # Multiselect widget for selecting multiple values
+                selected_keys = st.multiselect("Select options:", options, format_func=lambda x: f"{x[0]}: {x[1]}")
+
+                # Button to print the list of selected values
+                if st.button("Print Selected Values"):
+                    selected_values = [value for key, value in selected_keys]
+                    st.write("Selected Values:", selected_values)
+
+    elif choice == "Create Function Map✅":
+        components = st.text_input("Enter components:")
+        if st.button("Run"):
+            with st.spinner("Creating Useful Function map..."):
+                st.markdown("### Function Map with Useful Functions")
+                st.write(identify_useful_function_map(llm,components))
+            with st.spinner("Creating Harmful Function map..."):
+                st.markdown("### Function Map with Harmful Functions")
+                st.write(identify_harmful_function_map(llm,components))
+
 
     elif choice == "Apply TRIZ Principle":
         st.write("Prompt Under Development")
