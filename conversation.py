@@ -1067,67 +1067,69 @@ def create_same_domain_prompt(llm, idea):
 def attribute_analysis(llm, idea):
     prompt = f"""
         ## Instruction ##
-        Conduct a comprehensive attribute analysis for the following idea: {idea}
+        Conduct a comprehensive and innovative attribute analysis for the following idea: {idea}
 
-        Follow these steps:
-        1. Identify 3-4 main categories of attributes relevant to the idea.
-        2. For each category, list 4-6 specific attributes.
-        3. For each specific attribute, provide 2-4 detailed examples, options, or variations.
-        4. After each category, provide a brief insight on how analyzing these attributes could lead to innovation or improvement.
+        Follow these detailed steps:
+        1. Identify 4-5 main categories of attributes relevant to the idea, ensuring a broad coverage of aspects (e.g., technical, user experience, economic, environmental, social).
+        2. For each category, list 5-7 specific attributes.
+        3. For each specific attribute, provide 3-4 detailed examples, options, or variations. Include current state-of-the-art examples and potential future innovations.
+        4. After each category, provide a detailed insight (2-3 sentences) on how analyzing these attributes could lead to innovation or improvement. Consider both short-term and long-term implications.
+        5. Include relevant quantitative data or ranges where applicable to make the analysis more concrete.
+        6. Consider emerging trends, technologies, or societal shifts that might influence the attributes in the future.
+        7. Briefly compare the attributes to industry standards or competitors where relevant.
+        8. Touch on how consumer preferences or regulatory requirements might impact or be impacted by these attributes.
 
         Present your analysis in the following format:
 
         ## Attribute Analysis for [Idea]
 
-        **Example:** [Detailed description of the context, goal, or problem to be solved]
+        **Context:** [Provide a detailed description of the context, goal, or problem to be solved. Include relevant market trends, technological advancements, or societal needs that make this idea important.]
 
         ****[Category 1]****
-        - [Attribute 1]: [Detailed Example 1], [Detailed Example 2], [Detailed Example 3]
-        - [Attribute 2]: [Detailed Example 1], [Detailed Example 2], [Detailed Example 3]
+        - [Attribute 1]: [Detailed Example 1 (with quantitative data if applicable)], [Detailed Example 2], [Detailed Example 3], [Potential future innovation]
+        - [Attribute 2]: [Detailed Example 1], [Detailed Example 2], [Detailed Example 3], [Potential future innovation]
         ...
 
-        **Insight:** [Explain how analyzing this category of attributes could lead to innovation or improvement]
+        **Insight:** [Provide a detailed explanation of how analyzing this category of attributes could lead to innovation or improvement. Consider both immediate applications and long-term potential. Discuss any challenges or opportunities this analysis reveals.]
 
         ****[Category 2]****
-        - [Attribute 1]: [Detailed Example 1], [Detailed Example 2], [Detailed Example 3]
-        - [Attribute 2]: [Detailed Example 1], [Detailed Example 2], [Detailed Example 3]
         ...
-
-        **Insight:** [Explain how analyzing this category of attributes could lead to innovation or improvement]
 
         [Repeat for all categories]
 
-        After presenting the attribute analysis, provide a concluding paragraph explaining how this comprehensive analysis can be used to generate innovative ideas or improvements for the given concept.
+        **Comparative Analysis:** [Briefly discuss how these attributes compare to industry standards or key competitors. Highlight any unique selling points or areas for improvement.]
+
+        **Consumer and Regulatory Considerations:** [Discuss how these attributes align with or challenge consumer expectations and regulatory requirements. Consider regional variations if applicable.]
+
+        **Conclusion:** [Provide a detailed concluding paragraph explaining how this comprehensive analysis can be used to generate innovative ideas or improvements for the given concept. Highlight key areas of opportunity and potential synergies between different attributes.]
 
         Here are three diverse examples to guide your analysis:
 
-        1. Product Example: Smart Running Shoes
-        ****Performance Attributes****
-        - Cushioning: Gel inserts, Air pockets, Foam density
-        - Traction: Rubber compound, Tread pattern, Adaptive grip
-        - Weight: Lightweight mesh, Carbon fiber plate, Minimalist design
+        1. Product Example: Next-Generation Smartphone
+        ****Display Technology Attributes****
+        - Screen Type: OLED (1000 nits brightness), MicroLED (5000 nits brightness), Foldable (200,000 fold durability), Holographic (360-degree viewing angle)
+        - Refresh Rate: 120Hz (standard), 240Hz (gaming-optimized), Variable (1-120Hz for energy efficiency)
+        - Touch Sensitivity: Multi-touch (10 points), Pressure-sensitive (256 levels), In-air gestures (up to 50cm distance)
 
-        **Insight:** Analyzing performance attributes can lead to shoes that adapt to different running conditions or personalized biomechanics.
+        **Insight:** Analyzing display technology can lead to more immersive and energy-efficient user experiences. Future innovations might focus on combining high refresh rates with holographic displays, potentially revolutionizing mobile gaming and AR applications.
 
-        2. Service Example: Personalized Mental Health App
-        ****Therapeutic Approach Attributes****
-        - Modalities: Cognitive Behavioral Therapy, Mindfulness, Positive Psychology
-        - Session Format: Text-based chat, Voice calls, Video sessions
-        - AI Integration: Mood tracking, Personalized exercises, Crisis detection
+        2. Service Example: AI-Powered Personal Finance Assistant
+        ****Financial Analysis Attributes****
+        - Expense Categorization: Rule-based (90% accuracy), Machine Learning (98% accuracy), Hybrid approach (99% accuracy with human-in-the-loop)
+        - Investment Recommendations: Risk-based allocation, Goal-oriented strategies, ESG-focused options
+        - Fraud Detection: Real-time monitoring (detects 95% of fraudulent transactions), Behavioral analysis (reduces false positives by 80%), Predictive modeling (identifies potential fraud patterns a week in advance)
 
-        **Insight:** Examining therapeutic approaches can help create a more holistic and adaptable mental health solution.
+        **Insight:** Enhancing financial analysis attributes can lead to more personalized and secure financial management. Future developments might integrate quantum computing for more complex predictive models, potentially offering near-perfect fraud detection and highly optimized investment strategies.
 
-        3. Process Example: Sustainable Manufacturing
-        ****Material Attributes****
-        - Source: Recycled plastics, Bio-based polymers, Upcycled waste
-        - Durability: Lifespan enhancement, Repair-friendly design, Biodegradability
-        - Processing: Energy-efficient molding, Additive manufacturing, Zero-waste cutting
+        3. Process Example: Autonomous Urban Farming System
+        ****Crop Management Attributes****
+        - Nutrient Delivery: Hydroponics (30% faster growth), Aeroponics (98% water efficiency), Bioponics (incorporates beneficial microorganisms)
+        - Light Optimization: LED (customizable spectrum), Natural light harvesting (reduces energy use by 40%), Dynamic light adaptation (adjusts based on plant growth stage)
+        - Harvest Automation: Robotic arms (harvests 500 plants/hour), AI-powered ripeness detection (increases yield by 15%), Selective harvesting (extends production cycles)
 
-        **Insight:** Analyzing material attributes can inspire circular economy solutions and reduce environmental impact throughout the product lifecycle.
+        **Insight:** Analyzing crop management attributes can lead to highly efficient and sustainable urban food production. Future innovations might combine AI-driven crop selection with closed-loop nutrient systems, potentially enabling self-sustaining urban farms that adapt to changing climate conditions and nutritional needs.
 
-        Use these examples as a guide to create a detailed and insightful attribute analysis for: {idea}
-
-        Give your response in Markdown Format.
+        Use these examples as a guide to create a detailed, forward-thinking, and insightful attribute analysis for: {idea}
 
         ## End Instruction ##
 
@@ -1136,7 +1138,6 @@ def attribute_analysis(llm, idea):
 
     response = llm.invoke(prompt)
     return response.content
-
 
 # Function to prepare constraints
 def generate_constraints(llm, extracted_problem):
