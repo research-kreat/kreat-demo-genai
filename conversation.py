@@ -771,7 +771,156 @@ def identify_harmful_function_map(llm, components):
     return response.content
 
 #Function to use CREATE think model for Ideas.
-def create_combined_prompt(llm, idea):
+def create_adjacent_domain_prompt(llm, idea):
+    prompt = f"""
+    Let's explore ways to enhance and reimagine your product idea using the CREATE method. We'll go through each step together, considering both intuitive insights and creative suggestions.
+
+    WHEN YOU ARE FRAMING YOUR ANSWER THINK OF ADJACENTS DOMAIN OF THE FOLLOWING IDEA AND USE DATA FROM ADJACENT DOMAINS TO ANSWER THE GIVEN POINTS.
+    
+    Your product idea:
+    {idea}
+
+    For each CREATE step, we'll consider:
+    1. Intuitive insights: What naturally comes to mind when thinking about this aspect?
+    2. Creative suggestions: Some fresh ideas to consider.
+
+    Let's begin our journey through CREATE:
+
+    1. Combine
+       How might we blend this with other concepts or technologies for added value?
+
+    2. Reverse
+       What if we flipped our approach or looked at this from a new angle?
+
+    3. Eliminate
+       Are there aspects we could simplify or remove to streamline the product?
+
+    4. Adapt
+       In what ways could we adjust the product for different uses or markets?
+
+    5. Transform (Modify)
+       What changes in form or function might enhance the product?
+
+    6. Explore Other Uses
+       What unexpected applications might we discover for this product?
+
+    Feel free to let your imagination run wild - there are no wrong answers here. Let's see where this creative journey takes us!
+
+    Please note:
+    The Creative suggestions for every part of the response should be based on these intuitive insights given the same part.
+
+    Please provide your thoughts on each CREATE step.
+    WHEN YOU ARE FRAMING YOUR ANSWER THINK OF ADJACENTS DOMAIN OF THE FOLLOWING IDEA AND USE DATA FROM ADJACENT DOMAINS TO ANSWER THE GIVEN POINTS.
+
+    Here is an example input: Electric Vehicle Battery
+    Here is an example output:
+    Sure, let's integrate insights and suggestions from adjacent domains to further enrich our CREATE analysis for EV batteries. We'll draw from areas such as renewable energy, smart technology, aerospace, healthcare, and consumer electronics.
+
+    ### 1. Combine:
+    - **Intuitive insights:**
+    - Combining EV batteries with renewable energy sources like solar panels or wind turbines for charging.
+    - Integrating smart technology for real-time monitoring and optimization.
+    - Combining EV batteries with energy storage systems for homes.
+
+    - **Creative suggestions:**
+    - **From Renewable Energy:** Integrate EV batteries with microgrids to enhance energy resilience in communities.
+    - **From Smart Technology:** Embed IoT sensors to create a network of connected batteries that can share performance data for collective optimization.
+    - **From Aerospace:** Use lightweight composite materials to reduce battery weight while maintaining durability.
+    - **From Healthcare:** Apply wearable tech principles to develop flexible battery components that conform to the vehicle’s shape.
+
+    ### 2. Reverse:
+    - **Intuitive insights:**
+    - Considering the recycling process first to ensure the entire lifecycle of the battery is sustainable.
+    - Exploring the potential of second-life applications for used EV batteries.
+    - Developing a battery that can be charged in reverse, i.e., it can supply power back to the grid or other devices.
+
+    - **Creative suggestions:**
+    - **From Circular Economy:** Implement closed-loop recycling systems where materials from old batteries are reused in new ones.
+    - **From Consumer Electronics:** Adopt modular design practices, like those in smartphones, to allow for easy upgrades and replacements.
+    - **From Data Centers:** Utilize liquid cooling systems to enhance thermal management and improve battery longevity.
+
+    ### 3. Eliminate:
+    - **Intuitive insights:**
+    - Removing heavy metals and toxic materials to make the battery more environmentally friendly.
+    - Simplifying the design to reduce manufacturing complexity and costs.
+    - Eliminating rare and expensive materials by finding alternative resources.
+
+    - **Creative suggestions:**
+    - **From Green Chemistry:** Use green solvents and environmentally benign materials in battery production.
+    - **From Automotive Industry:** Adopt lean manufacturing principles to minimize waste and streamline production.
+    - **From Biotechnology:** Explore the use of biopolymers as sustainable alternatives to traditional battery materials.
+
+    ### 4. Adapt:
+    - **Intuitive insights:**
+    - Adjusting battery capacity for different vehicle types, from scooters to trucks.
+    - Customizing battery shapes and sizes to fit various vehicle designs.
+    - Adapting the battery for extreme weather conditions.
+
+    - **Creative suggestions:**
+    - **From Construction:** Develop ruggedized batteries designed to withstand harsh environments, similar to those used in heavy machinery.
+    - **From Textile Industry:** Create flexible, fabric-like batteries that can be integrated into various vehicle surfaces.
+    - **From Space Exploration:** Implement radiation-hardened components to ensure battery reliability in extreme conditions.
+
+    ### 5. Transform:
+    - **Intuitive insights:**
+    - Enhancing battery energy density and longevity.
+    - Improving charging speed and efficiency.
+    - Transforming the battery’s form factor for better integration into vehicle designs.
+
+    - **Creative suggestions:**
+    - **From Consumer Electronics:** Use solid-state technology to create thinner, more energy-dense batteries.
+    - **From Wearable Tech:** Develop batteries with energy-harvesting capabilities to recharge from ambient sources like sunlight or motion.
+    - **From Robotics:** Implement autonomous self-repair mechanisms that enable the battery to fix minor damages on the go.
+
+    ### 6. Explore Other Uses:
+    - **Intuitive insights:**
+    - Using EV batteries for grid storage when they are no longer efficient for vehicle use.
+    - Employing old EV batteries in renewable energy projects.
+    - Utilizing EV batteries in portable power solutions.
+
+    - **Creative suggestions:**
+    - **From Agriculture:** Adapt EV batteries for use in electric tractors and farm equipment, supporting sustainable agriculture.
+    - **From Home Automation:** Integrate batteries into smart home systems, providing backup power and enhancing energy efficiency.
+    - **From Public Transportation:** Use repurposed EV batteries to power electric buses and trains, reducing urban pollution.
+
+    ### Summary:
+
+    - **Combine:**
+    - Intuitive insights: Integrating with renewable energy, smart technology, and home energy systems.
+    - Creative suggestions: Microgrid integration, IoT connectivity, lightweight composites, flexible components.
+
+    - **Reverse:**
+    - Intuitive insights: Recycling, second-life applications, reversible charging.
+    - Creative suggestions: Closed-loop recycling, modular designs, liquid cooling systems.
+
+    - **Eliminate:**
+    - Intuitive insights: Removing harmful materials, simplifying design, finding alternative resources.
+    - Creative suggestions: Green solvents, lean manufacturing, biopolymers.
+
+    - **Adapt:**
+    - Intuitive insights: Adjusting capacity, customizing shapes, adapting for weather conditions.
+    - Creative suggestions: Ruggedized designs, flexible fabric-like batteries, radiation-hardened components.
+
+    - **Transform:**
+    - Intuitive insights: Improving density, charging speed, and form factor.
+    - Creative suggestions: Solid-state technology, energy-harvesting, autonomous self-repair.
+
+    - **Explore Other Uses:**
+    - Intuitive insights: Grid storage, renewable energy projects, portable power.
+    - Creative suggestions: Electric farm equipment, smart home integration, public transportation applications.
+
+    ##Your input : {idea}
+    Your output:
+
+    Give output in markdown format.
+    
+    
+    """
+    response = llm.invoke(prompt)
+    return response.content
+
+#Function to use CREATE think model for Ideas.
+def create_same_domain_prompt(llm, idea):
     prompt = f"""
     Let's explore ways to enhance and reimagine your product idea using the CREATE method. We'll go through each step together, considering both intuitive insights and creative suggestions.
 
@@ -807,27 +956,184 @@ def create_combined_prompt(llm, idea):
     Please note:
     The Creative suggestions for every part of the response should be based on these intuitive insights given the same part.
 
-    Please provide your thoughts on each CREATE step, following this format at the end of your response:
+    Please provide your thoughts on each CREATE step. Here is an examples: 
 
-    - Combine:
-      - Intuitive insights: 
-      - Creative suggestions: 
-    - Reverse:
-      - Intuitive insights: 
-      - Creative suggestions: 
-    - Eliminate:
-      - Intuitive insights: 
-      - Creative suggestions: 
-    - Adapt:
-      - Intuitive insights: 
-      - Creative suggestions: 
-    - Transform:
-      - Intuitive insights: 
-      - Creative suggestions: 
-    - Explore Other Uses:
-      - Intuitive insights: 
-      - Creative suggestions: 
+    Input: "Electric Vehicle Battery"
+    Output:
+    "Sure, let's dive into the CREATE method to explore and enhance the idea of an electric vehicle (EV) battery.
+
+    ### 1. Combine:
+    - **Intuitive insights:**
+    - Combining EV batteries with renewable energy sources like solar panels or wind turbines for charging.
+    - Integrating smart technology for real-time monitoring and optimization.
+    - Combining EV batteries with energy storage systems for homes.
+
+    - **Creative suggestions:**
+    - Develop a hybrid battery system that uses both solid-state and liquid electrolyte components for increased safety and performance.
+    - Integrate AI-driven predictive maintenance to forecast and address potential battery issues before they occur.
+    - Create a modular battery system that can be easily swapped or upgraded without replacing the entire unit.
+
+    ### 2. Reverse:
+    - **Intuitive insights:**
+    - Considering the recycling process first to ensure the entire lifecycle of the battery is sustainable.
+    - Exploring the potential of second-life applications for used EV batteries.
+    - Developing a battery that can be charged in reverse, i.e., it can supply power back to the grid or other devices.
+
+    - **Creative suggestions:**
+    - Design a battery that prioritizes disassembly and recycling, with components that are easier to separate and repurpose.
+    - Implement a leasing model where consumers lease batteries, and manufacturers take responsibility for end-of-life recycling.
+    - Create a dual-function battery that not only powers the vehicle but can also serve as a mobile power bank for external devices.
+
+    ### 3. Eliminate:
+    - **Intuitive insights:**
+    - Removing heavy metals and toxic materials to make the battery more environmentally friendly.
+    - Simplifying the design to reduce manufacturing complexity and costs.
+    - Eliminating rare and expensive materials by finding alternative resources.
+
+    - **Creative suggestions:**
+    - Develop a battery using bio-based or organic materials that are both sustainable and less harmful to the environment.
+    - Streamline the battery management system to reduce the number of electronic components, making the battery lighter and more efficient.
+    - Create a simplified manufacturing process using 3D printing technology to reduce waste and lower production costs.
+
+    ### 4. Adapt:
+    - **Intuitive insights:**
+    - Adjusting battery capacity for different vehicle types, from scooters to trucks.
+    - Customizing battery shapes and sizes to fit various vehicle designs.
+    - Adapting the battery for extreme weather conditions.
+
+    - **Creative suggestions:**
+    - Design a universal battery module that can be adapted for different vehicles by changing its configuration or adding supplementary modules.
+    - Develop a battery with adaptive thermal management to optimize performance in various climate conditions.
+    - Create a battery that can be easily reconfigured for use in stationary energy storage, powering homes or businesses when not in use in a vehicle.
+
+    ### 5. Transform:
+    - **Intuitive insights:**
+    - Enhancing battery energy density and longevity.
+    - Improving charging speed and efficiency.
+    - Transforming the battery’s form factor for better integration into vehicle designs.
+
+    - **Creative suggestions:**
+    - Innovate a flexible battery that can be molded into different shapes, allowing for more creative vehicle designs.
+    - Develop a self-healing battery that can automatically repair minor damages, extending its lifespan.
+    - Implement wireless charging capabilities to simplify the charging process and reduce wear on physical connectors.
+
+    ### 6. Explore Other Uses:
+    - **Intuitive insights:**
+    - Using EV batteries for grid storage when they are no longer efficient for vehicle use.
+    - Employing old EV batteries in renewable energy projects.
+    - Utilizing EV batteries in portable power solutions.
+
+    - **Creative suggestions:**
+    - Repurpose EV batteries for use in marine applications, such as electric boats or underwater drones.
+    - Explore the use of EV batteries in aerospace applications, providing power for electric planes or satellites.
+    - Develop a compact version of the EV battery for use in portable emergency power systems or for camping and outdoor activities.
+
+    ### Summary:
+
+    - **Combine:**
+    - Intuitive insights: Integrating with renewable energy, smart technology, and home energy systems.
+    - Creative suggestions: Hybrid systems, AI-driven maintenance, modular designs.
+
+    - **Reverse:**
+    - Intuitive insights: Recycling, second-life applications, reversible charging.
+    - Creative suggestions: Easy disassembly, leasing model, dual-function batteries.
+
+    - **Eliminate:**
+    - Intuitive insights: Removing harmful materials, simplifying design, finding alternative resources.
+    - Creative suggestions: Bio-based materials, streamlined management systems, 3D printing.
+
+    - **Adapt:**
+    - Intuitive insights: Adjusting capacity, customizing shapes, adapting for weather conditions.
+    - Creative suggestions: Universal modules, adaptive thermal management, reconfigurable for stationary storage.
+
+    - **Transform:**
+    - Intuitive insights: Improving density, charging speed, and form factor.
+    - Creative suggestions: Flexible batteries, self-healing, wireless charging.
+
+    - **Explore Other Uses:**
+    - Intuitive insights: Grid storage, renewable energy projects, portable power.
+    - Creative suggestions: Marine and aerospace applications, compact emergency power systems."
+
+
+    ##Your input : {idea}
+    Your output:
+
+    Give output in markdown format.
     """
+    response = llm.invoke(prompt)
+    return response.content
+
+#Function to analyse attributes
+def attribute_analysis(llm, idea):
+    prompt = f"""
+        ## Instruction ##
+        Conduct a comprehensive attribute analysis for the following idea: {idea}
+
+        Follow these steps:
+        1. Identify 3-4 main categories of attributes relevant to the idea.
+        2. For each category, list 4-6 specific attributes.
+        3. For each specific attribute, provide 2-4 detailed examples, options, or variations.
+        4. After each category, provide a brief insight on how analyzing these attributes could lead to innovation or improvement.
+
+        Present your analysis in the following format:
+
+        ## Attribute Analysis for [Idea]
+
+        **Example:** [Detailed description of the context, goal, or problem to be solved]
+
+        ****[Category 1]****
+        - [Attribute 1]: [Detailed Example 1], [Detailed Example 2], [Detailed Example 3]
+        - [Attribute 2]: [Detailed Example 1], [Detailed Example 2], [Detailed Example 3]
+        ...
+
+        **Insight:** [Explain how analyzing this category of attributes could lead to innovation or improvement]
+
+        ****[Category 2]****
+        - [Attribute 1]: [Detailed Example 1], [Detailed Example 2], [Detailed Example 3]
+        - [Attribute 2]: [Detailed Example 1], [Detailed Example 2], [Detailed Example 3]
+        ...
+
+        **Insight:** [Explain how analyzing this category of attributes could lead to innovation or improvement]
+
+        [Repeat for all categories]
+
+        After presenting the attribute analysis, provide a concluding paragraph explaining how this comprehensive analysis can be used to generate innovative ideas or improvements for the given concept.
+
+        Here are three diverse examples to guide your analysis:
+
+        1. Product Example: Smart Running Shoes
+        ****Performance Attributes****
+        - Cushioning: Gel inserts, Air pockets, Foam density
+        - Traction: Rubber compound, Tread pattern, Adaptive grip
+        - Weight: Lightweight mesh, Carbon fiber plate, Minimalist design
+
+        **Insight:** Analyzing performance attributes can lead to shoes that adapt to different running conditions or personalized biomechanics.
+
+        2. Service Example: Personalized Mental Health App
+        ****Therapeutic Approach Attributes****
+        - Modalities: Cognitive Behavioral Therapy, Mindfulness, Positive Psychology
+        - Session Format: Text-based chat, Voice calls, Video sessions
+        - AI Integration: Mood tracking, Personalized exercises, Crisis detection
+
+        **Insight:** Examining therapeutic approaches can help create a more holistic and adaptable mental health solution.
+
+        3. Process Example: Sustainable Manufacturing
+        ****Material Attributes****
+        - Source: Recycled plastics, Bio-based polymers, Upcycled waste
+        - Durability: Lifespan enhancement, Repair-friendly design, Biodegradability
+        - Processing: Energy-efficient molding, Additive manufacturing, Zero-waste cutting
+
+        **Insight:** Analyzing material attributes can inspire circular economy solutions and reduce environmental impact throughout the product lifecycle.
+
+        Use these examples as a guide to create a detailed and insightful attribute analysis for: {idea}
+
+        Give your response in Markdown Format.
+
+        ## End Instruction ##
+
+        Now, please perform the comprehensive attribute analysis for: {idea}
+    """
+
     response = llm.invoke(prompt)
     return response.content
 
@@ -938,6 +1244,7 @@ def convo():
         "Create Problem Landscape✅",
         "Create Function Map✅",
         "CREATE Model for ideas✅",
+        "Attribute Analysis✅",
         "Apply TRIZ Principle",
         "Generate Problem Summary",
         "Recommend Experts",
@@ -1080,9 +1387,17 @@ def convo():
     elif choice == "CREATE Model for ideas✅":
         idea = st.text_input("Enter any idea:")
         if st.button("Run"):
-            with st.spinner("C for Combine, R for Reverse, E for Eliminate, A for Adapt, T for Transform, E for Explore... Now let's CREATE your idea..."):
-                st.write(create_combined_prompt(llm,idea))
+            with st.spinner("Let's CREATE your idea..."):
+                st.markdown(create_same_domain_prompt(llm,idea))
+            with st.spinner("Let's CREATE your idea from adjacent domain..."):
+                st.markdown(create_adjacent_domain_prompt(llm,idea))
 
+
+    elif choice == "Attribute Analysis✅":
+        idea = st.text_input("Enter any idea: ")
+        if st.button("Run"):
+            with st.spinner("Performing Attribute Analysis...."):
+                st.markdown(attribute_analysis(llm,idea))
 
     elif choice == "Apply TRIZ Principle":
         st.write("Prompt Under Development")
