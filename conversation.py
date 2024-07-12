@@ -597,6 +597,8 @@ def problem_landscape(llm, extracted_information):
 
         Aim for high specificity and technical detail in your responses. Include actual technology names, scientific concepts, and industry-specific terminology where appropriate. Provide 4-5 examples for each category when possible.
 
+        Avoid using any kind of Brand name in any of your response. Always use actual technology names, scientific concepts, and industry-specific terminology.
+
         Use the following format for your response:
 
         PAST SUPER SYSTEM: "..."
@@ -1058,7 +1060,7 @@ def create_same_domain_prompt(llm, idea):
     response = llm.invoke(prompt)
     return response.content
 
-#Function to analyse attributes
+#Function to do Attribute Analysis
 def attribute_analysis(llm, idea):
     prompt = f"""
         ## Instruction ##
@@ -1067,8 +1069,9 @@ def attribute_analysis(llm, idea):
         Follow these detailed steps:
         1. Identify 4 main categories of attributes relevant to the idea.
         2. For each category, create a table with 4 attributes and 4 possible values for each attribute.
-        3. After the tables, create 5 hypothetical systems or products based on combinations of these attributes.
+        3. After the tables, create 5 hypothetical systems or products based on combinations of these attributes, ranging from realistic to highly innovative.
         4. For each hypothetical system, create a table showing the selected values for 8 attributes (2 from each category).
+        5. After each system's table, provide 1-2 brief points about its potential usefulness or applications.
 
         Use the following format for your analysis:
 
@@ -1083,7 +1086,7 @@ def attribute_analysis(llm, idea):
 
         [Repeat this table format for all 4 categories]
 
-        Now, predict 5 systems based on combinations of these attributes:
+        Now, predict 5 systems based on combinations of these attributes, starting from realistic and progressing to more complex and innovative:
 
         1. "[System Name 1]"
 
@@ -1098,117 +1101,140 @@ def attribute_analysis(llm, idea):
         | [Category 4] | [Attribute] | [Selected Value] |
         | [Category 4] | [Attribute] | [Selected Value] |
 
-        [Repeat this table format for all 5 systems]
+        Usefulness:
+        - [Point 1]
+        - [Point 2]
+
+        [Repeat this format for all 5 systems, increasing in complexity and innovation]
 
         Here's an example analysis for smartphones to guide your response:
 
-        Thanks for your input. So based on your input: Smartphones here are the 4 category of attributes we came up with!
+        Thanks for your input. Based on your input: Smartphones, here are the 4 categories of attributes we came up with!
 
-        Let's look at it one by one.
+        Let's look at them one by one.
 
         Category 1: Display
 
         | Attribute | Values |
         |-----------|--------|
-        | Type | 1. OLED, 2. MicroLED, 3. Foldable, 4. Rollable |
+        | Type | 1. LCD, 2. OLED, 3. MicroLED, 4. Foldable |
         | Size | 1. Compact (5-5.9"), 2. Standard (6-6.9"), 3. Large (7"+), 4. Variable |
-        | Refresh Rate | 1. 60Hz, 2. 120Hz, 3. 240Hz, 4. Adaptive (1-240Hz) |
-        | Resolution | 1. FHD+, 2. QHD+, 3. 4K, 4. 8K |
+        | Refresh Rate | 1. 60Hz, 2. 90Hz, 3. 120Hz, 4. Adaptive (1-120Hz) |
+        | Resolution | 1. HD+, 2. FHD+, 3. QHD+, 4. 4K |
 
         Category 2: Performance
 
         | Attribute | Values |
         |-----------|--------|
-        | Processor | 1. Mid-range, 2. Flagship, 3. AI-optimized, 4. Quantum |
-        | RAM | 1. 8GB, 2. 12GB, 3. 16GB, 4. 32GB+ |
-        | Storage | 1. 128GB, 2. 256GB, 3. 512GB, 4. 1TB+ |
+        | Processor | 1. Entry-level, 2. Mid-range, 3. Flagship, 4. AI-optimized |
+        | RAM | 1. 4GB, 2. 8GB, 3. 12GB, 4. 16GB+ |
+        | Storage | 1. 64GB, 2. 128GB, 3. 256GB, 4. 512GB+ |
         | Battery | 1. 3000mAh, 2. 4000mAh, 3. 5000mAh, 4. 6000mAh+ |
 
         Category 3: Camera System
 
         | Attribute | Values |
         |-----------|--------|
-        | Main Sensor | 1. 48MP, 2. 64MP, 3. 108MP, 4. 200MP+ |
-        | Zoom | 1. 2x optical, 2. 5x optical, 3. 10x optical, 4. 100x hybrid |
-        | Video | 1. 4K60fps, 2. 8K30fps, 3. 8K60fps, 4. 16K |
-        | Special Features | 1. Night mode, 2. Pro mode, 3. AI enhancement, 4. Computational photography |
+        | Main Sensor | 1. 12MP, 2. 48MP, 3. 64MP, 4. 108MP+ |
+        | Zoom | 1. Digital, 2. 2x optical, 3. 5x optical, 4. 10x optical |
+        | Video | 1. 1080p60fps, 2. 4K30fps, 3. 4K60fps, 4. 8K30fps |
+        | Special Features | 1. Portrait mode, 2. Night mode, 3. AI enhancement, 4. Computational photography |
 
         Category 4: Connectivity
 
         | Attribute | Values |
         |-----------|--------|
-        | Network | 1. 4G, 2. 5G, 3. 6G, 4. Satellite |
-        | Wi-Fi | 1. Wi-Fi 6, 2. Wi-Fi 6E, 3. Wi-Fi 7, 4. Li-Fi |
-        | Charging | 1. Wired fast, 2. Wireless, 3. Reverse wireless, 4. Over-the-air |
-        | Biometrics | 1. Fingerprint, 2. Face unlock, 3. Iris scan, 4. DNA |
+        | Network | 1. 4G, 2. 5G, 3. 5G mmWave, 4. Satellite |
+        | Wi-Fi | 1. Wi-Fi 5, 2. Wi-Fi 6, 3. Wi-Fi 6E, 4. Wi-Fi 7 |
+        | Charging | 1. Wired, 2. Fast wired, 3. Wireless, 4. Reverse wireless |
+        | Biometrics | 1. Fingerprint, 2. Face unlock, 3. In-display fingerprint, 4. 3D face unlock |
 
-        
-        Now, let's predict some smartphone models based on combinations of these attributes:
+        Now, let's predict some smartphone models based on combinations of these attributes, starting from realistic and progressing to more innovative:
 
-        1. "UltraFlex Pro"
+        1. "EssentialPlus"
+
+        | Category | Attribute | Selected Value |
+        |----------|-----------|----------------|
+        | Display | Type | OLED |
+        | Display | Size | Standard (6-6.9") |
+        | Performance | Processor | Mid-range |
+        | Performance | RAM | 8GB |
+        | Camera System | Main Sensor | 48MP |
+        | Camera System | Special Features | Night mode |
+        | Connectivity | Network | 5G |
+        | Connectivity | Charging | Fast wired |
+
+        Usefulness:
+        - Balanced performance for everyday tasks and casual photography
+        - Affordable 5G connectivity for the mass market
+
+        2. "ProView 120"
+
+        | Category | Attribute | Selected Value |
+        |----------|-----------|----------------|
+        | Display | Type | OLED |
+        | Display | Refresh Rate | 120Hz |
+        | Performance | Processor | Flagship |
+        | Performance | RAM | 12GB |
+        | Camera System | Main Sensor | 108MP+ |
+        | Camera System | Zoom | 5x optical |
+        | Connectivity | Wi-Fi | Wi-Fi 6E |
+        | Connectivity | Biometrics | In-display fingerprint |
+
+        Usefulness:
+        - Enhanced visual experience for gaming and media consumption
+        - Professional-grade camera system for content creators
+
+        3. "FoldMax Ultra"
 
         | Category | Attribute | Selected Value |
         |----------|-----------|----------------|
         | Display | Type | Foldable |
         | Display | Size | Variable |
         | Performance | Processor | AI-optimized |
-        | Performance | RAM | 16GB |
-        | Camera System | Main Sensor | 108MP |
+        | Performance | Storage | 512GB+ |
+        | Camera System | Video | 8K30fps |
         | Camera System | Special Features | Computational photography |
-        | Connectivity | Network | 5G |
-        | Connectivity | Charging | Reverse wireless |
+        | Connectivity | Network | 5G mmWave |
+        | Connectivity | Charging | Wireless |
 
-        2. "QuantumView Elite"
+        Usefulness:
+        - Versatile form factor for productivity and entertainment
+        - Advanced AI capabilities for enhanced user experience and photo/video processing
+
+        4. "QuantumVision Pro"
 
         | Category | Attribute | Selected Value |
         |----------|-----------|----------------|
         | Display | Type | MicroLED |
-        | Display | Refresh Rate | Adaptive (1-240Hz) |
-        | Performance | Processor | Quantum |
-        | Performance | Storage | 1TB+ |
+        | Display | Refresh Rate | Adaptive (1-120Hz) |
+        | Performance | Processor | AI-optimized |
+        | Performance | RAM | 16GB+ |
+        | Camera System | Main Sensor | 108MP+ |
         | Camera System | Zoom | 10x optical |
-        | Camera System | Video | 8K60fps |
-        | Connectivity | Wi-Fi | Wi-Fi 7 |
-        | Connectivity | Biometrics | Iris scan |
+        | Connectivity | Network | Satellite |
+        | Connectivity | Charging | Reverse wireless |
 
-        3. "EcoSmart Lite"
+        Usefulness:
+        - Cutting-edge display technology for unparalleled visual quality
+        - Global connectivity and power-sharing capabilities for extreme environments
 
-        | Category | Attribute | Selected Value |
-        |----------|-----------|----------------|
-        | Display | Type | OLED |
-        | Display | Size | Compact (5-5.9") |
-        | Performance | Processor | Mid-range |
-        | Performance | Battery | 4000mAh |
-        | Camera System | Main Sensor | 48MP |
-        | Camera System | Special Features | AI enhancement |
-        | Connectivity | Network | 4G |
-        | Connectivity | Charging | Wired fast |
-
-        4. "HyperConnect Max"
+        5. "NeuroPHone X"
 
         | Category | Attribute | Selected Value |
         |----------|-----------|----------------|
-        | Display | Resolution | 4K |
-        | Display | Size | Large (7"+) |
-        | Performance | RAM | 32GB+ |
-        | Performance | Storage | 512GB |
-        | Camera System | Main Sensor | 200MP+ |
+        | Display | Type | Holographic |
+        | Display | Resolution | 8K |
+        | Performance | Processor | Quantum |
+        | Performance | Storage | 1TB+ (molecular) |
+        | Camera System | Special Features | Brain-computer interface |
         | Camera System | Video | 16K |
         | Connectivity | Network | 6G |
-        | Connectivity | Charging | Over-the-air |
+        | Connectivity | Biometrics | Thought patterns |
 
-        5. "CreatorPro X"
-
-        | Category | Attribute | Selected Value |
-        |----------|-----------|----------------|
-        | Display | Type | Rollable |
-        | Display | Refresh Rate | 240Hz |
-        | Performance | Processor | Flagship |
-        | Performance | Storage | 1TB+ |
-        | Camera System | Zoom | 100x hybrid |
-        | Camera System | Special Features | Pro mode |
-        | Connectivity | Wi-Fi | Li-Fi |
-        | Connectivity | Biometrics | Face unlock |
+        Usefulness:
+        - Revolutionary human-computer interaction through direct neural interface
+        - Cutting-edge holographic display and quantum computing for immersive AR/VR experiences
 
         Use this example as a guide to create a similar attribute analysis for: {idea}
 
@@ -1217,7 +1243,6 @@ def attribute_analysis(llm, idea):
 
     response = llm.invoke(prompt)
     return response.content
-
 # Function to prepare constraints
 def generate_constraints(llm, extracted_problem):
     prompt = f'''
