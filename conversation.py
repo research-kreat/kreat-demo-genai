@@ -635,12 +635,7 @@ def problem_landscape(llm, extracted_information):
     response = llm.invoke(prompt)
     return response.content
 
-#Function to check the landscape
-def check_problem_landscape(llm,landscape):
-    prompt = f"""
-    Here is a problem: 
-    """
-
+#Function 
 def parse_problem_landscape_output(output):
     # Initialize a dictionary to store the parsed values
     parsed_data = {
@@ -677,7 +672,7 @@ def parse_problem_landscape_output(output):
             parsed_data["future_system"] = line.split(":")[1].strip().strip('"')
         elif line.startswith("FUTURE SUB SYSTEM:"):
             parsed_data["future_sub_system"] = line.split(":")[1].strip().strip('"')
-    #st.write(parsed_data)
+    st.write(parsed_data)
     # Create a DataFrame
     data = {
         "Past": [parsed_data["past_super_system"], parsed_data["past_system"], parsed_data["past_sub_system"]],
@@ -1070,71 +1065,155 @@ def attribute_analysis(llm, idea):
         Conduct a comprehensive and innovative attribute analysis for the following idea: {idea}
 
         Follow these detailed steps:
-        1. Identify 4-5 main categories of attributes relevant to the idea, ensuring a broad coverage of aspects (e.g., technical, user experience, economic, environmental, social).
-        2. For each category, list 5-7 specific attributes.
-        3. For each specific attribute, provide 3-4 detailed examples, options, or variations. Include current state-of-the-art examples and potential future innovations.
-        4. After each category, provide a detailed insight (2-3 sentences) on how analyzing these attributes could lead to innovation or improvement. Consider both short-term and long-term implications.
-        5. Include relevant quantitative data or ranges where applicable to make the analysis more concrete.
-        6. Consider emerging trends, technologies, or societal shifts that might influence the attributes in the future.
-        7. Briefly compare the attributes to industry standards or competitors where relevant.
-        8. Touch on how consumer preferences or regulatory requirements might impact or be impacted by these attributes.
+        1. Identify 4 main categories of attributes relevant to the idea.
+        2. For each category, create a table with 4 attributes and 4 possible values for each attribute.
+        3. After the tables, create 5 hypothetical systems or products based on combinations of these attributes.
+        4. For each hypothetical system, create a table showing the selected values for 8 attributes (2 from each category).
 
-        Present your analysis in the following format:
+        Use the following format for your analysis:
 
-        ## Attribute Analysis for [Idea]
+        Category 1: [Name]
 
-        **Context:** [Provide a detailed description of the context, goal, or problem to be solved. Include relevant market trends, technological advancements, or societal needs that make this idea important.]
+        | Attribute | Values |
+        |-----------|--------|
+        | [Attr 1]  | 1. [Value 1], 2. [Value 2], 3. [Value 3], 4. [Value 4] |
+        | [Attr 2]  | 1. [Value 1], 2. [Value 2], 3. [Value 3], 4. [Value 4] |
+        | [Attr 3]  | 1. [Value 1], 2. [Value 2], 3. [Value 3], 4. [Value 4] |
+        | [Attr 4]  | 1. [Value 1], 2. [Value 2], 3. [Value 3], 4. [Value 4] |
 
-        ****[Category 1]****
-        - [Attribute 1]: [Detailed Example 1 (with quantitative data if applicable)], [Detailed Example 2], [Detailed Example 3], [Potential future innovation]
-        - [Attribute 2]: [Detailed Example 1], [Detailed Example 2], [Detailed Example 3], [Potential future innovation]
-        ...
+        [Repeat this table format for all 4 categories]
 
-        **Insight:** [Provide a detailed explanation of how analyzing this category of attributes could lead to innovation or improvement. Consider both immediate applications and long-term potential. Discuss any challenges or opportunities this analysis reveals.]
+        Now, predict 5 systems based on combinations of these attributes:
 
-        ****[Category 2]****
-        ...
+        1. "[System Name 1]"
 
-        [Repeat for all categories]
+        | Category | Attribute | Selected Value |
+        |----------|-----------|----------------|
+        | [Category 1] | [Attribute] | [Selected Value] |
+        | [Category 1] | [Attribute] | [Selected Value] |
+        | [Category 2] | [Attribute] | [Selected Value] |
+        | [Category 2] | [Attribute] | [Selected Value] |
+        | [Category 3] | [Attribute] | [Selected Value] |
+        | [Category 3] | [Attribute] | [Selected Value] |
+        | [Category 4] | [Attribute] | [Selected Value] |
+        | [Category 4] | [Attribute] | [Selected Value] |
 
-        **Comparative Analysis:** [Briefly discuss how these attributes compare to industry standards or key competitors. Highlight any unique selling points or areas for improvement.]
+        [Repeat this table format for all 5 systems]
 
-        **Consumer and Regulatory Considerations:** [Discuss how these attributes align with or challenge consumer expectations and regulatory requirements. Consider regional variations if applicable.]
+        Here's an example analysis for smartphones to guide your response:
 
-        **Conclusion:** [Provide a detailed concluding paragraph explaining how this comprehensive analysis can be used to generate innovative ideas or improvements for the given concept. Highlight key areas of opportunity and potential synergies between different attributes.]
+        Thanks for your input. So based on your input: Smartphones here are the 4 category of attributes we came up with!
 
-        Here are three diverse examples to guide your analysis:
+        Let's look at it one by one.
 
-        1. Product Example: Next-Generation Smartphone
-        ****Display Technology Attributes****
-        - Screen Type: OLED (1000 nits brightness), MicroLED (5000 nits brightness), Foldable (200,000 fold durability), Holographic (360-degree viewing angle)
-        - Refresh Rate: 120Hz (standard), 240Hz (gaming-optimized), Variable (1-120Hz for energy efficiency)
-        - Touch Sensitivity: Multi-touch (10 points), Pressure-sensitive (256 levels), In-air gestures (up to 50cm distance)
+        Category 1: Display
 
-        **Insight:** Analyzing display technology can lead to more immersive and energy-efficient user experiences. Future innovations might focus on combining high refresh rates with holographic displays, potentially revolutionizing mobile gaming and AR applications.
+        | Attribute | Values |
+        |-----------|--------|
+        | Type | 1. OLED, 2. MicroLED, 3. Foldable, 4. Rollable |
+        | Size | 1. Compact (5-5.9"), 2. Standard (6-6.9"), 3. Large (7"+), 4. Variable |
+        | Refresh Rate | 1. 60Hz, 2. 120Hz, 3. 240Hz, 4. Adaptive (1-240Hz) |
+        | Resolution | 1. FHD+, 2. QHD+, 3. 4K, 4. 8K |
 
-        2. Service Example: AI-Powered Personal Finance Assistant
-        ****Financial Analysis Attributes****
-        - Expense Categorization: Rule-based (90% accuracy), Machine Learning (98% accuracy), Hybrid approach (99% accuracy with human-in-the-loop)
-        - Investment Recommendations: Risk-based allocation, Goal-oriented strategies, ESG-focused options
-        - Fraud Detection: Real-time monitoring (detects 95% of fraudulent transactions), Behavioral analysis (reduces false positives by 80%), Predictive modeling (identifies potential fraud patterns a week in advance)
+        Category 2: Performance
 
-        **Insight:** Enhancing financial analysis attributes can lead to more personalized and secure financial management. Future developments might integrate quantum computing for more complex predictive models, potentially offering near-perfect fraud detection and highly optimized investment strategies.
+        | Attribute | Values |
+        |-----------|--------|
+        | Processor | 1. Mid-range, 2. Flagship, 3. AI-optimized, 4. Quantum |
+        | RAM | 1. 8GB, 2. 12GB, 3. 16GB, 4. 32GB+ |
+        | Storage | 1. 128GB, 2. 256GB, 3. 512GB, 4. 1TB+ |
+        | Battery | 1. 3000mAh, 2. 4000mAh, 3. 5000mAh, 4. 6000mAh+ |
 
-        3. Process Example: Autonomous Urban Farming System
-        ****Crop Management Attributes****
-        - Nutrient Delivery: Hydroponics (30% faster growth), Aeroponics (98% water efficiency), Bioponics (incorporates beneficial microorganisms)
-        - Light Optimization: LED (customizable spectrum), Natural light harvesting (reduces energy use by 40%), Dynamic light adaptation (adjusts based on plant growth stage)
-        - Harvest Automation: Robotic arms (harvests 500 plants/hour), AI-powered ripeness detection (increases yield by 15%), Selective harvesting (extends production cycles)
+        Category 3: Camera System
 
-        **Insight:** Analyzing crop management attributes can lead to highly efficient and sustainable urban food production. Future innovations might combine AI-driven crop selection with closed-loop nutrient systems, potentially enabling self-sustaining urban farms that adapt to changing climate conditions and nutritional needs.
+        | Attribute | Values |
+        |-----------|--------|
+        | Main Sensor | 1. 48MP, 2. 64MP, 3. 108MP, 4. 200MP+ |
+        | Zoom | 1. 2x optical, 2. 5x optical, 3. 10x optical, 4. 100x hybrid |
+        | Video | 1. 4K60fps, 2. 8K30fps, 3. 8K60fps, 4. 16K |
+        | Special Features | 1. Night mode, 2. Pro mode, 3. AI enhancement, 4. Computational photography |
 
-        Use these examples as a guide to create a detailed, forward-thinking, and insightful attribute analysis for: {idea}
+        Category 4: Connectivity
+
+        | Attribute | Values |
+        |-----------|--------|
+        | Network | 1. 4G, 2. 5G, 3. 6G, 4. Satellite |
+        | Wi-Fi | 1. Wi-Fi 6, 2. Wi-Fi 6E, 3. Wi-Fi 7, 4. Li-Fi |
+        | Charging | 1. Wired fast, 2. Wireless, 3. Reverse wireless, 4. Over-the-air |
+        | Biometrics | 1. Fingerprint, 2. Face unlock, 3. Iris scan, 4. DNA |
+
+        
+        Now, let's predict some smartphone models based on combinations of these attributes:
+
+        1. "UltraFlex Pro"
+
+        | Category | Attribute | Selected Value |
+        |----------|-----------|----------------|
+        | Display | Type | Foldable |
+        | Display | Size | Variable |
+        | Performance | Processor | AI-optimized |
+        | Performance | RAM | 16GB |
+        | Camera System | Main Sensor | 108MP |
+        | Camera System | Special Features | Computational photography |
+        | Connectivity | Network | 5G |
+        | Connectivity | Charging | Reverse wireless |
+
+        2. "QuantumView Elite"
+
+        | Category | Attribute | Selected Value |
+        |----------|-----------|----------------|
+        | Display | Type | MicroLED |
+        | Display | Refresh Rate | Adaptive (1-240Hz) |
+        | Performance | Processor | Quantum |
+        | Performance | Storage | 1TB+ |
+        | Camera System | Zoom | 10x optical |
+        | Camera System | Video | 8K60fps |
+        | Connectivity | Wi-Fi | Wi-Fi 7 |
+        | Connectivity | Biometrics | Iris scan |
+
+        3. "EcoSmart Lite"
+
+        | Category | Attribute | Selected Value |
+        |----------|-----------|----------------|
+        | Display | Type | OLED |
+        | Display | Size | Compact (5-5.9") |
+        | Performance | Processor | Mid-range |
+        | Performance | Battery | 4000mAh |
+        | Camera System | Main Sensor | 48MP |
+        | Camera System | Special Features | AI enhancement |
+        | Connectivity | Network | 4G |
+        | Connectivity | Charging | Wired fast |
+
+        4. "HyperConnect Max"
+
+        | Category | Attribute | Selected Value |
+        |----------|-----------|----------------|
+        | Display | Resolution | 4K |
+        | Display | Size | Large (7"+) |
+        | Performance | RAM | 32GB+ |
+        | Performance | Storage | 512GB |
+        | Camera System | Main Sensor | 200MP+ |
+        | Camera System | Video | 16K |
+        | Connectivity | Network | 6G |
+        | Connectivity | Charging | Over-the-air |
+
+        5. "CreatorPro X"
+
+        | Category | Attribute | Selected Value |
+        |----------|-----------|----------------|
+        | Display | Type | Rollable |
+        | Display | Refresh Rate | 240Hz |
+        | Performance | Processor | Flagship |
+        | Performance | Storage | 1TB+ |
+        | Camera System | Zoom | 100x hybrid |
+        | Camera System | Special Features | Pro mode |
+        | Connectivity | Wi-Fi | Li-Fi |
+        | Connectivity | Biometrics | Face unlock |
+
+        Use this example as a guide to create a similar attribute analysis for: {idea}
 
         ## End Instruction ##
-
-        Now, please perform the comprehensive attribute analysis for: {idea}
-    """
+        """
 
     response = llm.invoke(prompt)
     return response.content
@@ -1356,7 +1435,7 @@ def convo():
         if st.button("Run"):
             with st.spinner("Creating Problem Landscape...."):
                 functionmap = problem_landscape(llm,extracted_information)
-            #st.write(functionmap)
+            st.write(functionmap)
             table,parsed_data = parse_problem_landscape_output(functionmap)
             st.table(table)
            # Store the parsed data in session state
