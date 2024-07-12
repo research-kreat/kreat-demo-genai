@@ -1125,7 +1125,42 @@ def attribute_analysis(llm, idea):
 
         Let's look at them one by one.
 
-        [The attribute tables remain the same as in the original example]
+        Category 1: Display
+
+        | Attribute | Values |
+        |-----------|--------|
+        | Type | 1. LCD, 2. OLED, 3. MicroLED, 4. Foldable |
+        | Size | 1. Compact (5-5.9"), 2. Standard (6-6.9"), 3. Large (7"+), 4. Variable |
+        | Refresh Rate | 1. 60Hz, 2. 90Hz, 3. 120Hz, 4. Adaptive (1-120Hz) |
+        | Resolution | 1. HD+, 2. FHD+, 3. QHD+, 4. 4K |
+
+        Category 2: Performance
+
+        | Attribute | Values |
+        |-----------|--------|
+        | Processor | 1. Entry-level, 2. Mid-range, 3. Flagship, 4. AI-optimized |
+        | RAM | 1. 4GB, 2. 8GB, 3. 12GB, 4. 16GB+ |
+        | Storage | 1. 64GB, 2. 128GB, 3. 256GB, 4. 512GB+ |
+        | Battery | 1. 3000mAh, 2. 4000mAh, 3. 5000mAh, 4. 6000mAh+ |
+
+        Category 3: Camera System
+
+        | Attribute | Values |
+        |-----------|--------|
+        | Main Sensor | 1. 12MP, 2. 48MP, 3. 64MP, 4. 108MP+ |
+        | Zoom | 1. Digital, 2. 2x optical, 3. 5x optical, 4. 10x optical |
+        | Video | 1. 1080p60fps, 2. 4K30fps, 3. 4K60fps, 4. 8K30fps |
+        | Special Features | 1. Portrait mode, 2. Night mode, 3. AI enhancement, 4. Computational photography |
+
+        Category 4: Connectivity
+
+        | Attribute | Values |
+        |-----------|--------|
+        | Network | 1. 4G, 2. 5G, 3. 5G mmWave, 4. Satellite |
+        | Wi-Fi | 1. Wi-Fi 5, 2. Wi-Fi 6, 3. Wi-Fi 6E, 4. Wi-Fi 7 |
+        | Charging | 1. Wired, 2. Fast wired, 3. Wireless, 4. Reverse wireless |
+        | Biometrics | 1. Fingerprint, 2. Face unlock, 3. In-display fingerprint, 4. 3D face unlock |
+
 
         Now, let's predict some smartphone models based on combinations of these attributes, starting from realistic and progressing to more innovative:
 
