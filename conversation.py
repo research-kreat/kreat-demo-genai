@@ -15,7 +15,8 @@ def initialize_llm():
         openai_api_key=api_key,
         openai_api_version=api_version,
         azure_deployment=deployment_name,
-        azure_endpoint=endpoint
+        azure_endpoint=endpoint,
+        temperature=0.4
     )
     return llm
 
