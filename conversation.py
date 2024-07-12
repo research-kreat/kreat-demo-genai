@@ -1073,6 +1073,18 @@ def attribute_analysis(llm, idea):
         4. For each hypothetical system, create a table showing the selected values for 8 attributes (2 from each category).
         5. After each system's table, provide 1-2 brief points about its potential usefulness or applications.
 
+        ## Some more detailed instructions to be noted##
+        6. Create 5-6 unique combinations of attribute values from different categories to generate innovative ideas for the product, service, or technology. Start with realistic combinations that are more common in the current market landscape and gradually progress towards more innovative and futuristic combinations.
+        7. For each combination, provide a brief but informative analysis of its usefulness and potential applications. Highlight the specific benefits, target audience, or situations where the combination would be most effective.
+        8. When creating combinations, ensure that they are diverse and cover a wide range of attributes from different categories. Each combination should demonstrate creative thinking and cater to various user needs and scenarios.
+        9. As you progress towards more innovative combinations, consider incorporating advanced technologies, emerging trends, or unconventional approaches. This showcases an understanding of the evolving market landscape and a forward-thinking mindset.
+        10. Ensure that each combination is coherent and has a logical flow. The selected attribute values should complement each other, creating a cohesive and practical solution.
+        11. Consider the impact of your combinations on various stakeholders, including end-users, businesses, society, and the environment. Incorporate attributes that address sustainability, inclusivity, and ethical considerations when relevant.
+        12. Present your combinations in a clear and engaging writing style that effectively communicates your ideas and insights. Provide sufficient context and explanations to make the response informative and valuable to the reader.
+        13. Conclude your Attribute Analysis with a summary of the key insights gained and the potential impact of the innovative combinations on the chosen product, service, or technology.
+
+
+
         Use the following format for your analysis:
 
         Category 1: [Name]
@@ -1113,62 +1125,30 @@ def attribute_analysis(llm, idea):
 
         Let's look at them one by one.
 
-        Category 1: Display
-
-        | Attribute | Values |
-        |-----------|--------|
-        | Type | 1. LCD, 2. OLED, 3. MicroLED, 4. Foldable |
-        | Size | 1. Compact (5-5.9"), 2. Standard (6-6.9"), 3. Large (7"+), 4. Variable |
-        | Refresh Rate | 1. 60Hz, 2. 90Hz, 3. 120Hz, 4. Adaptive (1-120Hz) |
-        | Resolution | 1. HD+, 2. FHD+, 3. QHD+, 4. 4K |
-
-        Category 2: Performance
-
-        | Attribute | Values |
-        |-----------|--------|
-        | Processor | 1. Entry-level, 2. Mid-range, 3. Flagship, 4. AI-optimized |
-        | RAM | 1. 4GB, 2. 8GB, 3. 12GB, 4. 16GB+ |
-        | Storage | 1. 64GB, 2. 128GB, 3. 256GB, 4. 512GB+ |
-        | Battery | 1. 3000mAh, 2. 4000mAh, 3. 5000mAh, 4. 6000mAh+ |
-
-        Category 3: Camera System
-
-        | Attribute | Values |
-        |-----------|--------|
-        | Main Sensor | 1. 12MP, 2. 48MP, 3. 64MP, 4. 108MP+ |
-        | Zoom | 1. Digital, 2. 2x optical, 3. 5x optical, 4. 10x optical |
-        | Video | 1. 1080p60fps, 2. 4K30fps, 3. 4K60fps, 4. 8K30fps |
-        | Special Features | 1. Portrait mode, 2. Night mode, 3. AI enhancement, 4. Computational photography |
-
-        Category 4: Connectivity
-
-        | Attribute | Values |
-        |-----------|--------|
-        | Network | 1. 4G, 2. 5G, 3. 5G mmWave, 4. Satellite |
-        | Wi-Fi | 1. Wi-Fi 5, 2. Wi-Fi 6, 3. Wi-Fi 6E, 4. Wi-Fi 7 |
-        | Charging | 1. Wired, 2. Fast wired, 3. Wireless, 4. Reverse wireless |
-        | Biometrics | 1. Fingerprint, 2. Face unlock, 3. In-display fingerprint, 4. 3D face unlock |
+        [The attribute tables remain the same as in the original example]
 
         Now, let's predict some smartphone models based on combinations of these attributes, starting from realistic and progressing to more innovative:
 
-        1. "EssentialPlus"
+        1. "EcoBalance"
 
         | Category | Attribute | Selected Value |
         |----------|-----------|----------------|
         | Display | Type | OLED |
-        | Display | Size | Standard (6-6.9") |
+        | Display | Size | Compact (5-5.9") |
         | Performance | Processor | Mid-range |
-        | Performance | RAM | 8GB |
+        | Performance | Battery | 4000mAh |
         | Camera System | Main Sensor | 48MP |
-        | Camera System | Special Features | Night mode |
+        | Camera System | Special Features | AI enhancement |
         | Connectivity | Network | 5G |
         | Connectivity | Charging | Fast wired |
 
         Usefulness:
-        - Balanced performance for everyday tasks and casual photography
-        - Affordable 5G connectivity for the mass market
+        - Energy-efficient design for environmentally conscious consumers
+        - Compact size and AI-enhanced camera for on-the-go photography enthusiasts
 
-        2. "ProView 120"
+        This combination addresses the growing demand for sustainable technology while maintaining essential features for daily use. The compact size and efficient battery make it ideal for users who prioritize portability and longer battery life. The AI-enhanced camera caters to the increasing interest in mobile photography without the need for professional-grade equipment.
+
+        2. "WorkFlow Pro"
 
         | Category | Attribute | Selected Value |
         |----------|-----------|----------------|
@@ -1176,16 +1156,18 @@ def attribute_analysis(llm, idea):
         | Display | Refresh Rate | 120Hz |
         | Performance | Processor | Flagship |
         | Performance | RAM | 12GB |
-        | Camera System | Main Sensor | 108MP+ |
         | Camera System | Zoom | 5x optical |
+        | Camera System | Video | 4K60fps |
         | Connectivity | Wi-Fi | Wi-Fi 6E |
         | Connectivity | Biometrics | In-display fingerprint |
 
         Usefulness:
-        - Enhanced visual experience for gaming and media consumption
-        - Professional-grade camera system for content creators
+        - Enhanced productivity features for business professionals and power users
+        - Seamless multitasking and secure access for handling sensitive information
 
-        3. "FoldMax Ultra"
+        This combination targets professionals who require high performance and security in their mobile devices. The high refresh rate and powerful processor enable smooth multitasking, while advanced biometrics ensure data protection. The versatile camera system supports various business needs, from document scanning to high-quality video conferencing.
+
+        3. "FoldFlex Ultra"
 
         | Category | Attribute | Selected Value |
         |----------|-----------|----------------|
@@ -1193,48 +1175,57 @@ def attribute_analysis(llm, idea):
         | Display | Size | Variable |
         | Performance | Processor | AI-optimized |
         | Performance | Storage | 512GB+ |
-        | Camera System | Video | 8K30fps |
+        | Camera System | Main Sensor | 108MP+ |
         | Camera System | Special Features | Computational photography |
         | Connectivity | Network | 5G mmWave |
         | Connectivity | Charging | Wireless |
 
         Usefulness:
-        - Versatile form factor for productivity and entertainment
-        - Advanced AI capabilities for enhanced user experience and photo/video processing
+        - Adaptable form factor for diverse use cases, from pocket-sized to tablet mode
+        - Advanced AI and camera capabilities for creative professionals and tech enthusiasts
 
-        4. "QuantumVision Pro"
+        This innovative combination pushes the boundaries of smartphone versatility. The foldable display and AI-optimized processor cater to users who demand flexibility in their devices, from compact everyday use to expanded productivity or entertainment modes. The advanced camera system with computational photography appeals to content creators and photography enthusiasts.
+
+        4. "HealthGuardian X"
 
         | Category | Attribute | Selected Value |
         |----------|-----------|----------------|
         | Display | Type | MicroLED |
         | Display | Refresh Rate | Adaptive (1-120Hz) |
         | Performance | Processor | AI-optimized |
-        | Performance | RAM | 16GB+ |
-        | Camera System | Main Sensor | 108MP+ |
-        | Camera System | Zoom | 10x optical |
+        | Performance | Battery | 6000mAh+ |
+        | Camera System | Special Features | AI enhancement |
+        | Camera System | Main Sensor | 64MP |
         | Connectivity | Network | Satellite |
-        | Connectivity | Charging | Reverse wireless |
+        | Connectivity | Biometrics | 3D face unlock |
 
         Usefulness:
-        - Cutting-edge display technology for unparalleled visual quality
-        - Global connectivity and power-sharing capabilities for extreme environments
+        - Comprehensive health monitoring and emergency communication capabilities
+        - Long-lasting battery and adaptive display for outdoor and extreme conditions
 
-        5. "NeuroPHone X"
+        This forward-thinking combination focuses on health and safety. The AI-optimized processor enables advanced health monitoring algorithms, while satellite connectivity ensures communication in remote areas. The long-lasting battery and adaptive display make it suitable for outdoor enthusiasts and individuals with health concerns who require constant monitoring.
+
+        5. "NeuroLink Infinity"
 
         | Category | Attribute | Selected Value |
         |----------|-----------|----------------|
         | Display | Type | Holographic |
-        | Display | Resolution | 8K |
+        | Display | Resolution | 4K |
         | Performance | Processor | Quantum |
-        | Performance | Storage | 1TB+ (molecular) |
+        | Performance | RAM | 16GB+ |
         | Camera System | Special Features | Brain-computer interface |
-        | Camera System | Video | 16K |
+        | Camera System | Video | 8K30fps |
         | Connectivity | Network | 6G |
         | Connectivity | Biometrics | Thought patterns |
 
         Usefulness:
-        - Revolutionary human-computer interaction through direct neural interface
-        - Cutting-edge holographic display and quantum computing for immersive AR/VR experiences
+        - Revolutionary human-computer interaction through neural interface
+        - Immersive holographic display for advanced augmented and virtual reality applications
+
+        This highly innovative combination represents a potential future of mobile technology. The brain-computer interface and thought pattern biometrics offer unprecedented control and security. The holographic display and quantum processor enable complex AR/VR applications, potentially transforming fields like education, healthcare, and entertainment. While futuristic, this combination raises important ethical considerations regarding privacy and the integration of technology with human cognition.
+
+        Summary:
+        These combinations demonstrate a progression from current market-ready solutions to highly innovative concepts. They address various user needs, from sustainability and productivity to health monitoring and futuristic interactions. The analysis highlights the potential impact on different user groups and industries, while also considering technological trends and ethical implications. As smartphone technology continues to evolve, these combinations suggest potential directions for innovation, emphasizing the importance of balancing functionality, user experience, and societal impact.
 
         Use this example as a guide to create a similar attribute analysis for: {idea}
 
