@@ -2,5 +2,6 @@ langchain==0.2.2
 langchain-core==0.2.4
 langchain-community
 langsmith
+langchain-groq
 langchain-openai==0.1.8
 pandas

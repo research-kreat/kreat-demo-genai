@@ -3,6 +3,7 @@
 import streamlit as st
 from langchain_openai import AzureChatOpenAI
 import pandas as pd
+#from langchain_groq import ChatGroq
 
 # Function to initialize AzureChatOpenAI
 def initialize_llm():
@@ -11,12 +12,15 @@ def initialize_llm():
     deployment_name = st.secrets["azure"]["AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"]
     endpoint = st.secrets["azure"]["AZURE_OPENAI_ENDPOINT"]
 
+    #llm = ChatGroq(temperature=0.5, groq_api_key="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", model_name="llama3-70b-8192")
+
+
     llm = AzureChatOpenAI(
         openai_api_key=api_key,
         openai_api_version=api_version,
         azure_deployment=deployment_name,
         azure_endpoint=endpoint,
-        temperature=0.9
+        temperature=0.4
     )
     return llm
 
@@ -516,6 +520,370 @@ def generate_description(llm, extracted_problem):
     response = llm.invoke(prompt)
     return response.content
 
+#Funtion to suggest Problem Breadth and Depth model
+def suggest_pdb_model(llm, problem):
+    prompt = f"""
+    ## Instruction ##
+    As an AI assistant, suggest an appropriate problem-solving model for the given problem. Choose from these options:
+    
+    - 5Ws and H (Who, What, Where, When, Why, How)
+    - 5Ps (People, Process, Products, Programs, Performance)
+    - 5Ms (Man, Machine, Material, Method, Measurement)
+    - 5Es (Environment, Education, Engineering, Enforcement, Evaluation)
+    - 4Ps (Product, Price, Place, Promotion)
+
+    Analyze the problem considering:
+    1. Context and core issue
+    2. Primary sector and desired outcome
+    3. Key stakeholders and their roles
+    4. Available resources and data requirements
+    5. Problem characteristics and model strengths
+    6. Model complexity vs. problem intricacy
+    7. Implementation feasibility
+    8. Potential for actionable insights
+
+    Provide your response in this exact format:
+    SUGGESTED MODEL: "........."
+    REASONING: "........."
+
+    NOTE: VERY IMPORTANT BOTH THE SUGGESTED MODEL and REASONING responses should be within double quotation "..." 
+
+    Here are three examples:
+
+    Example 1:
+    Problem: A local newspaper wants to improve its reporting on community events.
+    SUGGESTED MODEL: "5Ws and H"
+    REASONING: "Ideal for journalistic inquiry, covering all aspects of an event comprehensively and structuring reporting effectively."
+
+    Example 2:
+    Problem: A manufacturing plant is experiencing high defect rates in its production line.
+    SUGGESTED MODEL: "5Ms"
+    REASONING: "Tailored for manufacturing, systematically analyzes all production aspects to identify sources of defects."
+
+    Example 3:
+    Problem: A non-profit organization aims to reduce teenage smoking in their city.
+    SUGGESTED MODEL: "5Es"
+    REASONING: "Comprehensive approach for public health initiatives, addressing multiple aspects of behavior change and policy implementation."
+
+    Now, analyze this problem and suggest an appropriate model:
+
+    Problem: {problem}
+
+    
+    NOTE: VERY IMPORTANT BOTH THE SUGGESTED MODEL and REASONING responses should be within double quotation "..."
+
+    ## Response ##
+    """
+    
+    response = llm.invoke(prompt)
+    return response.content
+
+def parse_pbd_suggestion(output):
+    # Initialize a dictionary to store the parsed values
+    parsed_data = {
+        "SUGGESTED MODEL": "",
+        "REASONING": ""
+    }
+
+    # Split the output by lines and process each line
+    lines = output.split('\n')
+
+    for line in lines:
+        line = line.strip()
+        if line.startswith("SUGGESTED MODEL:"):
+            parsed_data["SUGGESTED MODEL"] = line.split(":")[1].strip().strip('"')
+        elif line.startswith("REASONING:"):
+            parsed_data["REASONING"] = line.split(":")[1].strip().strip('"')
+        elif "REASONING" in parsed_data and parsed_data["REASONING"]:
+            parsed_data["REASONING"] += " " + line.strip().strip('"')
+
+    return parsed_data
+
+def analyze_with_5w1h(llm, problem):
+    prompt = f"""
+    ## Instruction ##
+    As an AI analyst, use the 5Ws and H model (Who, What, Where, When, Why, How) to thoroughly analyze the given problem. This model is versatile and applicable across various domains including journalism, business analysis, project management, and general problem-solving.
+
+    Before answering each question, consider the following:
+
+    1. Context: Understand the broader context of the problem, including industry trends, historical background, and current landscape.
+    2. Stakeholders: Identify all parties involved or affected by the problem.
+    3. Data: Consider what data is available or needed to support your analysis.
+    4. Implications: Think about the potential consequences and impacts of the problem and its solution.
+    5. Interconnections: Explore how the different aspects of the problem relate to each other.
+    6. Time frame: Consider both short-term and long-term perspectives.
+    7. Scale: Assess the scope of the problem - is it local, global, or somewhere in between?
+    8. Resources: Think about the resources available or required to address the problem.
+    9. Constraints: Identify any limitations or restrictions that may affect the situation.
+    10. Opportunities: Look for potential positive outcomes or benefits that could arise.
+
+    For each of the 5Ws and H, provide a concise but comprehensive answer. Your analysis should be thorough, considering multiple angles and possibilities.
+
+    Problem: {problem}
+
+    Provide your analysis in the following format:
+
+    WHO: "......"
+    - Key stakeholders:
+    - Affected parties:
+
+    WHAT: "......"
+    - Core issue:
+    - Related factors:
+
+    WHERE: "......"
+    - Physical location(s):
+    - Contextual environment:
+
+    WHEN: "......"
+    - Timeframe:
+    - Relevant deadlines or milestones:
+
+    WHY: "......"
+    - Root causes:
+    - Motivating factors:
+
+    HOW: "......"
+    - Potential solutions:
+    - Implementation challenges:
+
+    SUMMARY:
+    "Provide a brief summary of your analysis, highlighting the most critical aspects and any key insights or recommendations."
+
+    ## Response ##
+    """
+    
+    response = llm.invoke(prompt)
+    return response.content
+
+def analyze_with_5ps(llm, problem):
+    prompt = f"""
+    ## Instruction ##
+    As an AI business analyst, use the 5Ps model (People, Process, Products, Programs, Performance) to comprehensively analyze the given organizational problem or situation. This framework is crucial for strategic decision-making and organizational development.
+
+    Before analyzing each P, consider the following:
+
+    1. Industry context: Understand current market trends, competitive landscape, and industry best practices.
+    2. Organizational culture: Consider the company's values, norms, and working environment.
+    3. Resource allocation: Evaluate how resources are distributed across different areas.
+    4. Technology integration: Assess the role of technology in each aspect of the organization.
+    5. Stakeholder expectations: Consider the needs and expectations of all stakeholders.
+    6. Regulatory environment: Be aware of relevant laws, regulations, and compliance requirements.
+    7. Long-term strategy: Align your analysis with the organization's long-term goals and vision.
+    8. Change management: Consider the organization's ability to adapt and implement changes.
+    9. Measurement and metrics: Identify key performance indicators for each area.
+    10. Interdependencies: Explore how each P impacts and interacts with the others.
+
+    For each of the 5Ps, provide a concise but comprehensive analysis. Your response should be thorough, considering multiple facets of the organization.
+
+    Problem: {problem}
+
+    Provide your analysis in the following format:
+
+    PEOPLE: "......"
+    - Key personnel and roles:
+    - Skills and competencies:
+    - Organizational structure:
+
+    PROCESS: "......"
+    - Core business processes:
+    - Efficiency and bottlenecks:
+    - Process integration:
+
+    PRODUCTS: "......"
+    - Product/service portfolio:
+    - Market positioning:
+    - Innovation pipeline:
+
+    PROGRAMS: "......"
+    - Key initiatives and projects:
+    - Resource allocation:
+    - Program effectiveness:
+
+    PERFORMANCE: "......"
+    - Key performance indicators:
+    - Benchmarking results:
+    - Areas for improvement:
+
+    STRATEGIC IMPLICATIONS:
+    "Provide a brief summary of your analysis, highlighting the most critical aspects across the 5Ps. Offer key insights and strategic recommendations based on your holistic review."
+
+    ## Response ##
+    """
+    
+    response = llm.invoke(prompt)
+    return response.content
+
+def analyze_with_5ms(llm, problem):
+    prompt = f"""
+    ## Instruction ##
+    As an AI manufacturing and quality control analyst, use the 5Ms model (Man, Machine, Material, Method, Measurement) to thoroughly analyze the given production or quality control problem. This framework is crucial for identifying root causes of issues and improving manufacturing processes.
+
+    Before analyzing each M, consider the following:
+
+    1. Industry standards: Understand current manufacturing best practices and quality benchmarks.
+    2. Regulatory compliance: Be aware of relevant manufacturing and safety regulations.
+    3. Lean manufacturing principles: Consider how lean concepts apply to the situation.
+    4. Supply chain dynamics: Evaluate how upstream and downstream processes impact the problem.
+    5. Technology trends: Assess the role of emerging technologies in manufacturing and quality control.
+    6. Environmental factors: Consider environmental impacts and sustainability concerns.
+    7. Cost implications: Analyze the financial aspects of the problem and potential solutions.
+    8. Scalability: Consider how solutions can be scaled across production lines or facilities.
+    9. Continuous improvement: Think about how ongoing monitoring and improvement can be implemented.
+    10. Cross-functional impacts: Evaluate how changes in one area might affect others.
+
+    For each of the 5Ms, provide a concise but comprehensive analysis. Your response should be thorough, considering multiple aspects of the manufacturing process.
+
+    Problem: {problem}
+
+    Provide your analysis in the following format:
+
+    MAN: "......"
+    - Workforce skills and training:
+    - Human factors and ergonomics:
+    - Shift patterns and fatigue management:
+
+    MACHINE: "......"
+    - Equipment capabilities and limitations:
+    - Maintenance schedules and issues:
+    - Automation and technology integration:
+
+    MATERIAL: "......"
+    - Raw material quality and consistency:
+    - Inventory management:
+    - Material handling and storage:
+
+    METHOD: "......"
+    - Production processes and workflows:
+    - Standard operating procedures:
+    - Process optimization opportunities:
+
+    MEASUREMENT: "......"
+    - Quality control metrics:
+    - Inspection methods and frequency:
+    - Data collection and analysis techniques:
+
+    ROOT CAUSE ANALYSIS AND RECOMMENDATIONS:
+    "Provide a brief summary of your analysis, identifying the most likely root causes of the problem across the 5Ms. Offer key insights and specific recommendations for process improvement and quality enhancement."
+
+    ## Response ##
+    """
+    
+    response = llm.invoke(prompt)
+    return response.content
+
+def analyze_with_5es(llm, problem):
+    prompt = f"""
+    ## Instruction ##
+    As an AI policy and program analyst, use the 5Es model (Environment, Education, Engineering, Enforcement, Evaluation) to comprehensively analyze the given public policy, safety program, or behavior change initiative. This framework is crucial for developing, implementing, and assessing effective interventions.
+
+    Before analyzing each E, consider the following:
+
+    1. Stakeholder landscape: Identify all groups affected by or influencing the policy/program.
+    2. Cultural context: Consider societal norms, values, and cultural factors.
+    3. Resource availability: Assess available and required resources for implementation.
+    4. Political climate: Understand the political factors that may impact the initiative.
+    5. Long-term sustainability: Consider the long-term viability and impact of interventions.
+    6. Ethical implications: Evaluate potential ethical issues or dilemmas.
+    7. Interdisciplinary approach: Consider insights from relevant fields (e.g., psychology, sociology, economics).
+    8. Technological integration: Assess how technology can support or hinder the initiative.
+    9. Scalability: Consider how the program can be scaled up or adapted to different contexts.
+    10. Unintended consequences: Anticipate potential negative outcomes or side effects.
+
+    For each of the 5Es, provide a concise but comprehensive analysis. Your response should be thorough, considering multiple aspects of policy implementation and behavior change.
+
+    Problem: {problem}
+
+    Provide your analysis in the following format:
+
+    ENVIRONMENT: "......"
+    - Physical and social context:
+    - Existing policies and infrastructure:
+    - Barriers and facilitators:
+
+    EDUCATION: "......"
+    - Target audience and key messages:
+    - Educational strategies and channels:
+    - Awareness and knowledge gaps:
+
+    ENGINEERING: "......"
+    - Design interventions and modifications:
+    - Technological solutions:
+    - Infrastructure improvements:
+
+    ENFORCEMENT: "......"
+    - Regulatory measures:
+    - Compliance strategies:
+    - Incentives and disincentives:
+
+    EVALUATION: "......"
+    - Key performance indicators:
+    - Monitoring methods:
+    - Feedback mechanisms:
+
+    STRATEGIC RECOMMENDATIONS:
+    "Provide a brief summary of your analysis, highlighting the most critical aspects across the 5Es. Offer key insights and specific recommendations for policy design, implementation, and assessment. Consider short-term actions and long-term strategies."
+
+    ## Response ##
+    """
+    
+    response = llm.invoke(prompt)
+    return response.content
+
+def analyze_with_4ps(llm, problem):
+    prompt = f"""
+    ## Instruction ##
+    As an AI marketing strategist, use the 4Ps model (Product, Price, Place, Promotion) to comprehensively analyze the given marketing challenge or opportunity. This Marketing Mix framework is crucial for developing effective marketing strategies and bringing products or services to market successfully.
+
+    Before analyzing each P, consider the following:
+
+    1. Target audience: Clearly define and understand the target market segments.
+    2. Competitive landscape: Analyze competitors' strategies and market positioning.
+    3. Brand identity: Consider how the strategy aligns with overall brand image and values.
+    4. Market trends: Identify current and emerging trends in the industry.
+    5. Customer journey: Map out the customer's path to purchase and key touchpoints.
+    6. Digital transformation: Evaluate the role of digital channels and technologies.
+    7. Regulatory environment: Be aware of relevant marketing and advertising regulations.
+    8. Sustainability: Consider environmental and social responsibility aspects.
+    9. Global vs. local approach: Assess the need for market-specific adaptations.
+    10. ROI and metrics: Identify key performance indicators for marketing success.
+
+    For each of the 4Ps, provide a concise but comprehensive analysis. Your response should be thorough, considering multiple aspects of marketing strategy.
+
+    Problem: {problem}
+
+    Provide your analysis in the following format:
+
+    PRODUCT: "......"
+    - Core features and benefits:
+    - Product line and portfolio:
+    - Branding and packaging:
+
+    PRICE: "......"
+    - Pricing strategy and positioning:
+    - Discount and promotion policies:
+    - Payment terms and options:
+
+    PLACE: "......"
+    - Distribution channels:
+    - Market coverage:
+    - Inventory and logistics:
+
+    PROMOTION: "......"
+    - Marketing communication mix:
+    - Key messages and unique selling propositions:
+    - Media strategy and budget allocation:
+
+    INTEGRATED MARKETING STRATEGY:
+    "Provide a brief summary of your analysis, highlighting how the 4Ps interact and support each other. Offer key insights and specific recommendations for an integrated marketing approach. Consider both short-term tactics and long-term strategic positioning."
+
+    ## Response ##
+    """
+    
+    response = llm.invoke(prompt)
+    return response.content
+
+
 # Function to generate problem breadth and depth
 def generate_breadth_and_depth(llm,extracted_problems):
     prompt = f"""
@@ -675,7 +1043,7 @@ def parse_problem_landscape_output(output):
             parsed_data["future_system"] = line.split(":")[1].strip().strip('"')
         elif line.startswith("FUTURE SUB SYSTEM:"):
             parsed_data["future_sub_system"] = line.split(":")[1].strip().strip('"')
-    st.write(parsed_data)
+    #st.write(parsed_data)
     # Create a DataFrame
     data = {
         "Past": [parsed_data["past_super_system"], parsed_data["past_system"], parsed_data["past_sub_system"]],
@@ -1270,6 +1638,191 @@ def attribute_analysis(llm, idea):
 
     response = llm.invoke(prompt)
     return response.content
+
+def morphological_analysis(llm, idea):
+    prompt = f"""
+        ## Instruction ##
+        Conduct a comprehensive and innovative morphological analysis for the following idea: {idea}
+
+        Follow these detailed steps:
+        1. Identify 4 main categories of attributes relevant to the idea.
+        2. For each category, create a table with 4 attributes and 4 possible values for each attribute.
+        3. After the tables, create 5 hypothetical systems or products by replacing the original attributes with elements from adjacent or complementary domains. These systems should range from realistic to highly innovative.
+        4. For each hypothetical system, create a table showing 8 replaced elements (2 from each category) and their original counterparts.
+        5. After each system's table, provide 1-2 brief points about its potential usefulness or applications.
+
+        Use the following format for your analysis:
+
+        Category 1: [Name]
+
+        | Attribute | Values |
+        |-----------|--------|
+        | [Attr 1]  | 1. [Value 1], 2. [Value 2], 3. [Value 3], 4. [Value 4] |
+        | [Attr 2]  | 1. [Value 1], 2. [Value 2], 3. [Value 3], 4. [Value 4] |
+        | [Attr 3]  | 1. [Value 1], 2. [Value 2], 3. [Value 3], 4. [Value 4] |
+        | [Attr 4]  | 1. [Value 1], 2. [Value 2], 3. [Value 3], 4. [Value 4] |
+
+        [Repeat this table format for all 4 categories]
+
+        Now, create 5 innovative systems by replacing attributes with elements from adjacent or complementary domains:
+
+        1. "[System Name 1]"
+
+        | Original Category | Original Attribute | Replaced Element | Adjacent/Complementary Domain |
+        |--------------------|---------------------|-------------------|--------------------------------|
+        | [Category 1] | [Attribute] | [Replaced Element] | [Domain] |
+        | [Category 1] | [Attribute] | [Replaced Element] | [Domain] |
+        | [Category 2] | [Attribute] | [Replaced Element] | [Domain] |
+        | [Category 2] | [Attribute] | [Replaced Element] | [Domain] |
+        | [Category 3] | [Attribute] | [Replaced Element] | [Domain] |
+        | [Category 3] | [Attribute] | [Replaced Element] | [Domain] |
+        | [Category 4] | [Attribute] | [Replaced Element] | [Domain] |
+        | [Category 4] | [Attribute] | [Replaced Element] | [Domain] |
+
+        Usefulness:
+        - [Point 1]
+        - [Point 2]
+
+        [Repeat this format for all 5 systems, increasing in complexity and innovation]
+
+        Here's an example analysis for smartphones to guide your response:
+
+        Category 1: Display
+
+        | Attribute | Values |
+        |-----------|--------|
+        | Type | 1. LCD, 2. OLED, 3. MicroLED, 4. Foldable |
+        | Size | 1. Compact (5-5.9"), 2. Standard (6-6.9"), 3. Large (7"+), 4. Variable |
+        | Refresh Rate | 1. 60Hz, 2. 90Hz, 3. 120Hz, 4. Adaptive (1-120Hz) |
+        | Resolution | 1. HD+, 2. FHD+, 3. QHD+, 4. 4K |
+
+
+        Category 2: Performance
+
+        | Attribute | Values |
+        |-----------|--------|
+        | Processor | 1. Entry-level, 2. Mid-range, 3. Flagship, 4. AI-optimized |
+        | RAM | 1. 4GB, 2. 8GB, 3. 12GB, 4. 16GB+ |
+        | Storage | 1. 64GB, 2. 128GB, 3. 256GB, 4. 512GB+ |
+        | Battery | 1. 3000mAh, 2. 4000mAh, 3. 5000mAh, 4. 6000mAh+ |
+
+        Category 3: Camera System
+
+        | Attribute | Values |
+        |-----------|--------|
+        | Main Sensor | 1. 12MP, 2. 48MP, 3. 64MP, 4. 108MP+ |
+        | Zoom | 1. Digital, 2. 2x optical, 3. 5x optical, 4. 10x optical |
+        | Video | 1. 1080p60fps, 2. 4K30fps, 3. 4K60fps, 4. 8K30fps |
+        | Special Features | 1. Portrait mode, 2. Night mode, 3. AI enhancement, 4. Computational photography |
+
+        Category 4: Connectivity
+
+        | Attribute | Values |
+        |-----------|--------|
+        | Network | 1. 4G, 2. 5G, 3. 5G mmWave, 4. Satellite |
+        | Wi-Fi | 1. Wi-Fi 5, 2. Wi-Fi 6, 3. Wi-Fi 6E, 4. Wi-Fi 7 |
+        | Charging | 1. Wired, 2. Fast wired, 3. Wireless, 4. Reverse wireless |
+        | Biometrics | 1. Fingerprint, 2. Face unlock, 3. In-display fingerprint, 4. 3D face unlock |
+
+
+        Now, let's create innovative systems by replacing attributes with elements from adjacent or complementary domains:
+
+        1. "NeuroPulse Communicator"
+
+        | Original Category | Original Attribute | Replaced Element | Adjacent/Complementary Domain |
+        |--------------------|---------------------|-------------------|--------------------------------|
+        | Display | Type | Neural projection | Neuroscience |
+        | Display | Size | Adjustable mental canvas | Virtual Reality |
+        | Performance | Processor | Quantum neural network | Quantum Computing |
+        | Performance | RAM | Biological memory augmentation | Biotechnology |
+        | Camera System | Main Sensor | Synesthetic capture | Cognitive Science |
+        | Camera System | Special Features | Emotion recognition | Psychology |
+        | Connectivity | Network | Thought-based mesh network | Telepathy Research |
+        | Connectivity | Biometrics | DNA signature | Genetics |
+
+        Usefulness:
+        - Revolutionary communication device that translates thoughts and emotions into shareable experiences
+        - Potential applications in mental health, education, and interpersonal understanding
+
+        2. "EcoSphere Nexus"
+
+        | Original Category | Original Attribute | Replaced Element | Adjacent/Complementary Domain |
+        |--------------------|---------------------|-------------------|--------------------------------|
+        | Display | Type | Bioluminescent screen | Marine Biology |
+        | Display | Refresh Rate | Circadian rhythm sync | Chronobiology |
+        | Performance | Battery | Photosynthetic power cells | Botany |
+        | Performance | Storage | Organic molecular storage | Biochemistry |
+        | Camera System | Zoom | Compound eye array | Entomology |
+        | Camera System | Video | Pheromone-based encoding | Chemical Ecology |
+        | Connectivity | Charging | Ambient energy harvesting | Environmental Science |
+        | Connectivity | Wi-Fi | Mycorrhizal network interface | Mycology |
+
+        Usefulness:
+        - Eco-friendly device that integrates seamlessly with natural ecosystems
+        - Applications in environmental monitoring, sustainable living, and biome-human interfaces
+
+        3. "Quantum Entanglement Communicator"
+
+        | Original Category | Original Attribute | Replaced Element | Adjacent/Complementary Domain |
+        |--------------------|---------------------|-------------------|--------------------------------|
+        | Display | Type | Holographic quantum field | Quantum Optics |
+        | Display | Resolution | Planck-scale pixelation | Theoretical Physics |
+        | Performance | Processor | Quantum entanglement computer | Quantum Information Theory |
+        | Performance | RAM | Infinite quantum superposition | Multiverse Theory |
+        | Camera System | Main Sensor | Cosmic ray detector | Particle Physics |
+        | Camera System | Special Features | Parallel universe imaging | String Theory |
+        | Connectivity | Network | Instantaneous quantum tunneling | Quantum Teleportation |
+        | Connectivity | Biometrics | Quantum state authentication | Quantum Cryptography |
+
+        Usefulness:
+        - Revolutionizes communication by enabling instantaneous, secure connections across vast distances
+        - Potential applications in deep space exploration, alternate reality research, and unhackable communications
+
+        4. "Temporal Nexus Device"
+
+        | Original Category | Original Attribute | Replaced Element | Adjacent/Complementary Domain |
+        |--------------------|---------------------|-------------------|--------------------------------|
+        | Display | Type | Temporal projection screen | Theoretical Physics (Time) |
+        | Display | Refresh Rate | Time dilation synchronization | Relativity Theory |
+        | Performance | Processor | Causality manipulation engine | Philosophy of Time |
+        | Performance | Storage | Akashic field access | Metaphysics |
+        | Camera System | Zoom | Chronological focus | Archaeology |
+        | Camera System | Video | Historical event reconstruction | Historiography |
+        | Connectivity | Network | Temporal rift network | Science Fiction Concepts |
+        | Connectivity | Charging | Entropy reversal power | Thermodynamics |
+
+        Usefulness:
+        - Allows users to observe and interact with different points in time
+        - Applications in historical research, predictive modeling, and personal life reflection
+
+        5. "Consciousness Integration Matrix"
+
+        | Original Category | Original Attribute | Replaced Element | Adjacent/Complementary Domain |
+        |--------------------|---------------------|-------------------|--------------------------------|
+        | Display | Type | Mind-matter interface | Consciousness Studies |
+        | Display | Size | Infinite mental space | Cognitive Architecture |
+        | Performance | Processor | Collective consciousness hub | Social Psychology |
+        | Performance | RAM | Akashic record access | Mysticism |
+        | Camera System | Main Sensor | Reality perception filter | Phenomenology |
+        | Camera System | Special Features | Qualia manipulation | Philosophy of Mind |
+        | Connectivity | Network | Noosphere integration | Teilhard de Chardin's Theory |
+        | Connectivity | Biometrics | Soul signature recognition | Spirituality |
+
+        Usefulness:
+        - Transcends individual consciousness limitations by connecting to a global consciousness network
+        - Potential to revolutionize human understanding, problem-solving, and spiritual experiences
+
+        Ensure that the replaced elements come from truly adjacent or complementary domains, leading to creative and unexpected combinations. The systems should progress from relatively realistic to highly innovative and potentially disruptive concepts.
+
+        Conclude your Morphological Analysis with a summary of the key insights gained and the potential impact of these innovative combinations on the chosen product, service, or technology.
+
+        ## End Instruction ##
+        """
+
+    response = llm.invoke(prompt)
+    return response.content
+
+
 # Function to prepare constraints
 def generate_constraints(llm, extracted_problem):
     prompt = f'''
@@ -1370,6 +1923,8 @@ def convo():
         "Access Data Sources",
         "Summarize Key Findings",
         "Update Problem Description✅",
+        "Suggest PBD model✅",
+        "PBD models✅",
         "Analyze Problem Breadth and Depth✅",
         "Update Breadth and Depth✅",
         "Generate Future Scenarios",
@@ -1377,6 +1932,7 @@ def convo():
         "Create Function Map✅",
         "CREATE Model for ideas✅",
         "Attribute Analysis✅",
+        "Morphological Analysis✅",
         "Apply TRIZ Principle",
         "Generate Problem Summary",
         "Recommend Experts",
@@ -1464,6 +2020,55 @@ def convo():
                 description = generate_description(llm,extracted_problems)
             st.write(description)
 
+    elif choice == "Suggest PBD model✅":
+        problem = st.text_input("Enter a problem(User won't have to enter):")
+        if st.button("Run"):
+            with st.spinner("Suggesting think model for you:"):
+                suggestion_output = suggest_pdb_model(llm,problem)
+                #st.write(suggestion_output)
+                suggestion_parsed = parse_pbd_suggestion(suggestion_output)
+                st.write(suggestion_parsed)
+    
+    elif choice == "PBD models✅":
+        problem = st.text_input("Enter your problem(Users won't have to enter):")
+        def model_5ws_and_h():
+            st.header("5Ws and H Model")
+            st.write(analyze_with_5w1h(llm,problem))
+
+        def model_5ps():
+            st.header("5Ps Model")
+            st.write(analyze_with_5ps(llm,problem))
+
+        def model_5ms():
+            st.header("5Ms Model")
+            st.write(analyze_with_5ms(llm,problem))
+
+        def model_5es():
+            st.header("5Es Model")
+            st.write(analyze_with_5es(llm,problem))
+
+        def model_4ps():
+            st.header("4Ps Model")
+            st.write(analyze_with_4ps(llm,problem))
+        # Define the models
+        models = {
+            "5Ws and H": model_5ws_and_h,
+            "5Ps": model_5ps,
+            "5Ms": model_5ms,
+            "5Es": model_5es,
+            "4Ps": model_4ps
+        }
+
+        # Create the radio button in the main area
+        model_selection = st.radio("Select a Model", list(models.keys()))
+
+        # Add some space
+        st.write("")
+
+        # Display the selected model
+        models[model_selection]()
+
+        
     elif choice == "Analyze Problem Breadth and Depth✅":
         extracted_problems = st.text_area("Enter extracted problems(user won't have to add):")
         if st.button("Run"):
@@ -1487,7 +2092,7 @@ def convo():
         if st.button("Run"):
             with st.spinner("Creating Problem Landscape...."):
                 functionmap = problem_landscape(llm,extracted_information)
-            st.write(functionmap)
+            #st.write(functionmap)
             table,parsed_data = parse_problem_landscape_output(functionmap)
             st.table(table)
            # Store the parsed data in session state
@@ -1531,6 +2136,12 @@ def convo():
             with st.spinner("Performing Attribute Analysis...."):
                 st.markdown(attribute_analysis(llm,idea))
 
+    elif choice == "Morphological Analysis✅":
+        idea = st.text_input("Enter any idea: ")
+        if st.button("Run"):
+            with st.spinner("Performing Morphological Analysis...."):
+                st.markdown(morphological_analysis(llm,idea))
+
     elif choice == "Apply TRIZ Principle":
         st.write("Prompt Under Development")
 
@@ -1562,114 +2173,3 @@ if __name__ == "__main__":
     convo()
 
 
-
-#to be inserted after problem extraction
-
-#title = problem_title(llm,extracted_problem)
-# st.markdown('### Problem title ###')
-# st.markdown(title)
-
-# abstract = generate_abstract(llm,extracted_problem)
-# st.markdown('### Problem abstract ###')
-# st.markdown(abstract)
-
-# assumptions = generate_assumptions(llm,extracted_problem)
-# st.markdown('### Problem assumptions ###')
-# st.markdown(assumptions)
-
-# description = generate_description(llm,extracted_problem)
-# st.markdown('### Problem description ###')
-# st.markdown(description)
-
-
-# constraints = generate_constraints(llm,extracted_problem)
-# st.markdown('### Problem constraints ###')
-# st.markdown(constraints)
-
-
-# risks = generate_risks(llm,extracted_problem)
-# st.markdown('### Problem risks ###')
-# st.markdown(risks)
-
-
-
-
-# if 'problem' not in st.session_state:
-#         st.session_state.problem = ""
-#     if 'extracted_problem' not in st.session_state:
-#         st.session_state.extracted_problem = ""
-#     if 'abstract' not in st.session_state:
-#         st.session_state.abstract = ""
-#     if 'title' not in st.session_state:
-#         st.session_state.title = ""
-#     if 'show_options' not in st.session_state:
-#         st.session_state.show_options = False
-#     if 'abstract_generated' not in st.session_state:
-#         st.session_state.abstract_generated = False
-#     if 'title_generated' not in st.session_state:
-#         st.session_state.title_generated = False
-#     if 'description_generated' not in st.session_state:
-#         st.session_state.description_generated = False
-
-#     st.session_state.problem = st.text_area("Hey, what is the problem that you are trying to crack?", st.session_state.problem)
-
-#     if st.button("Enter", key="problem-input"):
-#         if st.session_state.problem:
-#             st.session_state.show_options = True
-#             st.session_state.extracted_problem = problem_extraction(llm, st.session_state.problem)
-#         else:
-#             st.error("Please enter a problem statement.")
-
-#     if st.session_state.show_options:
-#         st.markdown("**Cool, should we make a good abstract based on this?**")
-#         option = st.radio(
-#             "Please choose an option:",
-#             ('Yes get me an AI generated abstract', 'No I will provide an abstract')
-#         )
-
-#         if option == 'Yes get me an AI generated abstract':
-#             if not st.session_state.abstract_generated:
-#                 with st.spinner('Generating Abstracts'):
-#                     st.session_state.abstract = generate_abstract(llm, st.session_state.extracted_problem)
-#                     st.session_state.abstract_generated = True
-#             st.markdown('### Abstract ###')
-#             st.markdown(st.session_state.abstract)
-            
-#             abstract_feedback = st.text_area("Do you like the abstract or should we change something? Please let me know below:", key="abstract-feedback")
-#             if st.button("Update Abstract", key="update-abstract"):
-#                 with st.spinner('Finishing up the abstract...'):
-#                     st.session_state.abstract = update_abstract(llm, st.session_state.abstract, abstract_feedback)
-#                 st.markdown('### Abstract ###')
-#                 st.markdown(st.session_state.abstract)
-                
-#             if not st.session_state.title_generated and st.button("Generate Title", key="generate-title"):
-#                 with st.spinner('Generating Title'):
-#                     st.session_state.title = problem_title(llm, st.session_state.extracted_problem)
-#                     st.session_state.title_generated = True
-#                 st.markdown('### Problem Title ###')
-#                 st.markdown(st.session_state.title)
-
-#             if st.session_state.title_generated:
-#                 st.markdown('### Problem Title ###')
-#                 st.markdown(st.session_state.title)
-#                 title_feedback = st.text_area("Do you like the title or should we change something? Please let me know below:", key="title-feedback")
-#                 if st.button("Update Title", key="update-title"):
-#                     with st.spinner('Finishing up the title...'):
-#                         st.session_state.title = update_title(llm, st.session_state.title, title_feedback)
-#                     st.markdown('### Problem Title ###')
-#                     st.markdown(st.session_state.title)
-                    
-#                     if not st.session_state.description_generated:
-#                         if st.button("Generate Description", key="generate-description"):
-#                             with st.spinner('Generating Description'):
-#                                 st.session_state.description = generate_description(llm, st.session_state.extracted_problems)
-#                                 st.session_state.description_generated = True
-#                             st.markdown('### Generated Description ###')
-#                             st.markdown(st.session_state.description)
-#                     elif st.session_state.description_generated:
-#                         st.markdown('### Generated Description ###')
-#                         st.markdown(st.session_state.description)
-
-#         else:
-#             st.session_state.abstract = st.text_area('You may enter an abstract:')
-#             st.session_state.title = st.text_area('You may enter a title:')
