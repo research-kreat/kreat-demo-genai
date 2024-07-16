@@ -3,6 +3,9 @@
 import streamlit as st
 from langchain_openai import AzureChatOpenAI
 import pandas as pd
+from exa_py import Exa
+import json
+
 #from langchain_groq import ChatGroq
 
 # Function to initialize AzureChatOpenAI
@@ -14,7 +17,6 @@ def initialize_llm():
 
     #llm = ChatGroq(temperature=0.5, groq_api_key="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", model_name="llama3-70b-8192")
 
-
     llm = AzureChatOpenAI(
         openai_api_key=api_key,
         openai_api_version=api_version,
@@ -23,6 +25,44 @@ def initialize_llm():
         temperature=0.4
     )
     return llm
+
+exa = Exa(st.secrets["exa"]["EXA_API_KEY"])
+
+class Result:
+    def __init__(self, url, id, title, score, published_date, author):
+        self.url = url
+        self.id = id
+        self.title = title
+        self.score = score
+        self.published_date = published_date
+        self.author = author
+
+    def to_dict(self):
+        return {
+            "url": self.url,
+            "id": self.id,
+            "title": self.title,
+            "score": self.score,
+            "published_date": self.published_date,
+            "author": self.author
+        }
+
+class SearchResponse:
+    def __init__(self, results, autoprompt_string=None):
+        self.results = results
+        self.autoprompt_string = autoprompt_string
+
+def extract_search_results(search_response):
+    extracted_results = [result.to_dict() for result in search_response.results]
+    return extracted_results
+
+# Function to perform the search and extract results
+def search_and_extract(query, include_domains=None, start_published_date=None):
+    # Perform the search
+    search_response = exa.search_and_contents(query,use_autoprompt=True,num_results=3)
+    
+    return search_response.results
+
 
 # Function to extract problems from a conversation
 def problem_extraction(llm, problem):
@@ -1904,6 +1944,36 @@ def generate_risks(llm, extracted_problem):
     return response.content
 
 
+def market_analysis(llm, idea, market_data):
+    prompt = f"""
+    ## Instruction ##
+    Analyze and summarize the provided market data according to the following components, using inline citations where possible:
+
+    1. Market size: Estimate the total market size based on the given data.
+    2. Sales analysis: Examine sales trends, patterns, and key performance indicators.
+    3. Geographic location: Identify key regions or areas of interest in the market.
+    4. Market segmentation: Divide the market into distinct groups based on shared characteristics.
+    5. Demographic description: Describe the key demographic factors of the target market.
+    6. Analysis of market demand: Evaluate current and projected demand for products or services.
+    7. Competition in the market: Identify major competitors and assess their market positions.
+    8. Consumer insights & requirements: Highlight key consumer needs, preferences, and behaviors.
+
+    Provide a concise summary for each component based on the information in the market_data. If any component lacks sufficient information, mention that the data is limited or unavailable for that aspect.
+
+    Use inline citations in the format (Source "URL") where X is the URL of the source document. For example, (Source www.xyz.com) for information for the mentioned point.
+
+    This is the domain whose market has to be searched: {idea}
+
+    Market Data:
+    {market_data}
+
+    Your analysis should be clear, data-driven, and actionable for business decision-making. Ensure to cite the sources for key information and statistics where possible.
+    """
+
+    response = llm.invoke(prompt)
+    return response.content
+
+
 def convo():
     st.title("Kreat Conversation")
     st.header("Converse with Kreat")
@@ -1933,6 +2003,7 @@ def convo():
         "CREATE Model for ideas✅",
         "Attribute Analysis✅",
         "Morphological Analysis✅",
+        "Market analysis✅",
         "Apply TRIZ Principle",
         "Generate Problem Summary",
         "Recommend Experts",
@@ -2141,6 +2212,35 @@ def convo():
         if st.button("Run"):
             with st.spinner("Performing Morphological Analysis...."):
                 st.markdown(morphological_analysis(llm,idea))
+
+    elif choice == "Market analysis✅":
+        idea = st.text_input("Enter an idea(Users won't have to enter):")
+        if st.button("Run"):
+            with st.spinner("Extracting Market Data: "):
+                prompt = f"""
+                Here is an idea: {idea}. 
+                Give me market trends, opportunities, and competition for this idea for the current market for this idea.
+                """
+                data = search_and_extract(prompt)
+                market_data = ""
+                for d in data:
+                    url = d.url
+                    title = d.title
+                    date = d.published_date
+                    author = d.author
+                    text = d.text
+                    split_market_data = market_data.split()
+                    if len(split_market_data)<14000:
+                        market_data += f"""\n Market Content 
+                        \nTitle:{title} 
+                        \nDate: {date}
+                        \nAuthor: {author}
+                        \nText: {text}
+                        \nURL: {url}
+                        """
+                #st.write(market_data)        
+            with st.spinner("Generating Market Analysis..."):
+                st.write(market_analysis(llm,idea,market_data))      
 
     elif choice == "Apply TRIZ Principle":
         st.write("Prompt Under Development")
