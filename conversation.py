@@ -22,7 +22,7 @@ def initialize_llm():
         openai_api_version=api_version,
         azure_deployment=deployment_name,
         azure_endpoint=endpoint,
-        temperature=0.4
+        temperature=0.5
     )
     return llm
 
@@ -64,198 +64,322 @@ def search_and_extract(query, include_domains=None, start_published_date=None):
     return search_response.results
 
 
-# Function to extract problems from a conversation
 def problem_extraction(llm, problem):
-    prompt = f''' 
-            {problem}
-
-            Based on the innovator's response to "What is a problem for you?", extract the following key elements:
-
-            1. Core issue: Identify the central problem or challenge.
-            2. Affected stakeholders: Note who is impacted by this problem.
-            3. Context or scope: Determine the scale and relevant setting of the problem.
-            4. Current impact: Understand how this problem is affecting stakeholders or the situation.
-            5. Desired outcome: If mentioned, note the envisioned improvement or solution.
-            6. Root causes: Identify underlying factors contributing to the problem.
-            7. Timeframe: Note if the problem is urgent, ongoing, or anticipated.
-            8. Quantifiable aspects: Extract any numbers, statistics, or metrics mentioned.
-            9. Industry or field: Determine the specific sector or area of focus.
-            10. Key terms: Identify important keywords or phrases related to the problem.
-            11. Constraints: Note any limitations or obstacles in addressing the problem.
-            12. Unique aspects: Highlight distinctive features of the problem.
-
-            '''
-    response = llm.invoke(prompt)
-    return response.content
-
-# Function to prepare a problem title
-def generate_title(llm, extracted_problem):
     prompt = f'''
-        You are tasked with generating Title for a problem statement of an innovator from some information provided to you by the innovator.
-        Here are some information related to a problem. 
-        {extracted_problem} 
-        Using these extracted elements, create a problem statement that follows these guidelines:
+    {problem}
 
-        1. Scope indication:
-        Characteristic: Includes a hint about the scale or scope of the problem.
-        Good example: "Reducing Plastic Waste in Southeast Asian Coastal Communities"
-        Bad example: "Plastic Waste Reduction"
+    Based on the innovator's response to "What is a problem for you?", extract the following key elements and present them in the specified format:
 
-        2. Stakeholder focus:
-        Characteristic: Mentions key stakeholders affected by or involved in the problem.
-        Good example: "Improving Healthcare Access for Rural Elderly Populations"
-        Bad example: "Healthcare Access Improvement"
+    CORE ISSUE: "....[Identify the central problem or challenge]..."
 
-        3. Timeframe:
-        Characteristic: Indicates whether it's an urgent, ongoing, or future issue.
-        Good example: "Addressing Immediate Food Insecurity in Drought-Affected Regions"
-        Bad example: "Food Insecurity in Drought Regions"
+    AFFECTED STAKEHOLDERS: "....[Note who is impacted by this problem]..."
 
-        4. Outcome-oriented:
-        Characteristic: Suggests the desired result or improvement.
-        Good example: "Enhancing Student Engagement Through Gamified Learning Platforms"
-        Bad example: "Using Gamification in Education"
+    CONTEXT OR SCOPE: "....[Determine the scale and relevant setting of the problem]..."
 
-        5. Keyword optimization:
-        Characteristic: Uses relevant keywords for searchability and categorization.
-        Good example: "Sustainable Urban Development: Implementing Green Infrastructure Solutions"
-        Bad example: "City Planning Improvements"
+    CURRENT IMPACT: "....[Understand how this problem is affecting stakeholders or the situation]..."
 
-        6. Avoid unnecessary words:
-        Characteristic: Eliminates articles and filler words when possible.
-        Good example: "Reducing Industrial Carbon Emissions"
-        Bad example: "The Challenge of Reducing the Carbon Emissions in the Industry"
+    DESIRED OUTCOME: "....[If mentioned, note the envisioned improvement or solution]..."
 
-        7. Use active voice:
-        Characteristic: Employs active rather than passive language for directness.
-        Good example: "Implementing Water Conservation Strategies in Arid Regions"
-        Bad example: "Water Conservation Strategies Being Implemented in Arid Regions"
+    ROOT CAUSES: "....[Identify underlying factors contributing to the problem]..."
 
-        8. Quantify if possible:
-        Characteristic: Includes numbers or metrics if they add significant value.
-        Good example: "Halving Food Waste: A 10-Year Strategy for Restaurants"
-        Bad example: "Reducing Food Waste in Restaurants"
+    TIMEFRAME: "....[Note if the problem is urgent, ongoing, or anticipated]..."
 
-        9. Avoid questions:
-        Characteristic: Frames the title as a statement rather than a question.
-        Good example: "Improving Public Transportation Efficiency in High-Density Urban Areas"
-        Bad example: "How Can We Improve Public Transportation in Crowded Cities?"
+    QUANTIFIABLE ASPECTS: "....[Extract any numbers, statistics, or metrics mentioned]..."
 
-        10. Balance creativity and clarity:
-            Characteristic: Uses engaging language but prioritizes clarity over cleverness.
-            Good example: "From Trash to Treasure: Upcycling Industrial Waste into Valuable Products"
-            Bad example: "Turning Garbage into Gold: A Waste Revolution"
+    INDUSTRY OR FIELD: "....[Determine the specific sector or area of focus]..."
 
-        11. Consistency:
-            Characteristic: Ensures the title aligns with the content of the problem statement.
-            Good example: "Global Climate Change Mitigation Strategies" (assuming the content discusses global strategies)
-            Bad example: "Global Climate Change Mitigation Strategies" (if the content only discusses local initiatives)
+    KEY TERMS: "....[Identify important keywords or phrases related to the problem]..."
 
-        12. Avoid abbreviations:
-            Characteristic: Spells out terms unless universally recognized in the field.
-            Good example: "Reducing Greenhouse Gas Emissions in the Transport Sector"
-            Bad example: "Reducing GHG Emissions in the Transport Sector"
+    CONSTRAINTS: "....[Note any limitations or obstacles in addressing the problem]..."
 
-        13. Clarity and Simplicity:
-            Characteristic: Ensure the title is easy to understand and free of complex jargon unless necessary.
-            Good example: "Improving Air Quality in Urban Areas"
-            Bad example: "Enhancing Atmospheric Composition Through Pollution Mitigation"
+    UNIQUE ASPECTS: "....[Highlight distinctive features of the problem]..."
 
-        14. Engagement:
-            Characteristic: Make the title engaging to capture the reader's interest.
-            Good example: "Boosting Renewable Energy Adoption in Developing Countries"
-            Bad example: "Promoting Renewable Energy"
-
-        15. Precision:
-            Characteristic: Use precise and specific language to avoid vagueness.
-            Good example: "Enhancing Cybersecurity Measures in Online Banking"
-            Bad example: "Improving Security in Banking"
-
-        16. Length:
-            Characteristic: Maintain a balance between brevity and informativeness, aiming for 5 to 12 words.
-            Good example: "Enhancing Urban Mobility Through Bike-Sharing Programs"
-            Bad example: "Exploring Ways to Enhance Urban Mobility Through the Implementation of Bike-Sharing Programs"
-
-        17. Perspective:
-            Characteristic: Reflect the perspective or approach being taken, such as policy, technology, or societal impact.
-            Good example: "Policy Interventions for Reducing Childhood Obesity"
-            Bad example: "Childhood Obesity Reduction"
-
-        **Output Format:**
-        Title: "......"
-        Reasoning: 
-        (....step by step reasoning....)
-        '''
-    response = llm.invoke(prompt)
-    return response.content
-
-#Funtion to check a problem title
-def check_title(llm,title):
-    guidelines = [
-        "1. Scope indication: Includes a hint about the scale or scope of the problem. Good example: 'Reducing Plastic Waste in Southeast Asian Coastal Communities'. Bad example: 'Plastic Waste Reduction'.",
-        "2. Stakeholder focus: Mentions key stakeholders affected by or involved in the problem. Good example: 'Improving Healthcare Access for Rural Elderly Populations'. Bad example: 'Healthcare Access Improvement'.",
-        "3. Timeframe: Indicates whether it's an urgent, ongoing, or future issue. Good example: 'Addressing Immediate Food Insecurity in Drought-Affected Regions'. Bad example: 'Food Insecurity in Drought Regions'.",
-        "4. Outcome-oriented: Suggests the desired result or improvement. Good example: 'Enhancing Student Engagement Through Gamified Learning Platforms'. Bad example: 'Using Gamification in Education'.",
-        "5. Keyword optimization: Uses relevant keywords for searchability and categorization. Good example: 'Sustainable Urban Development: Implementing Green Infrastructure Solutions'. Bad example: 'City Planning Improvements'.",
-        "6. Avoid unnecessary words: Eliminates articles and filler words when possible. Good example: 'Reducing Industrial Carbon Emissions'. Bad example: 'The Challenge of Reducing the Carbon Emissions in the Industry'.",
-        "7. Use active voice: Employs active rather than passive language for directness. Good example: 'Implementing Water Conservation Strategies in Arid Regions'. Bad example: 'Water Conservation Strategies Being Implemented in Arid Regions'.",
-        "8. Quantify if possible: Includes numbers or metrics if they add significant value. Good example: 'Halving Food Waste: A 10-Year Strategy for Restaurants'. Bad example: 'Reducing Food Waste in Restaurants'.",
-        "9. Avoid questions: Frames the title as a statement rather than a question. Good example: 'Improving Public Transportation Efficiency in High-Density Urban Areas'. Bad example: 'How Can We Improve Public Transportation in Crowded Cities?'.",
-        "10. Balance creativity and clarity: Uses engaging language but prioritizes clarity over cleverness. Good example: 'From Trash to Treasure: Upcycling Industrial Waste into Valuable Products'. Bad example: 'Turning Garbage into Gold: A Waste Revolution'.",
-        "11. Consistency: Ensures the title aligns with the content of the problem statement. Good example: 'Global Climate Change Mitigation Strategies'. Bad example: 'Global Climate Change Mitigation Strategies' (if the content only discusses local initiatives).",
-        "12. Avoid abbreviations: Spells out terms unless universally recognized in the field. Good example: 'Reducing Greenhouse Gas Emissions in the Transport Sector'. Bad example: 'Reducing GHG Emissions in the Transport Sector'.",
-        "13. Clarity and Simplicity: Ensure the title is easy to understand and free of complex jargon unless necessary. Good example: 'Improving Air Quality in Urban Areas'. Bad example: 'Enhancing Atmospheric Composition Through Pollution Mitigation'.",
-        "14. Engagement: Make the title engaging to capture the reader's interest. Good example: 'Boosting Renewable Energy Adoption in Developing Countries'. Bad example: 'Promoting Renewable Energy'.",
-        "15. Precision: Use precise and specific language to avoid vagueness. Good example: 'Enhancing Cybersecurity Measures in Online Banking'. Bad example: 'Improving Security in Banking'.",
-        "16. Length: Maintain a balance between brevity and informativeness, aiming for 5 to 12 words. Good example: 'Enhancing Urban Mobility Through Bike-Sharing Programs'. Bad example: 'Exploring Ways to Enhance Urban Mobility Through the Implementation of Bike-Sharing Programs'.",
-        "17. Perspective: Reflect the perspective or approach being taken, such as policy, technology, or societal impact. Good example: 'Policy Interventions for Reducing Childhood Obesity'. Bad example: 'Childhood Obesity Reduction'."
-    ]
-
-    prompt = f'''
-    Given title: "{title}"
-    Please evaluate this title based on the following guidelines:
-    {guidelines}
-    Provide a clear judgment: "Yes it's a good title" or "No if it is out of the scope". If it's no then give clear reasons as to which guidelines it failed.
+    Please provide your response in the exact format shown above, with each category in capital letters followed by a colon and the answers should be within double quotation"... ...". If information for a category is not available or not mentioned, write "Not specified" for that category.
     '''
     response = llm.invoke(prompt)
     return response.content
 
-#Function to update title
+def parse_problem_extraction(output):
+    # Initialize a dictionary to store the parsed values
+    parsed_data = {
+        "CORE ISSUE": "",
+        "AFFECTED STAKEHOLDERS": "",
+        "CONTEXT OR SCOPE": "",
+        "CURRENT IMPACT": "",
+        "DESIRED OUTCOME": "",
+        "ROOT CAUSES": "",
+        "TIMEFRAME": "",
+        "QUANTIFIABLE ASPECTS": "",
+        "INDUSTRY OR FIELD": "",
+        "KEY TERMS": "",
+        "CONSTRAINTS": "",
+        "UNIQUE ASPECTS": ""
+    }
+
+    # Split the output by lines
+    lines = output.split('\n')
+
+    current_key = None
+
+    for line in lines:
+        line = line.strip()
+        if line:
+            # Check if the line starts with any of our keys
+            for key in parsed_data.keys():
+                if line.startswith(key + ":"):
+                    current_key = key
+                    parsed_data[key] = line.split(":", 1)[1].strip()
+                    break
+            else:
+                # If no key is found, it's a continuation of the previous value
+                if current_key:
+                    parsed_data[current_key] += " " + line
+
+    return parsed_data
+
+def generate_title(llm, extracted_problem):
+    prompt = f'''
+    You are tasked with generating a Title for a problem statement of an innovator from some information provided to you by the innovator.
+    Here is some information related to a problem:
+    {extracted_problem}
+    Using these extracted elements, create a problem statement title that follows the guidelines provided below.
+
+    Guidelines for creating the title:
+    1. Scope indication: Include a hint about the scale or scope of the problem.
+    2. Stakeholder focus: Mention key stakeholders affected by or involved in the problem.
+    3. Timeframe: Indicate whether it's an urgent, ongoing, or future issue.
+    4. Outcome-oriented: Suggest the desired result or improvement.
+    5. Keyword optimization: Use relevant keywords for searchability and categorization.
+    6. Avoid unnecessary words: Eliminate articles and filler words when possible.
+    7. Use active voice: Employ active rather than passive language for directness.
+    8. Quantify if possible: Include numbers or metrics if they add significant value.
+    9. Avoid questions: Frame the title as a statement rather than a question.
+    10. Balance creativity and clarity: Use engaging language but prioritize clarity over cleverness.
+    11. Consistency: Ensure the title aligns with the content of the problem statement.
+    12. Avoid abbreviations: Spell out terms unless universally recognized in the field.
+    13. Clarity and Simplicity: Ensure the title is easy to understand and free of complex jargon unless necessary.
+    14. Engagement: Make the title engaging to capture the reader's interest.
+    15. Precision: Use precise and specific language to avoid vagueness.
+    16. Length: Maintain a balance between brevity and informativeness, aiming for 5 to 12 words.
+    17. Perspective: Reflect the perspective or approach being taken, such as policy, technology, or societal impact.
+
+
+    **Output Format:**
+
+    TITLE: "......"
+
+    EVALUATION:
+    SCOPE INDICATION: "YES/NO"
+    STAKEHOLDER FOCUS: "YES/NO"
+    TIMEFRAME: "YES/NO"
+    OUTCOME-ORIENTED: "YES/NO"
+    KEYWORD OPTIMIZATION: "YES/NO"
+    AVOID UNNECESSARY WORDS: "YES/NO"
+    USE ACTIVE VOICE: "YES/NO"
+    QUANTIFY IF POSSIBLE: "YES/NO"
+    AVOID QUESTIONS: "YES/NO"
+    BALANCE CREATIVITY AND CLARITY: "YES/NO"
+    CONSISTENCY: "YES/NO"
+    AVOID ABBREVIATIONS: "YES/NO"
+    CLARITY AND SIMPLICITY: "YES/NO"
+    ENGAGEMENT: "YES/NO"
+    PRECISION: "YES/NO"
+    LENGTH: "YES/NO"
+    PERSPECTIVE: "YES/NO"
+
+    
+    Note: Please follow the exact output format while answering. The Title response should be within double quotation marks. Each YES/NO evaluation should be within double quotation marks.
+    '''
+    response = llm.invoke(prompt)
+    return response.content
+def parse_title_generation(output):
+    # Initialize a dictionary to store the parsed values
+    parsed_data = {
+        "TITLE": "",
+        "EVALUATION": {
+            "SCOPE INDICATION": "",
+            "STAKEHOLDER FOCUS": "",
+            "TIMEFRAME": "",
+            "OUTCOME-ORIENTED": "",
+            "KEYWORD OPTIMIZATION": "",
+            "AVOID UNNECESSARY WORDS": "",
+            "USE ACTIVE VOICE": "",
+            "QUANTIFY IF POSSIBLE": "",
+            "AVOID QUESTIONS": "",
+            "BALANCE CREATIVITY AND CLARITY": "",
+            "CONSISTENCY": "",
+            "AVOID ABBREVIATIONS": "",
+            "CLARITY AND SIMPLICITY": "",
+            "ENGAGEMENT": "",
+            "PRECISION": "",
+            "LENGTH": "",
+            "PERSPECTIVE": ""
+        }
+    }
+
+    # Split the output by lines
+    lines = output.split('\n')
+
+    # Flag to indicate when we've reached the evaluation section
+    evaluation_section = False
+
+    for line in lines:
+        line = line.strip()
+        if line.startswith("TITLE:"):
+            # Extract the title, removing quotation marks
+            parsed_data["TITLE"] = line.split(":", 1)[1].strip().strip('"')
+        elif line == "EVALUATION:":
+            evaluation_section = True
+        elif evaluation_section and ":" in line:
+            # Split the line into key and value
+            key, value = line.split(":", 1)
+            key = key.strip()
+            value = value.strip().strip('"')  # Remove quotation marks
+            if key in parsed_data["EVALUATION"]:
+                parsed_data["EVALUATION"][key] = value
+
+    return parsed_data
+
+def check_title(llm, title):
+    guidelines = [
+        "1. Scope indication: Includes a hint about the scale or scope of the problem.",
+        "2. Stakeholder focus: Mentions key stakeholders affected by or involved in the problem.",
+        "3. Timeframe: Indicates whether it's an urgent, ongoing, or future issue.",
+        "4. Outcome-oriented: Suggests the desired result or improvement.",
+        "5. Keyword optimization: Uses relevant keywords for searchability and categorization.",
+        "6. Avoid unnecessary words: Eliminates articles and filler words when possible.",
+        "7. Use active voice: Employs active rather than passive language for directness.",
+        "8. Quantify if possible: Includes numbers or metrics if they add significant value.",
+        "9. Avoid questions: Frames the title as a statement rather than a question.",
+        "10. Balance creativity and clarity: Uses engaging language but prioritizes clarity over cleverness.",
+        "11. Consistency: Ensures the title aligns with the content of the problem statement.",
+        "12. Avoid abbreviations: Spells out terms unless universally recognized in the field.",
+        "13. Clarity and Simplicity: Ensure the title is easy to understand and free of complex jargon unless necessary.",
+        "14. Engagement: Make the title engaging to capture the reader's interest.",
+        "15. Precision: Use precise and specific language to avoid vagueness.",
+        "16. Length: Maintain a balance between brevity and informativeness, aiming for 5 to 12 words.",
+        "17. Perspective: Reflect the perspective or approach being taken, such as policy, technology, or societal impact."
+    ]
+
+    prompt = f'''
+    Evaluate the following title based on the given guidelines:
+
+    TITLE: "{title}"
+
+    Guidelines:
+    {' '.join(guidelines)}
+
+    Provide your evaluation in the following format:
+
+    OVERALL_EVALUATION: "YES" or "NO"
+
+    GUIDELINE_EVALUATIONS:
+    SCOPE_INDICATION: "YES/NO"
+    STAKEHOLDER_FOCUS: "YES/NO"
+    TIMEFRAME: "YES/NO"
+    OUTCOME_ORIENTED: "YES/NO"
+    KEYWORD_OPTIMIZATION: "YES/NO"
+    AVOID_UNNECESSARY_WORDS: "YES/NO"
+    USE_ACTIVE_VOICE: "YES/NO"
+    QUANTIFY_IF_POSSIBLE: "YES/NO"
+    AVOID_QUESTIONS: "YES/NO"
+    BALANCE_CREATIVITY_AND_CLARITY: "YES/NO"
+    CONSISTENCY: "YES/NO"
+    AVOID_ABBREVIATIONS: "YES/NO"
+    CLARITY_AND_SIMPLICITY: "YES/NO"
+    ENGAGEMENT: "YES/NO"
+    PRECISION: "YES/NO"
+    LENGTH: "YES/NO"
+    PERSPECTIVE: "YES/NO"
+
+    IMPROVEMENT_SUGGESTIONS: "Provide brief suggestions for improvement if the overall evaluation is NO. If YES, write 'No improvements needed.'"
+
+    Note: Ensure all responses are within double quotes as shown in the format above.
+    '''
+
+    response = llm.invoke(prompt)
+    return response.content
+
+def parse_title_check(output):
+    parsed_data = {
+        "OVERALL_EVALUATION": "",
+        "GUIDELINE_EVALUATIONS": {},
+        "IMPROVEMENT_SUGGESTIONS": ""
+    }
+
+    lines = output.split('\n')
+    current_section = None
+
+    for line in lines:
+        line = line.strip()
+        if line.startswith("OVERALL_EVALUATION:"):
+            parsed_data["OVERALL_EVALUATION"] = line.split(":", 1)[1].strip().strip('"')
+        elif line == "GUIDELINE_EVALUATIONS:":
+            current_section = "GUIDELINE_EVALUATIONS"
+        elif line.startswith("IMPROVEMENT_SUGGESTIONS:"):
+            parsed_data["IMPROVEMENT_SUGGESTIONS"] = line.split(":", 1)[1].strip().strip('"')
+        elif current_section == "GUIDELINE_EVALUATIONS" and ":" in line:
+            key, value = line.split(":", 1)
+            parsed_data["GUIDELINE_EVALUATIONS"][key.strip()] = value.strip().strip('"')
+
+    return parsed_data
+
 def update_title(llm, title, feedback):
     prompt = f'''
-        You are tasked with understand the sentiment of a feedback and updating an abstract if required based on the feedback provided by the user.
-        Here is the original Title:
-        {title}
-        
-        And here is the feedback:
-        {feedback}
-        
-        If the feedback is positive then your response will the same abstract otherwise please update the abstract according to the feedback. 
-        Thus your response will be one of the following:
+    You are tasked with understanding the sentiment of feedback and updating a title if required based on the feedback provided by the user.
+    
+    Original Title: "{title}"
+    
+    Feedback: "{feedback}"
+    
+    Please respond in the following format:
 
-        Output:
+    SENTIMENT: "POSITIVE" or "NEGATIVE"
+    
+    ACTION: "KEEP" or "UPDATE"
+    
+    TITLE: "The original or updated title goes here"
+    
+    EXPLANATION: "Brief explanation of why the title was kept or updated"
 
-        Okay then we will stick with the same Title:
-        {title}
-
-        or
-
-        Okay here's an updated Title:
-        
+    Note: Ensure all responses are within double quotes as shown in the format above.
     '''
     
     response = llm.invoke(prompt)
     return response.content
 
-# Function to prepare an abstract
-def generate_abstract(llm, title,extracted_problem):
+def parse_title_update(output):
+    parsed_data = {
+        "SENTIMENT": "",
+        "ACTION": "",
+        "TITLE": "",
+        "EXPLANATION": ""
+    }
+
+    lines = output.split('\n')
+
+    for line in lines:
+        line = line.strip()
+        if line:
+            key, value = line.split(":", 1)
+            key = key.strip()
+            value = value.strip().strip('"')
+            if key in parsed_data:
+                parsed_data[key] = value
+
+    return parsed_data
+
+def generate_abstract(llm, title, extracted_problem):
     prompt = f'''
-        You are tasked with generating an abstract for a problem statement from some information provided to you by the innovator.
-        Here is the title of the problem:
-        {title}
-        Here are some information related to a problem. 
-        {extracted_problem} 
-        Using these extracted elements, create an abstract that follows these guidelines:
+    You are tasked with generating an abstract for a problem statement from information provided by the innovator.
+    
+    Title: "{title}"
+    
+    Problem Information: "{extracted_problem}"
+    
+    Using these elements, create an abstract following the given guidelines. 
+    
+    Using these extracted elements, create an abstract that follows these guidelines:
 
         1. Conciseness:
         Characteristic: Uses as few words as possible to convey the core message.
@@ -306,51 +430,95 @@ def generate_abstract(llm, title,extracted_problem):
 
         Example 1:
         "Urban air pollution, primarily caused by vehicle emissions, affects the health of millions in major cities. This project aims to reduce pollution levels by 30% through the implementation of AI-driven traffic management systems. This intervention could significantly improve public health outcomes and enhance the quality of life for urban residents. Immediate action is needed to address this pressing issue and to secure a healthier future."
+    
+    Respond in the following format:
 
-        
-        Your response should be in the following format:
-        Here is your Abstract:
+    ABSTRACT: "Your generated abstract goes here"
 
-        Reasoning:
-        (...step by step reasoning, bulleted point-wise of why it is a well-framed abstract...)
+    REASONING: "Provide a brief explanation of how the abstract addresses the key guidelines"
+
+    Note: Ensure all responses are within double quotes as shown in the format above. 
+    ABSTRACT response should be within double quotes. ABSTRACT: "......."
+    REASONING response should be within double quotes. REASONING: "......."
     '''
+    
     response = llm.invoke(prompt)
     return response.content
 
-#Function to update abstract
+def parse_abstract_generation(output):
+    parsed_data = {
+        "ABSTRACT": "",
+        "REASONING": ""
+    }
+
+    lines = output.split('\n')
+
+    for line in lines:
+        line = line.strip()
+        if line.startswith("ABSTRACT:"):
+            parsed_data["ABSTRACT"] = line.split(":", 1)[1].strip().strip('"')
+        elif line.startswith("REASONING:"):
+            parsed_data["REASONING"] = line.split(":", 1)[1].strip().strip('"')
+
+    return parsed_data
+
 def update_abstract(llm, abstract, feedback):
     prompt = f'''
-        You are tasked with understand the sentiment of a feedback and updating an abstract if required based on the feedback provided by the user.
-        Here is the original abstract:
-        {abstract}
-        
-        And here is the feedback:
-        {feedback}
-        
-        If the feedback is positive then your response will the same abstract otherwise please update the abstract according to the feedback. 
-        Thus your response will be one of the following:
+    You are tasked with understanding the sentiment of feedback and updating an abstract if required based on the feedback provided by the user.
+    
+    Original Abstract: "{abstract}"
+    
+    Feedback: "{feedback}"
+    
+    Please respond in the following format:
 
-        Output:
+    SENTIMENT: "POSITIVE" or "NEGATIVE"
+    
+    ACTION: "KEEP" or "UPDATE"
+    
+    ABSTRACT: "The original or updated abstract goes here"
+    
+    EXPLANATION: "Brief explanation of why the abstract was kept or updated"
 
-        Okay then we will stick with the same abstract:
-        {abstract}
-
-        or
-
-        Okay here's an updated abstract:
-        
+    Note: Ensure all responses are within double quotes as shown in the format above.
     '''
     
     response = llm.invoke(prompt)
     return response.content
 
-# Function to classify problems
+def parse_abstract_update(output):
+    parsed_data = {
+        "SENTIMENT": "",
+        "ACTION": "",
+        "ABSTRACT": "",
+        "EXPLANATION": ""
+    }
+
+    lines = output.split('\n')
+    current_key = None
+
+    for line in lines:
+        line = line.strip()
+        if line:
+            if ":" in line:
+                key, value = line.split(":", 1)
+                key = key.strip()
+                value = value.strip().strip('"')
+                if key in parsed_data:
+                    parsed_data[key] = value
+                    current_key = key
+            elif current_key:
+                # If there's no colon, it's a continuation of the previous value
+                parsed_data[current_key] += " " + line.strip('"')
+
+    return parsed_data
+
+
 def assess_problem(llm, extracted_problem):
     prompt = f'''
-    ## Problem Analysis
-    
-    **Problem Description:**
-    {extracted_problem}
+    Analyze the following problem description and provide a classification based on its complexity and predictability:
+
+    Problem Description: "{extracted_problem}"
 
     **Instructions:**
     Analyze the text to determine the level of complexity and predictability:
@@ -378,17 +546,56 @@ def assess_problem(llm, extracted_problem):
     - Calculate a confidence score based on how clearly the problem fits into a quadrant
     - If confidence is low, flag for human review
 
-    ## Problem Classification Output
+    Please respond in the following format:
 
-    **Results:**
-    - Complexity Score: 
-    - Predictability Score: 
-    - Classification: 
-    - Confidence Score: 
+    COMPLEXITY_SCORE: "Score from 1-10"
+    COMPLEXITY_REASONING: "Brief explanation for the complexity score"
+
+    PREDICTABILITY_SCORE: "Score from 1-10"
+    PREDICTABILITY_REASONING: "Brief explanation for the predictability score"
+
+    CLASSIFICATION: "COMPLEX" or "COMPLICATED" or "WICKED" or "SIMPLE"
+    CLASSIFICATION_REASONING: "Explanation for why this classification was chosen"
+
+    CONFIDENCE_SCORE: "Score from 1-10"
+    CONFIDENCE_REASONING: "Explanation for the confidence score"
+
+    Note: Ensure all responses are within double quotes as shown in the format above.
     '''
-
+    
     response = llm.invoke(prompt)
     return response.content
+
+def parse_problem_assessment(output):
+    parsed_data = {
+        "COMPLEXITY_SCORE": "",
+        "COMPLEXITY_REASONING": "",
+        "PREDICTABILITY_SCORE": "",
+        "PREDICTABILITY_REASONING": "",
+        "CLASSIFICATION": "",
+        "CLASSIFICATION_REASONING": "",
+        "CONFIDENCE_SCORE": "",
+        "CONFIDENCE_REASONING": ""
+    }
+
+    lines = output.split('\n')
+    current_key = None
+
+    for line in lines:
+        line = line.strip()
+        if line:
+            if ":" in line:
+                key, value = line.split(":", 1)
+                key = key.strip()
+                value = value.strip().strip('"')
+                if key in parsed_data:
+                    parsed_data[key] = value
+                    current_key = key
+            elif current_key:
+                # If there's no colon, it's a continuation of the previous value
+                parsed_data[current_key] += " " + line.strip('"')
+
+    return parsed_data
 
 # Function to explain problem classification
 def explain_problem_classification(llm, extracted_problem,problem_classification):
@@ -471,53 +678,91 @@ def user_enhanced_problem_classification(llm, extracted_problem,complexity,predi
     response = llm.invoke(prompt)
     return response.content
 
-# Function to prepare assumptions
 def generate_assumptions(llm, extracted_problem):
     prompt = f'''
-        You are tasked with generating assumptions for a problem statement from some information provided to you by the innovator.
-        Here are some information related to a problem. 
-        {extracted_problem} 
-        Using these extracted elements, create assumptions that follow these guidelines:
+    You are tasked with generating assumptions for the following problem statement:
 
-        1. Clearly stated and justified:
-        Characteristic: Each assumption should be explicitly stated and accompanied by a rationale.
+    {extracted_problem}
 
-        2. Relevant to the problem and potential solutions:
-        Characteristic: Assumptions should directly relate to the problem at hand and the proposed solutions.
+    Generate 4 assumptions that follow these guidelines:
+    1. Clearly stated and justified
+    2. Relevant to the problem and potential solutions
+    3. Acknowledges uncertainties
+    4. Includes both technical and social aspects
 
-        3. Acknowledges uncertainties:
-        Characteristic: Assumptions should recognize any uncertainties or potential variability.
+    For each assumption, provide:
+    ASSUMPTION: "The assumption statement"
+    RATIONALE: "The justification for this assumption"
+    TYPE: "TECHNICAL" or "SOCIAL"
+    UNCERTAINTY_LEVEL: "LOW", "MEDIUM", or "HIGH"
 
-        4. Includes both technical and social assumptions:
-        Characteristic: Assumptions should cover both technical aspects and social dynamics.
+    Respond in the following format:
 
-        Here are some examples:
+    ASSUMPTION_1: "Assumption statement 1"
+    RATIONALE_1: "Rationale for assumption 1"
+    TYPE_1: "TECHNICAL" or "SOCIAL"
+    UNCERTAINTY_1: "LOW" or "MEDIUM" or "HIGH"
 
-        Example 1:
-        Assumption: "We assume that the majority of vehicles in the city will be equipped with or can be retrofitted with IoT devices for traffic management systems."
-        Rationale: This is based on the increasing prevalence of smart vehicles and the city's plan to subsidize IoT device installation.
+    ASSUMPTION_2: "Assumption statement 2"
+    RATIONALE_2: "Rationale for assumption 2"
+    TYPE_2: "TECHNICAL" or "SOCIAL"
+    UNCERTAINTY_2: "LOW" or "MEDIUM" or "HIGH"
 
-        Assumption: "We assume that reducing traffic congestion will lead to a proportional reduction in air pollution levels."
-        Rationale: This is based on studies showing a strong correlation between traffic density and air pollution in urban areas.
+    ASSUMPTION_3: "Assumption statement 3"
+    RATIONALE_3: "Rationale for assumption 3"
+    TYPE_3: "TECHNICAL" or "SOCIAL"
+    UNCERTAINTY_3: "LOW" or "MEDIUM" or "HIGH"
 
-        Example 2:
-        Assumption: "We assume that local farmers will adopt the proposed sustainable land management practices."
-        Rationale: This is based on prior successful pilot programs and the availability of government incentives.
+    ASSUMPTION_4: "Assumption statement 4"
+    RATIONALE_4: "Rationale for assumption 4"
+    TYPE_4: "TECHNICAL" or "SOCIAL"
+    UNCERTAINTY_4: "LOW" or "MEDIUM" or "HIGH"
 
-        Assumption: "We assume that international funding for conservation efforts will remain stable or increase."
-        Rationale: This is based on recent trends in global environmental funding and commitments made at international climate summits.
-
-        Example 3:
-        Assumption: "We assume that advancements in water-saving technologies will be accessible and affordable to farmers in arid regions."
-        Rationale: This is based on current trends in technology development and subsidies offered by the government.
-
-        Assumption: "We assume that public awareness campaigns will effectively change water usage behaviors."
-        Rationale: This is based on the success of similar campaigns in other regions and the involvement of local community leaders.
-
+    Note: Ensure all responses are within double quotes as shown in the format above.
     '''
+    
     response = llm.invoke(prompt)
     return response.content
 
+def parse_assumptions(output):
+    parsed_data = {}
+    lines = output.split('\n')
+    current_key = None
+    assumption_count = 0
+
+    for line in lines:
+        line = line.strip()
+        if line:
+            if ":" in line:
+                key, value = line.split(":", 1)
+                key = key.strip()
+                value = value.strip().strip('"')
+                
+                if key.startswith("ASSUMPTION"):
+                    assumption_count += 1
+                    parsed_data[f"assumption_{assumption_count}"] = {
+                        "assumption": value,
+                        "rationale": "",
+                        "type": "",
+                        "uncertainty": ""
+                    }
+                elif key.startswith("RATIONALE"):
+                    parsed_data[f"assumption_{assumption_count}"]["rationale"] = value
+                elif key.startswith("TYPE"):
+                    parsed_data[f"assumption_{assumption_count}"]["type"] = value
+                elif key.startswith("UNCERTAINTY"):
+                    parsed_data[f"assumption_{assumption_count}"]["uncertainty"] = value
+                
+                current_key = key
+            elif current_key:
+                # If there's no colon, it's a continuation of the previous value
+                if current_key.startswith("ASSUMPTION"):
+                    parsed_data[f"assumption_{assumption_count}"]["assumption"] += " " + line.strip('"')
+                elif current_key.startswith("RATIONALE"):
+                    parsed_data[f"assumption_{assumption_count}"]["rationale"] += " " + line.strip('"')
+
+    return parsed_data
+    
 # Function to prepare a problem description
 def generate_description(llm, extracted_problem):
     prompt = f'''
@@ -1984,12 +2229,14 @@ def convo():
     function_names = [
         "Extract Problem Information✅",
         "Generate Title✅",
+        "Check Title✅",
         "Update Title✅",
         "Generate Abstract✅",
         "Update Abstract✅",
         "Assess Problem Type✅",
         "Explain Problem Type Assessment✅",
         "Visualize Sliders✅",
+        "Generate Assumptions✅",
         "Access Data Sources",
         "Summarize Key Findings",
         "Update Problem Description✅",
@@ -2024,6 +2271,8 @@ def convo():
             with st.spinner("Extracting Information...."):
                 extracted_information = problem_extraction(llm,goal)
             st.code(extracted_information)
+            response = parse_problem_extraction(extracted_information)
+            st.write(response)
 
     elif choice == "Generate Title✅":
         extracted_information = st.text_area("Input the extracted Information(user won't need to enter): ")
@@ -2031,13 +2280,14 @@ def convo():
             with st.spinner("Generating Title..."):
                 result = generate_title(llm,extracted_information)
             st.code(result)
+            st.write(parse_title_generation(result))
 
     elif choice == "Update Title✅":
         current_title = st.text_input("Current Title(User won't need to enter)")
         feedback = st.text_input("Feedback")
         if st.button("Run"):
             result = update_title(llm,current_title, feedback)
-            st.write(result)
+            st.write(parse_title_update(result))
 
     elif choice == "Generate Abstract✅":
         title = st.text_input("Title(User won't need to enter)")
@@ -2045,6 +2295,7 @@ def convo():
         if st.button("Run"):
             result = generate_abstract(llm,title,extracted_information)
             st.write(result)
+            st.write(parse_abstract_generation(result))
 
     elif choice == "Update Abstract✅":
         current_abstract = st.text_input("Current Abstract")
@@ -2052,6 +2303,7 @@ def convo():
         if st.button("Run"):
             result = update_abstract(llm,current_abstract, feedback)
             st.write(result)
+            st.write(parse_abstract_update(result))
 
     elif choice == "Assess Problem Type✅":
         extracted_problems = st.text_area("Enter the extracted problems(User would not have to enter):")
@@ -2059,6 +2311,7 @@ def convo():
             with st.spinner("Assessing Problem type..."):
                 problem_classification = assess_problem(llm,extracted_problems)
             st.code(problem_classification)
+            st.write(parse_problem_assessment(problem_classification))
 
     elif choice == "Explain Problem Type Assessment✅":
         extracted_problems = st.text_area("Enter the extracted problems(User would not have to enter):")
@@ -2077,6 +2330,15 @@ def convo():
             with st.spinner("Analyzing your problem now..."):
                 problem_classification = user_enhanced_problem_classification(llm,extracted_problems,complexity,predictability)
             st.code(problem_classification)
+
+    elif choice == "Generate Assumptions✅":
+        extracted_problems = st.text_area("Enter the extracted problems(User would not have to enter):")
+        if st.button("Run"):
+            with st.spinner("Generating Assumptions..."):
+                assumptions = generate_assumptions(llm,extracted_problems)
+            st.code(assumptions)
+            st.write(parse_assumptions(assumptions))
+
 
     elif choice == "Access Data Sources":
         st.write("Prompt Under Development")
@@ -2139,6 +2401,11 @@ def convo():
         # Display the selected model
         models[model_selection]()
 
+    elif choice == "Check Title✅":
+        title = st.text_input("Enter a title:")
+        if st.button("Run"):
+            evaluation = check_title(llm,title)
+            st.write(parse_title_check(evaluation))
         
     elif choice == "Analyze Problem Breadth and Depth✅":
         extracted_problems = st.text_area("Enter extracted problems(user won't have to add):")
