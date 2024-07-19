@@ -1623,31 +1623,39 @@ def parse_problem_landscape_output(output):
 
     return df,parsed_data
 
-
 def opportunity_breadth(llm, opportunity):
     prompt = f"""
     ## Instruction ##
     Conduct a thorough Opportunity Breadth analysis for the following opportunity: {opportunity}
 
     1. Future-Oriented PESTEL:
-       Analyze Political, Economic, Social, Technological, Environmental, and Legal factors related to this opportunity, focusing on emerging trends and potential future states.
+       Analyze Political, Economic, Social, Technological, Environmental, and Legal factors, focusing on emerging trends and potential future states. For each factor, identify potential unmet customer needs or jobs-to-be-done.
 
-    2. Enhanced 7 Os of the Marketplace:
-       Examine Occupants, Objects, Objectives, Organizations, Operations, Occasions, and Outlets related to this opportunity with a future-focused lens.
+    2. 5Ws and H Framework:
+       Examine the opportunity space through the lens of Who, What, When, Where, Why, and How. For each question, identify struggles customers face in getting jobs done and potential desired outcomes.
 
     3. Trend Extrapolation and Weak Signals:
-       Identify current trends and weak signals related to this opportunity. Extrapolate these to extreme scenarios and consider potential intersections and implications.
+       Identify current trends and weak signals. Extrapolate these to extreme scenarios and consider how they might create new jobs-to-be-done or unmet needs.
 
     4. Cross-Industry Opportunity Mapping:
-       Explore how innovations in unrelated industries might apply to this opportunity in its target sector.
+       Explore innovations in unrelated industries and their potential applications in your target sector. Identify how these innovations address unmet needs or help customers better achieve desired outcomes.
 
     5. Emerging Needs Anticipation:
-       Project how current needs related to this opportunity might evolve and identify potential new needs arising from societal or technological changes.
+       Project how current needs might evolve and identify potential new needs arising from societal or technological changes. Consider both functional and emotional jobs-to-be-done.
 
     6. Disruptive Technology Radar:
-       Scan for emerging and potential future technologies that could enable radical innovations related to this opportunity.
+       Scan for emerging and potential future technologies that could enable radical innovations in your industry. Assess how these technologies might address currently unmet needs or create new desired outcomes.
 
-    Provide a concise summary of insights for each of these six areas as they relate to the given opportunity.
+    7. Innovation Ambition Mapping:
+       Categorize potential opportunities using the Innovation Ambition Matrix (core, adjacent, transformational). Consider the level of innovation ambition for each identified opportunity.
+
+    8. Underserved Markets Discovery and Qualification:
+       - Market Discovery: Identify potential underserved markets or segments within the scope of your analysis. These could be regions, customer groups, or industry sectors that currently lack access to key technologies or solutions.
+       - Market Characteristics: Assess the characteristics of these underserved markets, such as economic barriers, limited infrastructure, or social factors contributing to their underserved status.
+       - Needs and Gaps: Evaluate specific needs and gaps in these markets related to the opportunity being analyzed. Determine how addressing these needs could create significant opportunities.
+       - Qualification Criteria: Develop general criteria to qualify markets as underserved, such as limited technology access, high economic barriers, or gaps in infrastructure. Assess how addressing these criteria can open new avenues for innovation.
+
+    Provide a concise summary of insights for each of these eight areas as they relate to the given opportunity.
 
     Use the following example as a guide for your analysis and response format:
 
@@ -1656,48 +1664,80 @@ def opportunity_breadth(llm, opportunity):
     Breadth Analysis:
 
     1. Future-Oriented PESTEL:
-       - Political: Government initiatives for smart cities; potential policies to regulate autonomous vehicles; impact on employment in transportation sector
-       - Economic: Reduced transportation costs; new business models in mobility; potential job displacement
-       - Social: Changing perceptions of car ownership; increased mobility for elderly and disabled; cultural adaptation to AI-driven vehicles
-       - Technological: Advancements in AI, machine learning, and sensor technologies; development of 5G and edge computing
-       - Environmental: Potential reduction in emissions through optimized routing and integration with electric vehicles
-       - Legal: Development of new regulatory frameworks; liability issues in accidents; data privacy laws
+       - Political: Government initiatives for smart cities; potential policies to regulate autonomous vehicles
+         Unmet need: Clear regulatory framework for autonomous vehicles
+       - Economic: New business models in mobility; potential job displacement in traditional transport sector
+         Unmet need: Retraining programs for displaced workers
+       - Social: Changing perceptions of car ownership; increased mobility for elderly and disabled
+         Unmet need: Accessible, user-friendly interfaces for all demographics
+       - Technological: Advancements in AI, machine learning, and sensor technologies
+         Unmet need: India-specific AI algorithms for complex traffic scenarios
+       - Environmental: Potential reduction in emissions through optimized routing
+         Unmet need: Sustainable manufacturing and disposal of AV components
+       - Legal: Development of new liability frameworks for autonomous vehicle accidents
+         Unmet need: Clear legal guidelines for AV insurance and accident responsibility
 
-    2. Enhanced 7 Os of the Marketplace:
-       - Occupants: Urban professionals, elderly, disabled, logistics companies, ride-sharing users
-       - Objects: Autonomous vehicles adapted for Indian road conditions, AI systems, sensor suites
-       - Objectives: Safe, efficient, and accessible transportation; reduced congestion; lower transportation costs
-       - Organizations: Tech companies, traditional auto manufacturers, startups, government agencies
-       - Operations: AI-driven navigation, predictive maintenance, fleet management
-       - Occasions: Daily commutes, long-distance travel, goods transport, emergency services
-       - Outlets: Direct sales, mobility-as-a-service platforms, fleet services, public transportation
+    2. 5Ws and H Framework:
+       - Who: Urban commuters, logistics companies, elderly and disabled individuals
+         Struggle: Limited mobility options for certain demographics
+       - What: Self-driving vehicles adapted for Indian roads and traffic conditions
+         Struggle: Navigating unpredictable and diverse traffic scenarios
+       - When: Gradual implementation over the next 5-15 years
+         Struggle: Balancing early adoption with safety concerns
+       - Where: Initially in smart cities, later expanding to highways and rural areas
+         Struggle: Adapting to varied infrastructure quality across regions
+       - Why: To improve road safety, reduce congestion, and increase mobility
+         Struggle: Overcoming cultural resistance to AI-driven vehicles
+       - How: Through a combination of advanced AI, sensor technologies, and infrastructure upgrades
+         Struggle: Ensuring reliable performance in all weather and traffic conditions
 
     3. Trend Extrapolation and Weak Signals:
-       - Trend: Increasing urbanization and traffic congestion
-         Extrapolation: Development of multi-level autonomous transport systems (ground, elevated, underground)
-       - Weak Signal: Experiments with drone-based emergency services
-         Extrapolation: Integration of autonomous ground vehicles with aerial drones for comprehensive urban mobility
+       - Trend: Increasing adoption of advanced driver-assistance systems (ADAS)
+         Extrapolation: Fully autonomous vehicles becoming common in urban areas
+         Potential new need: On-demand, personalized public transportation
+       - Weak Signal: Experiments with autonomous vehicles in controlled environments
+         Extrapolation: Creation of dedicated AV lanes or zones in major cities
+         Potential new need: Redesign of urban spaces to optimize for AV traffic
 
     4. Cross-Industry Opportunity Mapping:
-       - Application of swarm intelligence from robotics to coordinate multiple autonomous vehicles
+       - Application of swarm intelligence from robotics to coordinate multiple AVs in traffic
+         Addresses need: Efficient traffic flow management in congested areas
        - Use of blockchain for secure, decentralized communication between vehicles
+         Addresses need: Tamper-proof record-keeping for liability and insurance purposes
 
     5. Emerging Needs Anticipation:
-       - On-demand, personalized public transportation
-       - Seamless integration of various transportation modes (last-mile connectivity)
-       - Real-time health monitoring and emergency response systems in vehicles
+       - Functional need: Real-time health monitoring and emergency response systems in AVs
+         Explanation: As vehicles become autonomous, they can take on additional roles like health monitoring
+       - Emotional need: Maintaining a sense of control and privacy in shared, autonomous vehicles
+         Explanation: As vehicle ownership decreases, users may seek ways to personalize their travel experience
 
     6. Disruptive Technology Radar:
-       - Quantum computing for complex traffic optimization
-       - Brain-computer interfaces for direct vehicle control
-       - Self-healing materials for vehicle maintenance
+       - Solid-state LiDAR for more reliable and cost-effective sensing
+         Addresses need: Affordable and reliable obstacle detection in diverse environments
+       - Edge AI for real-time decision making without reliance on cloud connectivity
+         Addresses need: Rapid response to dynamic traffic conditions in areas with poor network coverage
+
+    7. Innovation Ambition Mapping:
+       - Core: Implementing basic self-driving features in existing vehicles (e.g., automatic parking)
+       - Adjacent: Developing fully autonomous vehicles for specific use cases (e.g., highway driving)
+       - Transformational: Creating an integrated autonomous transportation system for entire cities
+
+    8. Underserved Markets Discovery and Qualification:
+       - Market Discovery: Rural areas and small towns with limited public transportation
+         Potential: Autonomous shared mobility solutions for improved connectivity
+       - Market Characteristics: Limited infrastructure, lower income levels, dispersed population
+         Challenge: Adapting AV technology to function in areas with poor road conditions
+       - Needs and Gaps: Affordable, reliable transportation for work and essential services
+         Opportunity: Develop low-cost, rugged AVs designed for rural environments
+       - Qualification Criteria: Regions with <50% public transport coverage, >30% population below poverty line
+         Innovation Avenue: Create a rural-focused AV platform with local manufacturing and maintenance
 
     Now, provide a similar analysis for the given opportunity: {opportunity}
     Follow the same structure and level of detail as the example.
-
     """
     response = llm.invoke(prompt)
     return response.content
+
 def opportunity_depth(llm, opportunity):
     prompt = f"""
     ## Instruction ##
