@@ -1998,7 +1998,7 @@ def parse_opportunity_pre_landscape(output):
     st.write(df)
 
     # Return the parsed data as JSON
-    return json.dumps(parsed_data, indent=2)
+    return parsed_data
 
 #Funtions to create function map updated.
 def identify_useful_function_map(llm, components):
