@@ -1698,93 +1698,139 @@ def opportunity_breadth(llm, opportunity):
     """
     response = llm.invoke(prompt)
     return response.content
-
 def opportunity_depth(llm, opportunity):
     prompt = f"""
     ## Instruction ##
     Conduct a thorough Opportunity Depth analysis for the following opportunity: {opportunity}
 
-    1. Blue Ocean Strategy's Four Actions Framework:
-       Apply Eliminate-Reduce-Raise-Create to identify ways to break away from current market boundaries and create new value for this opportunity.
+    1. Need Connection and Impact Assessment:
+       - Identify and list the specific needs this opportunity addresses
+       - Evaluate the potential impact on each identified need (Low/Medium/High)
+       - Assess the potential for creating new needs or markets
+       - Provide a brief explanation for each assessment
 
-    2. Five 'What Ifs/Hows':
-       Answer these questions for the opportunity:
-       - What if we pursued this opportunity?
-       - How could we maximize its potential?
-       - What if we expanded its scope?
-       - How could we overcome potential obstacles?
-       - What if we combined it with other opportunities?
+    2. Breakthrough Potential Analysis:
+       - Apply Moonshot thinking: Describe the most ambitious version of this opportunity
+       - Use Blue Ocean Strategy's Four Actions Framework:
+         * Eliminate: What factors should be eliminated?
+         * Reduce: What factors should be reduced well below the industry standard?
+         * Raise: What factors should be raised well above the industry standard?
+         * Create: What factors should be created that the industry has never offered?
+       - Evaluate disruptive potential using Christensen's criteria:
+         * Does it target non-consumption or low-end market?
+         * Does it offer a simpler, more affordable solution?
+         * Does it have potential to improve and move upmarket?
 
-    3. VRIO Framework for Future Potential:
-       Assess the Value, Rarity, Imitability, and Organizational fit of this opportunity, considering both current and future scenarios.
+    3. Technology and Feasibility Assessment:
+       - Assess Technology Readiness Level (TRL) on a scale of 1-9
+       - Identify key technological barriers (list at least 3)
+       - Identify key technological enablers (list at least 3)
+       - Evaluate organizational capability fit (Low/Medium/High) and explain why
 
-    4. Future Scenarios Framework:
-       Develop multiple future scenarios based on key uncertainties and identify potential developments within each for this opportunity.
+    4. Future Scenarios and Adaptability:
+       - Develop 2-3 plausible future scenarios relevant to this opportunity
+       - For each scenario:
+         * Describe its key characteristics
+         * Assess the opportunity's viability (Low/Medium/High)
+         * Identify adaptive strategies to succeed in this scenario
 
-    5. Sustainable Development Goals (SDGs) Future Mapping:
-       Project how SDGs might evolve and identify how this opportunity aligns with future sustainability challenges.
+    5. Risk and Sustainability Evaluation:
+       - Map key risks:
+         * Technical risks (list at least 2)
+         * Market risks (list at least 2)
+         * Execution risks (list at least 2)
+       - Align with relevant Sustainable Development Goals (SDGs):
+         * List relevant SDGs (at least 2)
+         * Explain how the opportunity contributes to each SDG
+       - Assess potential ethical implications:
+         * Identify at least 2 ethical considerations
+         * Propose mitigation strategies for each
 
-    6. Moonshot Thinking:
-       Apply moonshot thinking to push the boundaries of what's possible with this opportunity.
-
-    7. Risk and Feasibility Assessment:
-       Evaluate the potential risks and feasibility of this opportunity, considering technological, market, and organizational factors.
-
-    Provide a concise summary of insights for each of these seven areas as they relate to the given opportunity.
+    Provide a comprehensive analysis for each section, ensuring all points are addressed in detail.
 
     Use the following example as a guide for your analysis and response format:
 
-    Example Opportunity: Self-driving technologies for the Indian Markets
+    Example Opportunity: Creating an integrated autonomous transportation system for Indian cities
 
     Depth Analysis:
 
-    1. Blue Ocean Strategy's Four Actions Framework:
-       - Eliminate: Human driver errors, need for parking spaces in city centers
-       - Reduce: Traffic accidents, fuel consumption, travel time, vehicle ownership costs
-       - Raise: Road safety, mobility access, transportation efficiency, urban space utilization
-       - Create: New mobility services, data-driven traffic management systems, AI-powered logistics networks
+    1. Need Connection and Impact Assessment:
+       - Needs addressed:
+         a) Improved road safety (Impact: High)
+         b) Reduced traffic congestion (Impact: High)
+         c) Increased mobility for elderly and disabled (Impact: Medium)
+         d) Reduced air pollution (Impact: Medium)
+       Explanation: The system directly addresses critical urban transportation issues.
+       - Potential for creating new needs: High
+         New need: On-demand, personalized public transportation
+         Explanation: As the system evolves, it could create a need for more flexible, customized mobility options.
 
-    2. Five 'What Ifs/Hows':
-       - What if we pursued this opportunity? 
-         It could revolutionize transportation in India, improving safety and efficiency.
-       - How could we maximize its potential? 
-         By integrating it with smart city initiatives and developing India-specific AI algorithms.
-       - What if we expanded its scope? 
-         We could create an interconnected autonomous transport system for both people and goods.
-       - How could we overcome potential obstacles? 
-         Through public-private partnerships, extensive testing, and gradual implementation.
-       - What if we combined it with other opportunities? 
-         Integration with renewable energy and IoT could create a sustainable, intelligent transport ecosystem.
+    2. Breakthrough Potential Analysis:
+       - Moonshot thinking: A city with zero traffic accidents, no parking lots, and 24/7 available transportation for all citizens
+       - Blue Ocean Strategy:
+         * Eliminate: Private car ownership, traffic signals
+         * Reduce: Traffic congestion, transportation costs
+         * Raise: Mobility for all, urban space utilization
+         * Create: Seamless multi-modal autonomous transport network
+       - Disruptive potential:
+         * Targets non-consumption: Yes, by providing affordable mobility to those currently underserved
+         * Simpler, more affordable: Initially no, but has potential to become more cost-effective over time
+         * Potential to improve and move upmarket: High, as technology advances and scales
 
-    3. VRIO Framework for Future Potential:
-       - Value: High (improved safety, efficiency, and accessibility)
-       - Rarity: Medium (technology available globally but adaptation to Indian conditions unique)
-       - Imitability: Medium (requires significant R&D and local expertise)
-       - Organization: Challenging (requires collaboration between tech firms, auto industry, and government)
+    3. Technology and Feasibility Assessment:
+       - TRL: 6 (System model demonstration in a relevant environment)
+       - Technological barriers:
+         a) Developing AI capable of navigating complex Indian traffic scenarios
+         b) Ensuring reliable vehicle-to-vehicle and vehicle-to-infrastructure communication
+         c) Creating fail-safe systems for various edge cases and emergencies
+       - Technological enablers:
+         a) Advancements in AI and machine learning
+         b) Improvements in sensor technologies (LiDAR, cameras)
+         c) Development of 5G/6G networks for high-speed, low-latency communication
+       - Organizational capability fit: Medium
+         Explanation: Requires collaboration between tech companies, auto manufacturers, and government bodies. Existing organizations have relevant capabilities, but integration is challenging.
 
-    4. Future Scenarios Framework:
-       - Scenario 1: Rapid Adoption - Government fully embraces autonomous vehicles, leading to swift implementation
-       - Scenario 2: Gradual Integration - Autonomous features gradually introduced, coexisting with traditional vehicles
-       - Scenario 3: Limited Application - Autonomous technology limited to specific zones or applications (e.g., highways, industrial areas)
+    4. Future Scenarios and Adaptability:
+       Scenario 1: Rapid AV adoption and supportive regulations
+       - Characteristics: Strong government support, public acceptance, fast technological progress
+       - Viability: High
+       - Adaptive strategies: Focus on scaling operations and continuous improvement of AI algorithms
 
-    5. SDGs Future Mapping:
-       - SDG 11 (Sustainable Cities): Contribution to smart, sustainable urban mobility
-       - SDG 9 (Industry, Innovation, and Infrastructure): Driving technological advancement and infrastructure development
-       - SDG 13 (Climate Action): Potential reduction in emissions through optimized transportation
+       Scenario 2: Gradual adoption with mixed autonomous and manual vehicles
+       - Characteristics: Cautious regulatory approach, slower public acceptance, technological challenges
+       - Viability: Medium
+       - Adaptive strategies: Develop systems for safe interaction between autonomous and manual vehicles, invest in public education
 
-    6. Moonshot Thinking:
-       - Develop an AI system capable of navigating any road in India, from bustling city streets to remote village paths
-       - Create a fully autonomous, interconnected transportation system for an entire city, eliminating the need for private car ownership
+       Scenario 3: Limited adoption due to social resistance and technical challenges
+       - Characteristics: Strong public skepticism, technological setbacks, regulatory hurdles
+       - Viability: Low
+       - Adaptive strategies: Focus on niche applications (e.g., dedicated AV lanes), increase safety demonstrations and public engagement
 
-    7. Risk and Feasibility Assessment:
-       - Technological Risks: Adapting AI to complex Indian traffic conditions; ensuring reliability in diverse weather conditions
-       - Market Risks: Public acceptance; impact on existing transportation jobs
-       - Regulatory Risks: Developing comprehensive laws for autonomous vehicles; liability issues
-       - Feasibility: Challenging but achievable with significant investment and public-private collaboration
+    5. Risk and Sustainability Evaluation:
+       - Technical risks:
+         a) System failures leading to accidents
+         b) Cybersecurity vulnerabilities in the connected vehicle network
+       - Market risks:
+         a) Slow public acceptance of autonomous vehicles
+         b) Competition from improved traditional public transportation systems
+       - Execution risks:
+         a) Delays in necessary infrastructure upgrades
+         b) Difficulties in coordinating multiple stakeholders (government, tech companies, auto manufacturers)
+
+       - SDG Alignment:
+         a) SDG 11 (Sustainable Cities and Communities):
+            Contribution: Improved urban mobility and reduced congestion
+         b) SDG 9 (Industry, Innovation and Infrastructure):
+            Contribution: Driving technological innovation in transportation and smart city infrastructure
+
+       - Ethical Implications:
+         a) Privacy concerns with data collection from vehicles and passengers
+            Mitigation: Implement strict data protection policies and give users control over their data
+         b) Potential job displacement in traditional transportation sector
+            Mitigation: Develop retraining programs and create new jobs in AV maintenance and operations
 
     Now, provide a similar analysis for the given opportunity: {opportunity}
     Follow the same structure and level of detail as the example.
-
     """
     response = llm.invoke(prompt)
     return response.content
