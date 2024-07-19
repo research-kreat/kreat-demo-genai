@@ -763,47 +763,78 @@ def parse_assumptions(output):
 
     return parsed_data
     
-# Function to prepare a problem description
 def generate_description(llm, extracted_problem):
     prompt = f'''
-        You are tasked with generating a description for a problem statement from some information provided to you by the innovator.
-        Here are some information related to a problem. 
-        {extracted_problem} 
-        Using these extracted elements, create a description that follows these guidelines:
+    Generate a detailed problem description based on the following information:
 
-        1. Detailed context and background:
-        Characteristic: Provides detailed context and background about the problem.
+    Problem Information: "{extracted_problem}"
 
-        2. Quantifies the problem with data when possible:
-        Characteristic: Includes specific numbers or metrics to quantify the problem.
+    Please provide a step-by-step breakdown of the problem, addressing the following points:
 
-        3. Root causes and contributing factors:
-        Characteristic: Explains the root causes and contributing factors of the problem.
+    1. Context and Background
+    2. Quantification of the Problem
+    3. Root Causes and Contributing Factors
+    4. Current Solution Attempts
+    5. Potential Impacts
+    6. Broader Context
+    7. Historical Perspective
+    8. Stakeholder Analysis
 
-        4. Current attempts to solve the problem:
-        Characteristic: Describes any current solutions or efforts being made to solve the problem.
+    Respond in the following format:
 
-        5. Potential impacts of solving (or not solving) the problem:
-        Characteristic: Outlines the potential impacts of solving or not solving the problem.
+    DESCRIPTION:
+    "1. Context and Background: [Detailed explanation]
+    2. Quantification of the Problem: [Include specific numbers or metrics]
+    3. Root Causes and Contributing Factors: [Explanation]
+    4. Current Solution Attempts: [Description of current efforts]
+    5. Potential Impacts: [Outline impacts of solving or not solving]
+    6. Broader Context: [Connection to wider issues]
+    7. Historical Perspective: [Brief history of the problem]
+    8. Stakeholder Analysis: [Identify key stakeholders]"
 
-        6. Logical flow of information:
-        Characteristic: Ensures the information is presented in a logical, coherent manner.
+    EVALUATION:
+    DETAILED_CONTEXT: "YES/NO"
+    QUANTIFICATION: "YES/NO"
+    ROOT_CAUSES: "YES/NO"
+    CURRENT_ATTEMPTS: "YES/NO"
+    POTENTIAL_IMPACTS: "YES/NO"
+    LOGICAL_FLOW: "YES/NO"
+    CONTEXTUAL_RELEVANCE: "YES/NO"
+    HISTORICAL_PERSPECTIVE: "YES/NO"
+    STAKEHOLDER_ANALYSIS: "YES/NO"
 
-        7. Contextual relevance:
-        Characteristic: Connects the problem to broader social, economic, or environmental issues.
-
-        8. Historical perspective:
-        Characteristic: Provides a brief history of how the problem has evolved over time.
-
-        9. Stakeholder analysis:
-        Characteristic: Identifies key stakeholders affected by or involved in the problem.
-
-        10. Finally the description should contain step by step breakdown of the problem and not just be a bunch of paragraphs. Include all these above points in the description.
-        
-        
+    Note: Ensure all responses are within double quotes as shown in the format above.
     '''
+    
     response = llm.invoke(prompt)
     return response.content
+
+def parse_problem_description(output):
+    parsed_data = {
+        "DESCRIPTION": "",
+        "EVALUATION": {}
+    }
+
+    lines = output.split('\n')
+    current_section = None
+    description_parts = []
+
+    for line in lines:
+        line = line.strip()
+        if line.startswith("DESCRIPTION:"):
+            current_section = "DESCRIPTION"
+        elif line.startswith("EVALUATION:"):
+            current_section = "EVALUATION"
+        elif current_section == "DESCRIPTION" and line:
+            description_parts.append(line.strip('"'))
+        elif current_section == "EVALUATION" and ":" in line:
+            key, value = line.split(":", 1)
+            parsed_data["EVALUATION"][key.strip()] = value.strip().strip('"')
+
+    parsed_data["DESCRIPTION"] = "\n".join(description_parts)
+
+    return parsed_data
+
 
 #Funtion to suggest Problem Breadth and Depth model
 def suggest_pdb_model(llm, problem):
@@ -886,66 +917,98 @@ def parse_pbd_suggestion(output):
 
 def analyze_with_5w1h(llm, problem):
     prompt = f"""
-    ## Instruction ##
-    As an AI analyst, use the 5Ws and H model (Who, What, Where, When, Why, How) to thoroughly analyze the given problem. This model is versatile and applicable across various domains including journalism, business analysis, project management, and general problem-solving.
+    Analyze the following problem using the 5Ws and H model:
 
     Before answering each question, consider the following:
 
-    1. Context: Understand the broader context of the problem, including industry trends, historical background, and current landscape.
-    2. Stakeholders: Identify all parties involved or affected by the problem.
-    3. Data: Consider what data is available or needed to support your analysis.
-    4. Implications: Think about the potential consequences and impacts of the problem and its solution.
-    5. Interconnections: Explore how the different aspects of the problem relate to each other.
-    6. Time frame: Consider both short-term and long-term perspectives.
-    7. Scale: Assess the scope of the problem - is it local, global, or somewhere in between?
-    8. Resources: Think about the resources available or required to address the problem.
-    9. Constraints: Identify any limitations or restrictions that may affect the situation.
-    10. Opportunities: Look for potential positive outcomes or benefits that could arise.
+    Context: Understand the broader context of the problem, including industry trends, historical background, and current landscape.
+    Stakeholders: Identify all parties involved or affected by the problem.
+    Data: Consider what data is available or needed to support your analysis.
+    Implications: Think about the potential consequences and impacts of the problem and its solution.
+    Interconnections: Explore how the different aspects of the problem relate to each other.
+    Time frame: Consider both short-term and long-term perspectives.
+    Scale: Assess the scope of the problem - is it local, global, or somewhere in between?
+    Resources: Think about the resources available or required to address the problem.
+    Constraints: Identify any limitations or restrictions that may affect the situation.
+    Opportunities: Look for potential positive outcomes or benefits that could arise.
 
     For each of the 5Ws and H, provide a concise but comprehensive answer. Your analysis should be thorough, considering multiple angles and possibilities.
 
-    Problem: {problem}
+    Problem: "{problem}"
 
     Provide your analysis in the following format:
 
-    WHO: "......"
-    - Key stakeholders:
-    - Affected parties:
+    WHO: "Main answer"
+    KEY_STAKEHOLDERS: "List of key stakeholders"
+    AFFECTED_PARTIES: "List of affected parties"
 
-    WHAT: "......"
-    - Core issue:
-    - Related factors:
+    WHAT: "Main answer"
+    CORE_ISSUE: "Description of the core issue"
+    RELATED_FACTORS: "List of related factors"
 
-    WHERE: "......"
-    - Physical location(s):
-    - Contextual environment:
+    WHERE: "Main answer"
+    PHYSICAL_LOCATIONS: "List of physical locations"
+    CONTEXTUAL_ENVIRONMENT: "Description of contextual environment"
 
-    WHEN: "......"
-    - Timeframe:
-    - Relevant deadlines or milestones:
+    WHEN: "Main answer"
+    TIMEFRAME: "Description of the timeframe"
+    MILESTONES: "List of relevant deadlines or milestones"
 
-    WHY: "......"
-    - Root causes:
-    - Motivating factors:
+    WHY: "Main answer"
+    ROOT_CAUSES: "List of root causes"
+    MOTIVATING_FACTORS: "List of motivating factors"
 
-    HOW: "......"
-    - Potential solutions:
-    - Implementation challenges:
+    HOW: "Main answer"
+    POTENTIAL_SOLUTIONS: "List of potential solutions"
+    IMPLEMENTATION_CHALLENGES: "List of implementation challenges"
 
-    SUMMARY:
-    "Provide a brief summary of your analysis, highlighting the most critical aspects and any key insights or recommendations."
+    SUMMARY: "Brief summary of the analysis, highlighting critical aspects, key insights, and recommendations"
 
-    ## Response ##
+    Note: Ensure all responses are within double quotes as shown in the format above.
     """
     
     response = llm.invoke(prompt)
     return response.content
 
+def parse_5w1h_analysis(output):
+    parsed_data = {
+        "WHO": {"MAIN": "", "KEY_STAKEHOLDERS": "", "AFFECTED_PARTIES": ""},
+        "WHAT": {"MAIN": "", "CORE_ISSUE": "", "RELATED_FACTORS": ""},
+        "WHERE": {"MAIN": "", "PHYSICAL_LOCATIONS": "", "CONTEXTUAL_ENVIRONMENT": ""},
+        "WHEN": {"MAIN": "", "TIMEFRAME": "", "MILESTONES": ""},
+        "WHY": {"MAIN": "", "ROOT_CAUSES": "", "MOTIVATING_FACTORS": ""},
+        "HOW": {"MAIN": "", "POTENTIAL_SOLUTIONS": "", "IMPLEMENTATION_CHALLENGES": ""},
+        "SUMMARY": ""
+    }
+
+    lines = output.split('\n')
+    current_section = None
+    current_subsection = None
+
+    for line in lines:
+        line = line.strip()
+        if line:
+            if line in parsed_data:
+                current_section = line
+                current_subsection = "MAIN"
+            elif ":" in line:
+                key, value = line.split(":", 1)
+                key = key.strip()
+                value = value.strip().strip('"')
+                if current_section and key in parsed_data[current_section]:
+                    parsed_data[current_section][key] = value
+                    current_subsection = key
+            elif current_section and current_subsection:
+                parsed_data[current_section][current_subsection] += " " + line.strip('"')
+
+    return parsed_data
+
+
 def analyze_with_5ps(llm, problem):
     prompt = f"""
-    ## Instruction ##
-    As an AI business analyst, use the 5Ps model (People, Process, Products, Programs, Performance) to comprehensively analyze the given organizational problem or situation. This framework is crucial for strategic decision-making and organizational development.
+    Analyze the following organizational problem or situation using the 5Ps model:
 
+    
     Before analyzing each P, consider the following:
 
     1. Industry context: Understand current market trends, competitive landscape, and industry best practices.
@@ -961,212 +1024,430 @@ def analyze_with_5ps(llm, problem):
 
     For each of the 5Ps, provide a concise but comprehensive analysis. Your response should be thorough, considering multiple facets of the organization.
 
-    Problem: {problem}
+
+    Problem: "{problem}"
 
     Provide your analysis in the following format:
 
-    PEOPLE: "......"
-    - Key personnel and roles:
-    - Skills and competencies:
-    - Organizational structure:
+    PEOPLE: "Main analysis"
+    KEY_PERSONNEL: "List of key personnel and roles"
+    SKILLS_COMPETENCIES: "Description of skills and competencies"
+    ORGANIZATIONAL_STRUCTURE: "Description of organizational structure"
 
-    PROCESS: "......"
-    - Core business processes:
-    - Efficiency and bottlenecks:
-    - Process integration:
+    PROCESS: "Main analysis"
+    CORE_PROCESSES: "List of core business processes"
+    EFFICIENCY_BOTTLENECKS: "Description of efficiency and bottlenecks"
+    PROCESS_INTEGRATION: "Description of process integration"
 
-    PRODUCTS: "......"
-    - Product/service portfolio:
-    - Market positioning:
-    - Innovation pipeline:
+    PRODUCTS: "Main analysis"
+    PRODUCT_PORTFOLIO: "Description of product/service portfolio"
+    MARKET_POSITIONING: "Description of market positioning"
+    INNOVATION_PIPELINE: "Description of innovation pipeline"
 
-    PROGRAMS: "......"
-    - Key initiatives and projects:
-    - Resource allocation:
-    - Program effectiveness:
+    PROGRAMS: "Main analysis"
+    KEY_INITIATIVES: "List of key initiatives and projects"
+    RESOURCE_ALLOCATION: "Description of resource allocation"
+    PROGRAM_EFFECTIVENESS: "Description of program effectiveness"
 
-    PERFORMANCE: "......"
-    - Key performance indicators:
-    - Benchmarking results:
-    - Areas for improvement:
+    PERFORMANCE: "Main analysis"
+    KEY_INDICATORS: "List of key performance indicators"
+    BENCHMARKING_RESULTS: "Description of benchmarking results"
+    IMPROVEMENT_AREAS: "List of areas for improvement"
 
-    STRATEGIC IMPLICATIONS:
-    "Provide a brief summary of your analysis, highlighting the most critical aspects across the 5Ps. Offer key insights and strategic recommendations based on your holistic review."
+    STRATEGIC_IMPLICATIONS: "Brief summary of the analysis, highlighting critical aspects across the 5Ps, key insights, and strategic recommendations"
 
-    ## Response ##
+    Note: Ensure all responses are within double quotes as shown in the format above.
     """
     
     response = llm.invoke(prompt)
     return response.content
 
+def parse_5ps_analysis(output):
+    parsed_data = {
+        "PEOPLE": {"MAIN": "", "KEY_PERSONNEL": "", "SKILLS_COMPETENCIES": "", "ORGANIZATIONAL_STRUCTURE": ""},
+        "PROCESS": {"MAIN": "", "CORE_PROCESSES": "", "EFFICIENCY_BOTTLENECKS": "", "PROCESS_INTEGRATION": ""},
+        "PRODUCTS": {"MAIN": "", "PRODUCT_PORTFOLIO": "", "MARKET_POSITIONING": "", "INNOVATION_PIPELINE": ""},
+        "PROGRAMS": {"MAIN": "", "KEY_INITIATIVES": "", "RESOURCE_ALLOCATION": "", "PROGRAM_EFFECTIVENESS": ""},
+        "PERFORMANCE": {"MAIN": "", "KEY_INDICATORS": "", "BENCHMARKING_RESULTS": "", "IMPROVEMENT_AREAS": ""},
+        "STRATEGIC_IMPLICATIONS": ""
+    }
+
+    lines = output.split('\n')
+    current_section = None
+    current_subsection = None
+
+    for line in lines:
+        line = line.strip()
+        if line:
+            if line in parsed_data:
+                current_section = line
+                current_subsection = "MAIN"
+            elif ":" in line:
+                key, value = line.split(":", 1)
+                key = key.strip()
+                value = value.strip().strip('"')
+                if current_section and key in parsed_data[current_section]:
+                    parsed_data[current_section][key] = value
+                    current_subsection = key
+            elif current_section and current_subsection:
+                parsed_data[current_section][current_subsection] += " " + line.strip('"')
+
+    return parsed_data
 def analyze_with_5ms(llm, problem):
     prompt = f"""
     ## Instruction ##
     As an AI manufacturing and quality control analyst, use the 5Ms model (Man, Machine, Material, Method, Measurement) to thoroughly analyze the given production or quality control problem. This framework is crucial for identifying root causes of issues and improving manufacturing processes.
 
-    Before analyzing each M, consider the following:
-
-    1. Industry standards: Understand current manufacturing best practices and quality benchmarks.
-    2. Regulatory compliance: Be aware of relevant manufacturing and safety regulations.
-    3. Lean manufacturing principles: Consider how lean concepts apply to the situation.
-    4. Supply chain dynamics: Evaluate how upstream and downstream processes impact the problem.
-    5. Technology trends: Assess the role of emerging technologies in manufacturing and quality control.
-    6. Environmental factors: Consider environmental impacts and sustainability concerns.
-    7. Cost implications: Analyze the financial aspects of the problem and potential solutions.
-    8. Scalability: Consider how solutions can be scaled across production lines or facilities.
-    9. Continuous improvement: Think about how ongoing monitoring and improvement can be implemented.
-    10. Cross-functional impacts: Evaluate how changes in one area might affect others.
-
-    For each of the 5Ms, provide a concise but comprehensive analysis. Your response should be thorough, considering multiple aspects of the manufacturing process.
+    Consider the following aspects:
+    1. Industry standards
+    2. Regulatory compliance
+    3. Lean manufacturing principles
+    4. Supply chain dynamics
+    5. Technology trends
+    6. Environmental factors
+    7. Cost implications
+    8. Scalability
+    9. Continuous improvement
+    10. Cross-functional impacts
 
     Problem: {problem}
 
     Provide your analysis in the following format:
 
-    MAN: "......"
-    - Workforce skills and training:
-    - Human factors and ergonomics:
-    - Shift patterns and fatigue management:
+    MAN: "Overall analysis of man-related factors"
+    WORKFORCE_SKILLS: "Analysis of workforce skills and training"
+    HUMAN_FACTORS: "Analysis of human factors and ergonomics"
+    SHIFT_PATTERNS: "Analysis of shift patterns and fatigue management"
 
-    MACHINE: "......"
-    - Equipment capabilities and limitations:
-    - Maintenance schedules and issues:
-    - Automation and technology integration:
+    MACHINE: "Overall analysis of machine-related factors"
+    EQUIPMENT_CAPABILITIES: "Analysis of equipment capabilities and limitations"
+    MAINTENANCE: "Analysis of maintenance schedules and issues"
+    AUTOMATION: "Analysis of automation and technology integration"
 
-    MATERIAL: "......"
-    - Raw material quality and consistency:
-    - Inventory management:
-    - Material handling and storage:
+    MATERIAL: "Overall analysis of material-related factors"
+    RAW_MATERIAL: "Analysis of raw material quality and consistency"
+    INVENTORY: "Analysis of inventory management"
+    MATERIAL_HANDLING: "Analysis of material handling and storage"
 
-    METHOD: "......"
-    - Production processes and workflows:
-    - Standard operating procedures:
-    - Process optimization opportunities:
+    METHOD: "Overall analysis of method-related factors"
+    PRODUCTION_PROCESSES: "Analysis of production processes and workflows"
+    SOPS: "Analysis of standard operating procedures"
+    OPTIMIZATION: "Analysis of process optimization opportunities"
 
-    MEASUREMENT: "......"
-    - Quality control metrics:
-    - Inspection methods and frequency:
-    - Data collection and analysis techniques:
+    MEASUREMENT: "Overall analysis of measurement-related factors"
+    QUALITY_METRICS: "Analysis of quality control metrics"
+    INSPECTION: "Analysis of inspection methods and frequency"
+    DATA_ANALYSIS: "Analysis of data collection and analysis techniques"
 
-    ROOT CAUSE ANALYSIS AND RECOMMENDATIONS:
-    "Provide a brief summary of your analysis, identifying the most likely root causes of the problem across the 5Ms. Offer key insights and specific recommendations for process improvement and quality enhancement."
+    ROOT_CAUSE: "Summary of root cause analysis"
+    RECOMMENDATIONS: "Specific recommendations for process improvement and quality enhancement"
 
-    ## Response ##
+    Note: Ensure all responses are within double quotes as shown in the format above.
     """
     
     response = llm.invoke(prompt)
     return response.content
 
+def parse_5ms_analysis(output):
+    parsed_data = {
+        "MAN": {
+            "overall": "",
+            "workforce_skills": "",
+            "human_factors": "",
+            "shift_patterns": ""
+        },
+        "MACHINE": {
+            "overall": "",
+            "equipment_capabilities": "",
+            "maintenance": "",
+            "automation": ""
+        },
+        "MATERIAL": {
+            "overall": "",
+            "raw_material": "",
+            "inventory": "",
+            "material_handling": ""
+        },
+        "METHOD": {
+            "overall": "",
+            "production_processes": "",
+            "sops": "",
+            "optimization": ""
+        },
+        "MEASUREMENT": {
+            "overall": "",
+            "quality_metrics": "",
+            "inspection": "",
+            "data_analysis": ""
+        },
+        "ROOT_CAUSE": "",
+        "RECOMMENDATIONS": ""
+    }
+
+    lines = output.split('\n')
+    current_category = None
+    current_key = None
+
+    for line in lines:
+        line = line.strip()
+        if line:
+            if ":" in line:
+                key, value = line.split(":", 1)
+                key = key.strip()
+                value = value.strip().strip('"')
+
+                if key in parsed_data:
+                    current_category = key
+                    parsed_data[key]["overall"] = value
+                elif key in ["ROOT_CAUSE", "RECOMMENDATIONS"]:
+                    parsed_data[key] = value
+                elif current_category:
+                    parsed_data[current_category][key.lower()] = value
+                current_key = key
+            elif current_key:
+                # If there's no colon, it's a continuation of the previous value
+                if current_key in ["ROOT_CAUSE", "RECOMMENDATIONS"]:
+                    parsed_data[current_key] += " " + line.strip('"')
+                elif current_category:
+                    if current_key in parsed_data[current_category]:
+                        parsed_data[current_category][current_key.lower()] += " " + line.strip('"')
+                    else:
+                        parsed_data[current_category]["overall"] += " " + line.strip('"')
+
+    return parsed_data
 def analyze_with_5es(llm, problem):
     prompt = f"""
     ## Instruction ##
     As an AI policy and program analyst, use the 5Es model (Environment, Education, Engineering, Enforcement, Evaluation) to comprehensively analyze the given public policy, safety program, or behavior change initiative. This framework is crucial for developing, implementing, and assessing effective interventions.
 
-    Before analyzing each E, consider the following:
-
-    1. Stakeholder landscape: Identify all groups affected by or influencing the policy/program.
-    2. Cultural context: Consider societal norms, values, and cultural factors.
-    3. Resource availability: Assess available and required resources for implementation.
-    4. Political climate: Understand the political factors that may impact the initiative.
-    5. Long-term sustainability: Consider the long-term viability and impact of interventions.
-    6. Ethical implications: Evaluate potential ethical issues or dilemmas.
-    7. Interdisciplinary approach: Consider insights from relevant fields (e.g., psychology, sociology, economics).
-    8. Technological integration: Assess how technology can support or hinder the initiative.
-    9. Scalability: Consider how the program can be scaled up or adapted to different contexts.
-    10. Unintended consequences: Anticipate potential negative outcomes or side effects.
-
-    For each of the 5Es, provide a concise but comprehensive analysis. Your response should be thorough, considering multiple aspects of policy implementation and behavior change.
+    Consider the following aspects:
+    1. Stakeholder landscape
+    2. Cultural context
+    3. Resource availability
+    4. Political climate
+    5. Long-term sustainability
+    6. Ethical implications
+    7. Interdisciplinary approach
+    8. Technological integration
+    9. Scalability
+    10. Unintended consequences
 
     Problem: {problem}
 
     Provide your analysis in the following format:
 
-    ENVIRONMENT: "......"
-    - Physical and social context:
-    - Existing policies and infrastructure:
-    - Barriers and facilitators:
+    ENVIRONMENT: "Overall analysis of environmental factors"
+    PHYSICAL_SOCIAL_CONTEXT: "Analysis of physical and social context"
+    EXISTING_POLICIES: "Analysis of existing policies and infrastructure"
+    BARRIERS_FACILITATORS: "Analysis of barriers and facilitators"
 
-    EDUCATION: "......"
-    - Target audience and key messages:
-    - Educational strategies and channels:
-    - Awareness and knowledge gaps:
+    EDUCATION: "Overall analysis of educational factors"
+    TARGET_AUDIENCE: "Analysis of target audience and key messages"
+    EDUCATIONAL_STRATEGIES: "Analysis of educational strategies and channels"
+    KNOWLEDGE_GAPS: "Analysis of awareness and knowledge gaps"
 
-    ENGINEERING: "......"
-    - Design interventions and modifications:
-    - Technological solutions:
-    - Infrastructure improvements:
+    ENGINEERING: "Overall analysis of engineering factors"
+    DESIGN_INTERVENTIONS: "Analysis of design interventions and modifications"
+    TECH_SOLUTIONS: "Analysis of technological solutions"
+    INFRASTRUCTURE: "Analysis of infrastructure improvements"
 
-    ENFORCEMENT: "......"
-    - Regulatory measures:
-    - Compliance strategies:
-    - Incentives and disincentives:
+    ENFORCEMENT: "Overall analysis of enforcement factors"
+    REGULATORY_MEASURES: "Analysis of regulatory measures"
+    COMPLIANCE_STRATEGIES: "Analysis of compliance strategies"
+    INCENTIVES: "Analysis of incentives and disincentives"
 
-    EVALUATION: "......"
-    - Key performance indicators:
-    - Monitoring methods:
-    - Feedback mechanisms:
+    EVALUATION: "Overall analysis of evaluation factors"
+    KPIS: "Analysis of key performance indicators"
+    MONITORING_METHODS: "Analysis of monitoring methods"
+    FEEDBACK_MECHANISMS: "Analysis of feedback mechanisms"
 
-    STRATEGIC RECOMMENDATIONS:
-    "Provide a brief summary of your analysis, highlighting the most critical aspects across the 5Es. Offer key insights and specific recommendations for policy design, implementation, and assessment. Consider short-term actions and long-term strategies."
+    STRATEGIC_RECOMMENDATIONS: "Summary of key insights and specific recommendations for policy design, implementation, and assessment, including short-term actions and long-term strategies"
 
-    ## Response ##
+    Note: Ensure all responses are within double quotes as shown in the format above.
     """
     
     response = llm.invoke(prompt)
     return response.content
+
+def parse_5es_analysis(output):
+    parsed_data = {
+        "ENVIRONMENT": {
+            "overall": "",
+            "physical_social_context": "",
+            "existing_policies": "",
+            "barriers_facilitators": ""
+        },
+        "EDUCATION": {
+            "overall": "",
+            "target_audience": "",
+            "educational_strategies": "",
+            "knowledge_gaps": ""
+        },
+        "ENGINEERING": {
+            "overall": "",
+            "design_interventions": "",
+            "tech_solutions": "",
+            "infrastructure": ""
+        },
+        "ENFORCEMENT": {
+            "overall": "",
+            "regulatory_measures": "",
+            "compliance_strategies": "",
+            "incentives": ""
+        },
+        "EVALUATION": {
+            "overall": "",
+            "kpis": "",
+            "monitoring_methods": "",
+            "feedback_mechanisms": ""
+        },
+        "STRATEGIC_RECOMMENDATIONS": ""
+    }
+
+    lines = output.split('\n')
+    current_category = None
+    current_key = None
+
+    for line in lines:
+        line = line.strip()
+        if line:
+            if ":" in line:
+                key, value = line.split(":", 1)
+                key = key.strip()
+                value = value.strip().strip('"')
+
+                if key in parsed_data:
+                    current_category = key
+                    if key == "STRATEGIC_RECOMMENDATIONS":
+                        parsed_data[key] = value
+                    else:
+                        parsed_data[key]["overall"] = value
+                elif current_category and key in parsed_data[current_category]:
+                    parsed_data[current_category][key.lower()] = value
+                current_key = key
+            elif current_key:
+                # If there's no colon, it's a continuation of the previous value
+                if current_key == "STRATEGIC_RECOMMENDATIONS":
+                    parsed_data[current_key] += " " + line.strip('"')
+                elif current_category:
+                    if current_key in parsed_data[current_category]:
+                        parsed_data[current_category][current_key.lower()] += " " + line.strip('"')
+                    else:
+                        parsed_data[current_category]["overall"] += " " + line.strip('"')
+
+    return parsed_data
 
 def analyze_with_4ps(llm, problem):
     prompt = f"""
     ## Instruction ##
     As an AI marketing strategist, use the 4Ps model (Product, Price, Place, Promotion) to comprehensively analyze the given marketing challenge or opportunity. This Marketing Mix framework is crucial for developing effective marketing strategies and bringing products or services to market successfully.
 
-    Before analyzing each P, consider the following:
-
-    1. Target audience: Clearly define and understand the target market segments.
-    2. Competitive landscape: Analyze competitors' strategies and market positioning.
-    3. Brand identity: Consider how the strategy aligns with overall brand image and values.
-    4. Market trends: Identify current and emerging trends in the industry.
-    5. Customer journey: Map out the customer's path to purchase and key touchpoints.
-    6. Digital transformation: Evaluate the role of digital channels and technologies.
-    7. Regulatory environment: Be aware of relevant marketing and advertising regulations.
-    8. Sustainability: Consider environmental and social responsibility aspects.
-    9. Global vs. local approach: Assess the need for market-specific adaptations.
-    10. ROI and metrics: Identify key performance indicators for marketing success.
-
-    For each of the 4Ps, provide a concise but comprehensive analysis. Your response should be thorough, considering multiple aspects of marketing strategy.
+    Consider the following aspects:
+    1. Target audience
+    2. Competitive landscape
+    3. Brand identity
+    4. Market trends
+    5. Customer journey
+    6. Digital transformation
+    7. Regulatory environment
+    8. Sustainability
+    9. Global vs. local approach
+    10. ROI and metrics
 
     Problem: {problem}
 
     Provide your analysis in the following format:
 
-    PRODUCT: "......"
-    - Core features and benefits:
-    - Product line and portfolio:
-    - Branding and packaging:
+    PRODUCT: "Overall analysis of product factors"
+    CORE_FEATURES: "Analysis of core features and benefits"
+    PRODUCT_LINE: "Analysis of product line and portfolio"
+    BRANDING: "Analysis of branding and packaging"
 
-    PRICE: "......"
-    - Pricing strategy and positioning:
-    - Discount and promotion policies:
-    - Payment terms and options:
+    PRICE: "Overall analysis of pricing factors"
+    PRICING_STRATEGY: "Analysis of pricing strategy and positioning"
+    DISCOUNT_POLICIES: "Analysis of discount and promotion policies"
+    PAYMENT_TERMS: "Analysis of payment terms and options"
 
-    PLACE: "......"
-    - Distribution channels:
-    - Market coverage:
-    - Inventory and logistics:
+    PLACE: "Overall analysis of place factors"
+    DISTRIBUTION_CHANNELS: "Analysis of distribution channels"
+    MARKET_COVERAGE: "Analysis of market coverage"
+    INVENTORY_LOGISTICS: "Analysis of inventory and logistics"
 
-    PROMOTION: "......"
-    - Marketing communication mix:
-    - Key messages and unique selling propositions:
-    - Media strategy and budget allocation:
+    PROMOTION: "Overall analysis of promotion factors"
+    MARKETING_MIX: "Analysis of marketing communication mix"
+    KEY_MESSAGES: "Analysis of key messages and unique selling propositions"
+    MEDIA_STRATEGY: "Analysis of media strategy and budget allocation"
 
-    INTEGRATED MARKETING STRATEGY:
-    "Provide a brief summary of your analysis, highlighting how the 4Ps interact and support each other. Offer key insights and specific recommendations for an integrated marketing approach. Consider both short-term tactics and long-term strategic positioning."
+    INTEGRATED_STRATEGY: "Summary of how the 4Ps interact, key insights, and specific recommendations for an integrated marketing approach, including short-term tactics and long-term strategic positioning"
 
-    ## Response ##
+    Note: Ensure all responses are within double quotes as shown in the format above.
     """
     
     response = llm.invoke(prompt)
     return response.content
+
+def parse_4ps_analysis(output):
+    parsed_data = {
+        "PRODUCT": {
+            "overall": "",
+            "core_features": "",
+            "product_line": "",
+            "branding": ""
+        },
+        "PRICE": {
+            "overall": "",
+            "pricing_strategy": "",
+            "discount_policies": "",
+            "payment_terms": ""
+        },
+        "PLACE": {
+            "overall": "",
+            "distribution_channels": "",
+            "market_coverage": "",
+            "inventory_logistics": ""
+        },
+        "PROMOTION": {
+            "overall": "",
+            "marketing_mix": "",
+            "key_messages": "",
+            "media_strategy": ""
+        },
+        "INTEGRATED_STRATEGY": ""
+    }
+
+    lines = output.split('\n')
+    current_category = None
+    current_key = None
+
+    for line in lines:
+        line = line.strip()
+        if line:
+            if ":" in line:
+                key, value = line.split(":", 1)
+                key = key.strip()
+                value = value.strip().strip('"')
+
+                if key in parsed_data:
+                    current_category = key
+                    if key == "INTEGRATED_STRATEGY":
+                        parsed_data[key] = value
+                    else:
+                        parsed_data[key]["overall"] = value
+                elif current_category and key in parsed_data[current_category]:
+                    parsed_data[current_category][key.lower()] = value
+                current_key = key
+            elif current_key:
+                # If there's no colon, it's a continuation of the previous value
+                if current_key == "INTEGRATED_STRATEGY":
+                    parsed_data[current_key] += " " + line.strip('"')
+                elif current_category:
+                    if current_key in parsed_data[current_category]:
+                        parsed_data[current_category][current_key.lower()] += " " + line.strip('"')
+                    else:
+                        parsed_data[current_category]["overall"] += " " + line.strip('"')
+
+    return parsed_data
+
 
 
 # Function to generate problem breadth and depth
@@ -1341,6 +1622,297 @@ def parse_problem_landscape_output(output):
     df = pd.DataFrame(data, index=index)
 
     return df,parsed_data
+
+
+def opportunity_breadth(llm, opportunity):
+    prompt = f"""
+    ## Instruction ##
+    Conduct a thorough Opportunity Breadth analysis for the following opportunity: {opportunity}
+
+    1. Future-Oriented PESTEL:
+       Analyze Political, Economic, Social, Technological, Environmental, and Legal factors related to this opportunity, focusing on emerging trends and potential future states.
+
+    2. Enhanced 7 Os of the Marketplace:
+       Examine Occupants, Objects, Objectives, Organizations, Operations, Occasions, and Outlets related to this opportunity with a future-focused lens.
+
+    3. Trend Extrapolation and Weak Signals:
+       Identify current trends and weak signals related to this opportunity. Extrapolate these to extreme scenarios and consider potential intersections and implications.
+
+    4. Cross-Industry Opportunity Mapping:
+       Explore how innovations in unrelated industries might apply to this opportunity in its target sector.
+
+    5. Emerging Needs Anticipation:
+       Project how current needs related to this opportunity might evolve and identify potential new needs arising from societal or technological changes.
+
+    6. Disruptive Technology Radar:
+       Scan for emerging and potential future technologies that could enable radical innovations related to this opportunity.
+
+    Provide a concise summary of insights for each of these six areas as they relate to the given opportunity.
+
+    Use the following example as a guide for your analysis and response format:
+
+    Example Opportunity: Self-driving technologies for the Indian Markets
+
+    Breadth Analysis:
+
+    1. Future-Oriented PESTEL:
+       - Political: Government initiatives for smart cities; potential policies to regulate autonomous vehicles; impact on employment in transportation sector
+       - Economic: Reduced transportation costs; new business models in mobility; potential job displacement
+       - Social: Changing perceptions of car ownership; increased mobility for elderly and disabled; cultural adaptation to AI-driven vehicles
+       - Technological: Advancements in AI, machine learning, and sensor technologies; development of 5G and edge computing
+       - Environmental: Potential reduction in emissions through optimized routing and integration with electric vehicles
+       - Legal: Development of new regulatory frameworks; liability issues in accidents; data privacy laws
+
+    2. Enhanced 7 Os of the Marketplace:
+       - Occupants: Urban professionals, elderly, disabled, logistics companies, ride-sharing users
+       - Objects: Autonomous vehicles adapted for Indian road conditions, AI systems, sensor suites
+       - Objectives: Safe, efficient, and accessible transportation; reduced congestion; lower transportation costs
+       - Organizations: Tech companies, traditional auto manufacturers, startups, government agencies
+       - Operations: AI-driven navigation, predictive maintenance, fleet management
+       - Occasions: Daily commutes, long-distance travel, goods transport, emergency services
+       - Outlets: Direct sales, mobility-as-a-service platforms, fleet services, public transportation
+
+    3. Trend Extrapolation and Weak Signals:
+       - Trend: Increasing urbanization and traffic congestion
+         Extrapolation: Development of multi-level autonomous transport systems (ground, elevated, underground)
+       - Weak Signal: Experiments with drone-based emergency services
+         Extrapolation: Integration of autonomous ground vehicles with aerial drones for comprehensive urban mobility
+
+    4. Cross-Industry Opportunity Mapping:
+       - Application of swarm intelligence from robotics to coordinate multiple autonomous vehicles
+       - Use of blockchain for secure, decentralized communication between vehicles
+
+    5. Emerging Needs Anticipation:
+       - On-demand, personalized public transportation
+       - Seamless integration of various transportation modes (last-mile connectivity)
+       - Real-time health monitoring and emergency response systems in vehicles
+
+    6. Disruptive Technology Radar:
+       - Quantum computing for complex traffic optimization
+       - Brain-computer interfaces for direct vehicle control
+       - Self-healing materials for vehicle maintenance
+
+    Now, provide a similar analysis for the given opportunity: {opportunity}
+    Follow the same structure and level of detail as the example.
+
+    """
+    response = llm.invoke(prompt)
+    return response.content
+
+def opportunity_depth(llm, opportunity):
+    prompt = f"""
+    ## Instruction ##
+    Conduct a thorough Opportunity Depth analysis for the following opportunity: {opportunity}
+
+    1. Blue Ocean Strategy's Four Actions Framework:
+       Apply Eliminate-Reduce-Raise-Create to identify ways to break away from current market boundaries and create new value for this opportunity.
+
+    2. Five 'What Ifs/Hows':
+       Answer these questions for the opportunity:
+       - What if we pursued this opportunity?
+       - How could we maximize its potential?
+       - What if we expanded its scope?
+       - How could we overcome potential obstacles?
+       - What if we combined it with other opportunities?
+
+    3. VRIO Framework for Future Potential:
+       Assess the Value, Rarity, Imitability, and Organizational fit of this opportunity, considering both current and future scenarios.
+
+    4. Future Scenarios Framework:
+       Develop multiple future scenarios based on key uncertainties and identify potential developments within each for this opportunity.
+
+    5. Sustainable Development Goals (SDGs) Future Mapping:
+       Project how SDGs might evolve and identify how this opportunity aligns with future sustainability challenges.
+
+    6. Moonshot Thinking:
+       Apply moonshot thinking to push the boundaries of what's possible with this opportunity.
+
+    7. Risk and Feasibility Assessment:
+       Evaluate the potential risks and feasibility of this opportunity, considering technological, market, and organizational factors.
+
+    Provide a concise summary of insights for each of these seven areas as they relate to the given opportunity.
+
+    Use the following example as a guide for your analysis and response format:
+
+    Example Opportunity: Self-driving technologies for the Indian Markets
+
+    Depth Analysis:
+
+    1. Blue Ocean Strategy's Four Actions Framework:
+       - Eliminate: Human driver errors, need for parking spaces in city centers
+       - Reduce: Traffic accidents, fuel consumption, travel time, vehicle ownership costs
+       - Raise: Road safety, mobility access, transportation efficiency, urban space utilization
+       - Create: New mobility services, data-driven traffic management systems, AI-powered logistics networks
+
+    2. Five 'What Ifs/Hows':
+       - What if we pursued this opportunity? 
+         It could revolutionize transportation in India, improving safety and efficiency.
+       - How could we maximize its potential? 
+         By integrating it with smart city initiatives and developing India-specific AI algorithms.
+       - What if we expanded its scope? 
+         We could create an interconnected autonomous transport system for both people and goods.
+       - How could we overcome potential obstacles? 
+         Through public-private partnerships, extensive testing, and gradual implementation.
+       - What if we combined it with other opportunities? 
+         Integration with renewable energy and IoT could create a sustainable, intelligent transport ecosystem.
+
+    3. VRIO Framework for Future Potential:
+       - Value: High (improved safety, efficiency, and accessibility)
+       - Rarity: Medium (technology available globally but adaptation to Indian conditions unique)
+       - Imitability: Medium (requires significant R&D and local expertise)
+       - Organization: Challenging (requires collaboration between tech firms, auto industry, and government)
+
+    4. Future Scenarios Framework:
+       - Scenario 1: Rapid Adoption - Government fully embraces autonomous vehicles, leading to swift implementation
+       - Scenario 2: Gradual Integration - Autonomous features gradually introduced, coexisting with traditional vehicles
+       - Scenario 3: Limited Application - Autonomous technology limited to specific zones or applications (e.g., highways, industrial areas)
+
+    5. SDGs Future Mapping:
+       - SDG 11 (Sustainable Cities): Contribution to smart, sustainable urban mobility
+       - SDG 9 (Industry, Innovation, and Infrastructure): Driving technological advancement and infrastructure development
+       - SDG 13 (Climate Action): Potential reduction in emissions through optimized transportation
+
+    6. Moonshot Thinking:
+       - Develop an AI system capable of navigating any road in India, from bustling city streets to remote village paths
+       - Create a fully autonomous, interconnected transportation system for an entire city, eliminating the need for private car ownership
+
+    7. Risk and Feasibility Assessment:
+       - Technological Risks: Adapting AI to complex Indian traffic conditions; ensuring reliability in diverse weather conditions
+       - Market Risks: Public acceptance; impact on existing transportation jobs
+       - Regulatory Risks: Developing comprehensive laws for autonomous vehicles; liability issues
+       - Feasibility: Challenging but achievable with significant investment and public-private collaboration
+
+    Now, provide a similar analysis for the given opportunity: {opportunity}
+    Follow the same structure and level of detail as the example.
+
+    """
+    response = llm.invoke(prompt)
+    return response.content
+
+def opportunity_synthesize(llm, breadth_analysis, depth_analysis, opportunity):
+    prompt = f"""
+    ## Instruction ##
+    Synthesize insights from the following breadth and depth analyses for the opportunity: {opportunity}
+
+    Breadth Analysis:
+    {breadth_analysis}
+
+    Depth Analysis:
+    {depth_analysis}
+
+    Based on these analyses:
+    1. Identify the most promising aspects of this opportunity for breakthrough and radical innovations.
+    2. Provide a comprehensive summary including:
+       a) A brief description of the opportunity
+       b) Potential impact and value proposition
+       c) Key enabling factors or technologies
+       d) Potential challenges or barriers
+       e) Relevant time horizon (near-future, mid-term, long-term)
+
+    Format your response similar to this example:
+
+    Integration and Output:
+
+    a) Brief Description: Development and implementation of self-driving technologies tailored for the unique and challenging conditions of Indian roads and traffic patterns.
+
+    b) Potential Impact and Value Proposition:
+       - Drastically reduced road accidents and fatalities
+       - Increased mobility and independence for elderly and disabled
+       - Optimized traffic flow and reduced congestion in urban areas
+       - New business models in transportation and logistics
+       - Potential for India to become a global hub for complex environment autonomous systems
+
+    c) Key Enabling Factors/Technologies:
+       - Advanced AI and machine learning algorithms
+       - High-definition mapping of Indian roads
+       - 5G networks and edge computing for real-time processing
+       - Advanced sensor technologies (LIDAR, cameras, radar)
+       - Supportive government policies and regulations
+
+    d) Potential Challenges/Barriers:
+       - Complex and often unpredictable traffic conditions
+       - Varied road quality and lack of standardized infrastructure
+       - Public trust and acceptance of autonomous vehicles
+       - High initial costs for technology development and implementation
+       - Regulatory hurdles and liability issues
+
+    e) Relevant Time Horizon: Mid-term (3-7 years) to Long-term (7+ years), with gradual implementation starting in controlled environments and expanding over time.
+
+    Provide a similar comprehensive analysis for the given opportunity.
+    """
+    response = llm.invoke(prompt)
+    return response.content
+def opportunity_prepare_for_landscape(llm, synthesis, opportunity):
+    prompt = f"""
+    ## Instruction ##
+    Based on the following synthesis for the opportunity '{opportunity}', prepare insights in a format that can be easily mapped onto the Opportunity Landscape (9 windows) in the next stage.
+
+    Synthesis:
+    {synthesis}
+
+    Create a structured summary with the following aspects:
+
+    OPPORTUNITY: "Name of the opportunity"
+    DESCRIPTION: "Brief description of the opportunity"
+    SOURCE: "Source of the opportunity"
+    IMPACT_VALUE_PROPOSITION: "Impact and value proposition"
+    ENABLING_FACTORS: "Enabling factors and technologies"
+    CHALLENGES: "Challenges and barriers"
+    TIME_HORIZON: "Expected time horizon"
+    PESTEL_FACTORS: "Relevant PESTEL factors"
+    SEVEN_OS_INSIGHTS: "7 Os insights"
+    BLUE_OCEAN_STRATEGY: "Blue Ocean Strategy elements"
+    VRIO_ASSESSMENT: "VRIO assessment"
+    RISK_LEVEL: "Risk level assessment"
+
+    Note: Ensure all responses are within double quotes as shown in the format above. For multi-point responses, separate each point with a semicolon (;).
+
+    Here's an example in the required format:
+
+    OPPORTUNITY: "Self-driving technologies for the Indian Markets"
+    DESCRIPTION: "Development and implementation of autonomous vehicle technologies tailored for the unique and challenging conditions of Indian roads and traffic patterns"
+    SOURCE: "PESTEL Analysis; Disruptive Technology Radar; Cross-Industry Opportunity Mapping"
+    IMPACT_VALUE_PROPOSITION: "Drastically reduced road accidents and fatalities; Increased mobility for elderly and disabled; Optimized traffic flow and reduced congestion; New business models in transportation and logistics; Potential for India to become a global hub for complex environment autonomous systems"
+    ENABLING_FACTORS: "Advanced AI and machine learning algorithms; High-definition mapping of Indian roads; 5G networks and edge computing; Advanced sensor technologies (LIDAR, cameras, radar); Supportive government policies"
+    CHALLENGES: "Complex and unpredictable traffic conditions; Varied road quality and lack of standardized infrastructure; Public trust and acceptance; High initial costs; Regulatory hurdles and liability issues"
+    TIME_HORIZON: "Mid-term (3-7 years) to Long-term (7+ years)"
+    PESTEL_FACTORS: "Political: Smart city initiatives, employment impact; Economic: New business models, job displacement; Social: Changing perceptions of mobility; Technological: AI advancements, 5G networks; Environmental: Potential emission reduction; Legal: New regulatory frameworks"
+    SEVEN_OS_INSIGHTS: "Occupants: Urban professionals, elderly, disabled; Objects: AI-driven vehicles; Objectives: Safe, efficient transport; Organizations: Tech firms, auto manufacturers; Operations: AI navigation, fleet management; Occasions: Daily commutes, goods transport; Outlets: MaaS platforms, fleet services"
+    BLUE_OCEAN_STRATEGY: "Eliminate: Human driver errors; Reduce: Accidents, fuel consumption; Raise: Safety, efficiency, urban space utilization; Create: New mobility services, AI-powered logistics networks"
+    VRIO_ASSESSMENT: "Value: High; Rarity: Medium; Imitability: Medium; Organization: Challenging"
+    RISK_LEVEL: "High"
+
+    Provide a similar summary for the given opportunity, ensuring all aspects are covered in detail.
+    """
+    response = llm.invoke(prompt)
+    return response.content
+
+def parse_opportunity_pre_landscape(output):
+    parsed_data = {}
+    lines = output.split('\n')
+    current_key = None
+
+    for line in lines:
+        line = line.strip()
+        if line:
+            if ":" in line:
+                key, value = line.split(":", 1)
+                key = key.strip()
+                value = value.strip().strip('"')
+                parsed_data[key] = value
+                current_key = key
+            elif current_key:
+                # If there's no colon, it's a continuation of the previous value
+                parsed_data[current_key] += " " + line.strip('"')
+
+    # Convert the parsed data to a DataFrame
+    df = pd.DataFrame(list(parsed_data.items()), columns=['Aspect', 'Details'])
+    
+    # Display the DataFrame using Streamlit
+    st.write(df)
+
+    # Return the parsed data as JSON
+    return json.dumps(parsed_data, indent=2)
 
 #Funtions to create function map updated.
 def identify_useful_function_map(llm, components):
@@ -2247,6 +2819,7 @@ def convo():
         "Generate Future Scenarios",
         "Create Problem Landscape✅",
         "Create Function Map✅",
+        "Opportunity Breadth and Depth✅",
         "CREATE Model for ideas✅",
         "Attribute Analysis✅",
         "Morphological Analysis✅",
@@ -2458,6 +3031,22 @@ def convo():
             with st.spinner("Creating Harmful Function map..."):
                 st.markdown("### Function Map with Harmful Functions")
                 st.write(identify_harmful_function_map(llm,components))
+
+    elif choice == "Opportunity Breadth and Depth✅":
+        opportunity = st.text_input("Enter your Opportunity: ")
+        if st.button("Run"):
+            with st.spinner("Generating Opportunity Breadth..."):
+                opp_breadth = opportunity_breadth(llm,opportunity)
+                st.write(opp_breadth)
+            with st.spinner("Generating Opportunity Depth..."):
+                opp_depth = opportunity_depth(llm,opportunity)
+                st.write(opp_depth)
+            with st.spinner("Integrating breadth and depth... Your analysis is almost ready..."):
+                synthesis = opportunity_synthesize(llm,opp_breadth,opp_depth,opportunity)
+                initial_response = opportunity_prepare_for_landscape(llm,synthesis,opportunity)
+                response = parse_opportunity_pre_landscape(initial_response)
+                st.write(response)
+
 
     elif choice == "CREATE Model for ideas✅":
         idea = st.text_input("Enter any idea:")
