@@ -2000,6 +2000,487 @@ def parse_opportunity_pre_landscape(output):
     # Return the parsed data as JSON
     return parsed_data
 
+def opportunity_landscape(llm, extracted_information):
+    prompt = f"""
+        ## CONTEXT ##
+        Here is some information about the opportunity:
+        {extracted_information}
+
+        ## TASK ##
+        Your task is to create a detailed Opportunity Landscape analysis using the 9 Windows approach for the given opportunity. This analysis will explore the opportunity across different system levels and time frames, considering various aspects as outlined in the guidelines below.
+
+        Follow these guidelines:
+
+        1. System Definition:
+            - Define the core opportunity (system), its broader context (super-system), and component parts (sub-systems).
+
+        2. Time Frames:
+            - Past: Recent history (last 5-10 years)
+            - Present: Current state and immediate future (0-2 years)
+            - Future: Projected future state (5-10 years ahead)
+
+        For each of the following categories, address the past, present, and future:
+
+        3. Super-System (Broader Context):
+            - Broader context, major trends, and drivers
+            - Current and future trends, regulations, and market forces
+            - Potential evolution, disruptions, or paradigm shifts
+
+        4. System (Core Opportunity):
+            - State of the core opportunity or similar technologies
+            - Key features, capabilities, and limitations
+            - Potential evolution, breakthroughs, or innovations
+
+        5. Sub-System (Component Parts):
+            - Key components or technologies, characteristics, and limitations
+            - Current and future capabilities and constraints
+            - Potential advancements, new emerging sub-systems
+
+        6. Regulatory Environment:
+            - Past, present, and future regulatory frameworks and challenges
+
+        7. Market Readiness:
+            - Past, present, and future market awareness, acceptance, and demand
+
+        8. Infrastructure Readiness:
+            - Past, present, and future state of supporting infrastructure
+
+        9. Interactions and Patterns:
+            - Identify patterns, trends, or potential innovations across all categories and time frames
+            - Explore how changes in one area might impact others
+
+        10. Opportunity Identification:
+            - Identify new opportunities or potential innovations based on the analysis
+            - Consider combinations of insights that might lead to breakthrough ideas
+
+        11. Constraints and Enablers:
+            - Identify key constraints that might hinder progress in each area and time frame
+            - Highlight potential enablers that could accelerate development or adoption
+
+        12. Synthesis:
+            - Summarize key insights from the analysis
+            - Highlight the most promising opportunities or areas for innovation
+
+        Aim for high specificity and technical detail in your responses. Include actual technology names, scientific concepts, and industry-specific terminology where appropriate.
+
+        Use the following format for your response:
+
+        SYSTEM DEFINITION:
+        Core Opportunity: "..."
+        Broader Context: "..."
+        Component Parts: "..."
+
+        SUPER-SYSTEM:
+        Past: "..."
+        Present: "..."
+        Future: "..."
+
+        SYSTEM:
+        Past: "..."
+        Present: "..."
+        Future: "..."
+
+        SUB-SYSTEM:
+        Past: "..."
+        Present: "..."
+        Future: "..."
+
+        REGULATORY ENVIRONMENT:
+        Past: "..."
+        Present: "..."
+        Future: "..."
+
+        MARKET READINESS:
+        Past: "..."
+        Present: "..."
+        Future: "..."
+
+        INFRASTRUCTURE READINESS:
+        Past: "..."
+        Present: "..."
+        Future: "..."
+
+        INTERACTIONS AND PATTERNS: "..."
+
+        OPPORTUNITY IDENTIFICATION: "..."
+
+        CONSTRAINTS AND ENABLERS: "..."
+
+        SYNTHESIS: "..."
+
+        ## EXAMPLE ##
+        Here's an example of how to structure your response for the super-system, system, and sub-system categories:
+
+        SUPER-SYSTEM (Indian Transportation Ecosystem):
+        Past: "Rapid urbanization, increasing congestion. Growing middle class, rising car ownership. Limited public transportation infrastructure. High rate of road accidents and fatalities."
+        Present: "Government push for smart cities and digital India. Increasing awareness of environmental issues. Growing ride-sharing and mobility-as-a-service platforms. Ongoing challenges with traffic congestion and safety."
+        Future: "Fully integrated, multi-modal transportation systems. Stricter environmental regulations favoring electric and autonomous vehicles. Reshaping of urban spaces with reduced parking needs. New business models in transportation and logistics."
+
+        SYSTEM (Self-driving Technologies for Indian Markets):
+        Past: "Early stage development and testing in controlled environments. Limited to basic driver assistance features. Not adapted for complex Indian traffic scenarios."
+        Present: "Advanced driver assistance systems becoming common. Initial testing of autonomous vehicles in controlled Indian environments. Challenges in adapting global technologies to Indian roads. Growing interest from global and Indian companies."
+        Future: "Fully autonomous vehicles navigating complex Indian traffic. Integration with smart city infrastructure. India-specific innovations in autonomous technology. Scalable solutions applicable to other developing markets."
+
+        SUB-SYSTEM (Key Components):
+        Past: "Basic sensors (cameras, radar) with limited capabilities. Rule-based algorithms for simple driving tasks. Limited processing power for real-time decision making."
+        Present: "Advanced sensor suite (LIDAR, high-res cameras, radar). Machine learning algorithms for complex decision making. Improved processing with edge computing. High-definition mapping of some Indian roads."
+        Future: "Next-gen sensors with higher accuracy, lower cost. Advanced AI with real-time learning and adaptation. Quantum computing for complex traffic optimization. Seamless integration with smart infrastructure."
+
+        Your Input: {extracted_information}
+        Your output:
+    """
+    response = llm.invoke(prompt)
+    return response.content
+
+# Function to parse the output
+def parse_opportunity_landscape_output(output):
+    # Initialize a dictionary to store the parsed values
+    parsed_data = {
+        "system_definition": {"core": "", "context": "", "components": ""},
+        "super_system": {"past": "", "present": "", "future": ""},
+        "system": {"past": "", "present": "", "future": ""},
+        "sub_system": {"past": "", "present": "", "future": ""},
+        "regulatory_environment": {"past": "", "present": "", "future": ""},
+        "market_readiness": {"past": "", "present": "", "future": ""},
+        "infrastructure_readiness": {"past": "", "present": "", "future": ""},
+        "interactions_patterns": "",
+        "opportunity_identification": "",
+        "constraints_enablers": "",
+        "synthesis": ""
+    }
+
+    # Split the output by lines and process each line
+    current_section = ""
+    for line in output.split('\n'):
+        line = line.strip()
+        if line.startswith("SYSTEM DEFINITION:"):
+            current_section = "system_definition"
+        elif line.startswith("Core Opportunity:"):
+            parsed_data["system_definition"]["core"] = line.split(":")[1].strip().strip('"')
+        elif line.startswith("Broader Context:"):
+            parsed_data["system_definition"]["context"] = line.split(":")[1].strip().strip('"')
+        elif line.startswith("Component Parts:"):
+            parsed_data["system_definition"]["components"] = line.split(":")[1].strip().strip('"')
+        elif line.startswith("SUPER-SYSTEM:"):
+            current_section = "super_system"
+        elif line.startswith("SYSTEM:"):
+            current_section = "system"
+        elif line.startswith("SUB-SYSTEM:"):
+            current_section = "sub_system"
+        elif line.startswith("REGULATORY ENVIRONMENT:"):
+            current_section = "regulatory_environment"
+        elif line.startswith("MARKET READINESS:"):
+            current_section = "market_readiness"
+        elif line.startswith("INFRASTRUCTURE READINESS:"):
+            current_section = "infrastructure_readiness"
+        elif line.startswith("Past:") and current_section:
+            parsed_data[current_section]["past"] = line.split(":")[1].strip().strip('"')
+        elif line.startswith("Present:") and current_section:
+            parsed_data[current_section]["present"] = line.split(":")[1].strip().strip('"')
+        elif line.startswith("Future:") and current_section:
+            parsed_data[current_section]["future"] = line.split(":")[1].strip().strip('"')
+        elif line.startswith("INTERACTIONS AND PATTERNS:"):
+            parsed_data["interactions_patterns"] = line.split(":")[1].strip().strip('"')
+        elif line.startswith("OPPORTUNITY IDENTIFICATION:"):
+            parsed_data["opportunity_identification"] = line.split(":")[1].strip().strip('"')
+        elif line.startswith("CONSTRAINTS AND ENABLERS:"):
+            parsed_data["constraints_enablers"] = line.split(":")[1].strip().strip('"')
+        elif line.startswith("SYNTHESIS:"):
+            parsed_data["synthesis"] = line.split(":")[1].strip().strip('"')
+
+    # Create DataFrames
+    main_df = pd.DataFrame({
+        "Category": ["Super-System", "System", "Sub-System", "Regulatory Environment", "Market Readiness", "Infrastructure Readiness"],
+        "Past": [parsed_data["super_system"]["past"], parsed_data["system"]["past"], parsed_data["sub_system"]["past"],
+                 parsed_data["regulatory_environment"]["past"], parsed_data["market_readiness"]["past"], parsed_data["infrastructure_readiness"]["past"]],
+        "Present": [parsed_data["super_system"]["present"], parsed_data["system"]["present"], parsed_data["sub_system"]["present"],
+                    parsed_data["regulatory_environment"]["present"], parsed_data["market_readiness"]["present"], parsed_data["infrastructure_readiness"]["present"]],
+        "Future": [parsed_data["super_system"]["future"], parsed_data["system"]["future"], parsed_data["sub_system"]["future"],
+                   parsed_data["regulatory_environment"]["future"], parsed_data["market_readiness"]["future"], parsed_data["infrastructure_readiness"]["future"]]
+    })
+    st.write(main_df)
+    additional_info_df = pd.DataFrame({
+        "Category": ["System Definition", "Interactions and Patterns", "Opportunity Identification", "Constraints and Enablers", "Synthesis"],
+        "Information": [
+            f"Core: {parsed_data['system_definition']['core']}\nContext: {parsed_data['system_definition']['context']}\nComponents: {parsed_data['system_definition']['components']}",
+            parsed_data["interactions_patterns"],
+            parsed_data["opportunity_identification"],
+            parsed_data["constraints_enablers"],
+            parsed_data["synthesis"]
+        ]
+    })
+
+    return main_df, additional_info_df, parsed_data
+
+def breakthrough_opportunity_analysis(llm, opportunity):
+    prompt = f"""
+    ## Instruction ##
+    Conduct a comprehensive Breakthrough Opportunity Analysis for the following innovation opportunity: {opportunity}
+
+    Evaluate the opportunity's potential to create significant, transformative change in its industry or market. Provide a detailed assessment for each of the following criteria:
+
+    1. Disruptive Potential:
+       - Quantify the improvement over existing solutions
+       - Describe how it challenges industry norms or creates new paradigms
+       - Assess its potential to render current solutions obsolete
+
+    2. Market Impact:
+       - Estimate the potential market size and growth
+       - Identify new customer segments or use cases
+       - Describe how it might reshape market dynamics or create new markets
+
+    3. Technological Innovation:
+       - Explain the key technological advancements or novel applications
+       - Assess the difficulty of replication by competitors
+       - Describe potential for spawning additional innovations
+
+    4. Scalability and Sustainability:
+       - Evaluate the ease of scaling the innovation
+       - Assess long-term viability and adaptability
+       - Identify potential barriers to widespread adoption
+
+    5. Economic Impact:
+       - Estimate potential cost savings or value creation
+       - Describe new business models or revenue streams enabled
+       - Assess impact on industry economics and value chains
+
+    6. Social and Environmental Impact:
+       - Describe potential positive and negative societal effects
+       - Assess alignment with sustainability goals
+       - Identify any ethical considerations or challenges
+
+    7. Competitive Advantage:
+       - Evaluate uniqueness and defensibility of the innovation
+       - Assess potential first-mover advantages
+       - Describe how it creates lasting differentiation
+
+    8. Cross-Industry Applications:
+       - Identify potential uses in other industries or sectors
+       - Describe how it might blur traditional industry boundaries
+       - Assess potential for creating new ecosystems or platforms
+
+    For each criterion, provide:
+    - A detailed assessment
+    - Supporting evidence or examples
+    - A score from 1-10 (1 being lowest, 10 being highest)
+    - Notes on any uncertainties or areas needing further investigation
+
+    After the analysis, provide:
+    1. An overall breakthrough potential score (1-100) with justification
+    2. A concise summary of the key factors contributing to the opportunity's breakthrough potential
+    3. A list of critical uncertainties or risks
+    4. Recommended next steps for further development or investigation
+
+    Use the following example as a guide for your analysis and response format:
+
+    Example Opportunity: Self-driving technologies for the Indian market
+
+    1. Disruptive Potential:
+       Assessment: Highly disruptive to traditional transportation models
+       Evidence: Potential to significantly reduce accidents, congestion, and transform urban mobility
+       Score: 9/10
+       Uncertainties: Public acceptance, regulatory challenges
+
+    2. Market Impact:
+       Assessment: Massive potential to reshape transportation market
+       Evidence: Could create new markets for autonomous taxis, delivery services, and transform car ownership models
+       Score: 8/10
+       Uncertainties: Speed of adoption, infrastructure readiness
+
+    3. Technological Direction:
+    - Envisioned advancements: AI algorithms adapted for complex Indian traffic scenarios, advanced sensor technologies for diverse road conditions
+    - New paradigm potential: Could lead to India-specific autonomous driving systems applicable to other developing markets
+    - Platform potential: Possibility of creating an integrated smart transportation platform connecting various modes of transport
+
+    4. Business Model Possibilities:
+    - Challenging current models: Shift from vehicle ownership to Mobility-as-a-Service (MaaS)
+    - New revenue streams: Data monetization, personalized in-vehicle services
+    - Scalability: Highly scalable across urban and eventually rural areas, with potential for export to similar markets
+
+    5. Adoption Considerations:
+    - Influencing factors: Government regulations, public trust in technology, infrastructure readiness
+    - Potential barriers: Cultural preference for manual driving, job displacement concerns, infrastructure limitations
+    - Overcoming barriers: Phased implementation, public education campaigns, reskilling programs for affected workers
+
+    6. Competitive Landscape:
+    - Competitive advantage: First-mover advantage in adapting self-driving tech to complex traffic environments
+    - Setting new standards: Potential to set standards for autonomous systems in challenging road conditions
+    - Differentiation: Unique solutions tailored to Indian roads and traffic behavior
+
+    7. Potential Societal and Environmental Impact:
+    - Positive impacts: Reduced road fatalities, improved air quality through optimized driving, increased productivity
+    - Alignment with SDGs: Contributes to Sustainable Cities and Communities (SDG 11), Industry, Innovation and Infrastructure (SDG 9)
+    - Potential negatives: Job displacement in transportation sector, privacy concerns with data collection
+
+    8. Cross-Industry Potential:
+    - Multiple applications: Could impact urban planning, logistics, healthcare (emergency services)
+    - Blurring boundaries: Potential convergence of automotive, tech, and urban development industries
+
+    9. Paradigm Shift Possibilities:
+    - Challenging assumptions: Rethinking the need for human drivers, changing perceptions of vehicle ownership
+    - New thinking: Holistic approach to urban mobility, integrating various transport modes seamlessly
+
+    Overall Breakthrough Potential Score: 85/100
+    Justification: High scores across most criteria, particularly in disruptive potential and market impact. Some uncertainties in regulatory landscape and infrastructure readiness.
+
+    Key Factors:
+    1. Potential to dramatically improve road safety and traffic efficiency
+    2. Creation of new markets and business models in transportation
+    3. Technological leap in AI and sensor technologies adapted for complex Indian traffic
+
+    Critical Uncertainties:
+    1. Regulatory framework development
+    2. Public trust and acceptance of autonomous vehicles
+    3. Infrastructure adaptation requirements
+
+    Next Steps:
+    1. Engage with government bodies on regulatory frameworks
+    2. Conduct extensive market research on public perception
+    3. Initiate R&D on India-specific AI algorithms for autonomous driving
+    4. Plan pilot projects in controlled environments
+
+    Now, provide a similar analysis for the given opportunity: {opportunity}
+    Follow the same structure and level of detail as the example.
+    """
+    response = llm.invoke(prompt)
+    return response.content
+
+def parse_breakthrough_analysis(analysis):
+    # Initialize a dictionary to store the parsed results
+    parsed_results = {
+        'criteria': {},
+        'overall_score': None,
+        'key_factors': [],
+        'critical_uncertainties': [],
+        'next_steps': []
+    }
+
+    # Split the analysis into sections
+    sections = analysis.split('\n\n')
+
+    # Parse each criterion
+    for section in sections:
+        if section.startswith(('1.', '2.', '3.', '4.', '5.', '6.', '7.', '8.')):
+            lines = section.split('\n')
+            criterion = lines[0].split(':')[0].strip()
+            parsed_results['criteria'][criterion] = {
+                'assessment': lines[1].split(':')[1].strip() if len(lines) > 1 else '',
+                'evidence': lines[2].split(':')[1].strip() if len(lines) > 2 else '',
+                'score': int(lines[3].split(':')[1].strip().split('/')[0]) if len(lines) > 3 else None,
+                'uncertainties': lines[4].split(':')[1].strip() if len(lines) > 4 else ''
+            }
+
+    # Parse overall score and justification
+    for section in sections:
+        if section.startswith('Overall Breakthrough Potential Score:'):
+            lines = section.split('\n')
+            parsed_results['overall_score'] = int(lines[0].split(':')[1].strip().split('/')[0])
+            parsed_results['justification'] = lines[1].split(':')[1].strip() if len(lines) > 1 else ''
+
+    # Parse key factors, critical uncertainties, and next steps
+    for section in sections:
+        if section.startswith('Key Factors:'):
+            parsed_results['key_factors'] = [factor.strip() for factor in section.split('\n')[1:] if factor.strip()]
+        elif section.startswith('Critical Uncertainties:'):
+            parsed_results['critical_uncertainties'] = [uncertainty.strip() for uncertainty in section.split('\n')[1:] if uncertainty.strip()]
+        elif section.startswith('Next Steps:'):
+            parsed_results['next_steps'] = [step.strip() for step in section.split('\n')[1:] if step.strip()]
+
+    return parsed_results
+
+def future_wheel_analysis(llm, opportunity):
+    prompt = f"""
+    ## Instruction ##
+    Conduct a comprehensive Future Wheel Analysis for the following innovation opportunity: {opportunity}
+
+    Explore the potential consequences and ripple effects of implementing this innovation. Follow this structure:
+
+    1. Central Impact:
+       Briefly describe the core concept and primary intended impact of the innovation.
+
+    2. First-Order Consequences:
+       Identify 5-7 direct, immediate consequences of implementing this innovation. Consider technological, economic, social, environmental, regulatory, market, and behavioral impacts.
+
+    3. Second-Order Consequences:
+       For each first-order consequence, identify 2-3 secondary effects. Consider indirect impacts, system-level changes, new opportunities or challenges, and shifts in industry structure.
+
+    4. Third-Order Consequences:
+       For key second-order consequences, explore 1-2 potential tertiary effects. Consider long-term societal changes, potential new industries, and global impacts.
+
+    5. Interconnections and Feedback Loops:
+       Identify connections between consequences at different levels, including reinforcing and counterbalancing effects.
+
+    6. Probability and Impact Assessment:
+       For each consequence, estimate its likelihood (low, medium, high) and potential impact (minor, moderate, major).
+
+    7. Opportunity and Risk Identification:
+       Based on your analysis, identify new opportunities, potential risks, and ethical considerations.
+
+    8. Strategic Implications:
+       Reflect on how these insights might influence the innovation's development, implementation, and long-term planning.
+
+    9. Synthesis and Key Takeaways:
+       Summarize the most significant insights and their implications for the innovation.
+
+    Use the following example as a guide for your analysis and response format:
+
+    Example Opportunity: Widespread adoption of vertical farming in urban areas
+
+    1. Central Impact: Implementation of large-scale vertical farming in cities
+
+    2. First-Order Consequences:
+       a) Increased local food production (High probability, Major impact)
+       b) Reduction in transportation costs for produce (High probability, Moderate impact)
+       c) Changes in urban land use and real estate (Medium probability, Major impact)
+       d) Increased energy consumption in cities (High probability, Moderate impact)
+       e) Job creation in urban agriculture sector (Medium probability, Moderate impact)
+       f) Shift in traditional farming practices (Medium probability, Major impact)
+
+    3. Second-Order Consequences:
+       For a) Increased local food production:
+       - Improved food security in urban areas (High probability, Major impact)
+       - Shift in global agricultural trade patterns (Medium probability, Moderate impact)
+
+       For c) Changes in urban land use:
+       - Repurposing of abandoned buildings for farming (Medium probability, Moderate impact)
+       - Development of new architectural designs integrating farming (Low probability, Major impact)
+
+    4. Third-Order Consequences:
+       - Evolution of urban planning around food production hubs (Low probability, Major impact)
+       - Emergence of new educational programs in urban agriculture (Medium probability, Moderate impact)
+
+    5. Interconnections and Feedback Loops:
+       - Increased local production could further reduce transportation needs, creating a positive feedback loop for sustainability
+       - Job creation in urban agriculture might accelerate the shift away from traditional farming, potentially causing rural economic challenges
+
+    6. Probability and Impact Assessment:
+       (Already included in the consequences above)
+
+    7. Opportunity and Risk Identification:
+       Opportunities:
+       - Development of specialized technology for vertical farming
+       - Creation of new local food brands and markets
+       Risks:
+       - Potential for increased energy consumption and associated environmental impacts
+       - Disruption of traditional rural farming communities
+
+    8. Strategic Implications:
+       - Need for collaboration between urban planners, agriculturalists, and technologists
+       - Importance of developing energy-efficient growing technologies
+       - Potential for cities to position themselves as leaders in sustainable urban food production
+
+    9. Synthesis and Key Takeaways:
+       - Vertical farming could significantly reshape urban food systems and city landscapes
+       - The most impactful consequences relate to food security, urban land use, and shifts in agricultural practices
+       - Managing energy use and supporting traditional farming communities will be crucial challenges
+       - Further research needed on optimizing energy efficiency in vertical farms and integrating them into urban infrastructure
+
+    Now, provide a similar analysis for the given opportunity: {opportunity}
+    Follow the same structure and level of detail as the example.
+    """
+    response = llm.invoke(prompt)
+    return response.content
+
 #Funtions to create function map updated.
 def identify_useful_function_map(llm, components):
     prompt = f"""
@@ -2906,6 +3387,8 @@ def convo():
         "Create Problem Landscape✅",
         "Create Function Map✅",
         "Opportunity Breadth and Depth✅",
+        "Opportunity Landscape✅",
+        "Breakthrough Opportunity Analysis✅",
         "CREATE Model for ideas✅",
         "Attribute Analysis✅",
         "Morphological Analysis✅",
@@ -3132,6 +3615,29 @@ def convo():
                 initial_response = opportunity_prepare_for_landscape(llm,synthesis,opportunity)
                 response = parse_opportunity_pre_landscape(initial_response)
                 st.write(response)
+            with st.spinner("Creating Opportunity Landscape..."):
+                extracted_information = f"""\n Opportunity Breadth: {opp_breadth} \n Opportunity Depth: {opp_depth} """
+                opp_landscape = opportunity_landscape(llm,extracted_information)
+                response = parse_opportunity_landscape_output(opp_landscape)
+                
+    elif choice == "Breakthrough Opportunity Analysis✅":
+        opportunity = st.text_input("Enter your Opportunity: ")
+        if st.button("Run"):
+            with st.spinner("Analysing Breakthrough Opportunity..."):
+                initial_response = breakthrough_opportunity_analysis(llm,opportunity)
+                st.write(initial_response)
+                # response = parse_breakthrough_analysis(initial_response)
+                # print(response)
+
+    
+    elif choice == "Future Wheel Analysis✅":
+        opportunity = st.text_input("Enter your Opportunity: ")
+        if st.button("Run"):
+            with st.spinner("Future Wheel Analysis loading..."):
+                initial_response = future_wheel_analysis(llm,opportunity)
+                st.write(initial_response)
+                # response = parse_breakthrough_analysis(initial_response)
+                # print(response)
 
 
     elif choice == "CREATE Model for ideas✅":
